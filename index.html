@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="عداد التسبيح">
+  <meta name="theme-color" content="#0f5132">
+  <link rel="apple-touch-icon" sizes="512x512" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAAcvUlEQVR4nO3dO5bcRpYG4FQfyZbfXrvj9DlyuQptQFvR6a1wL1xAO+OOp03Q0BjqbFYVM6sygXjcx/e5lEg8Iu79EUACP/z86y9/XgCAVv62ewMAgPUEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIYEAABoSAAAgIZ+3L0BwHlffvtp+b/56fPX5f8mMM4PP//6y5+7NwL43o6mPouwAPEIALBJpQZ/loAA6wkAMJlGf5xgAPMIADCQZj+fUABjCABwgoa/n0AAxwgA8KAqzf4f//ifu3/2f//3vwu3ZB6hAD4mAMA7qjT9y+X9xv9WlSBwuQgDcI8AAC9UavhXzzT+tyoFgSuBAP4iANBexaZ/dab5X1UMAVfCAJ0JALRTueG/NKL5X1UOAS8JBHQiANBCl6Z/NbL5X3UJAVfCANUJAJTVrelfzWj+V91CwJUwQEUCAOV0bfyXy9zmf9U1BFwuggC1+BogJXRu+pfLt8b0x+/r/q2Ox/zlPgsDZGcFgLQ6NKBnmswfv/9z4pa89vd//fvh/9Z5gpisAJBOpYbSoXF8tI8Vzud1HzqcT+oQAEgje6PQHG67dVyynmtBgEzcAiC0rI1gdQNYufx/9cxtgBGMBRjLCgAhZSr2CvwaWVcKrAoQlQBAKBkKukIex9tzEXn8CAJEIwAQQuTCrWDnkSEQCAJEIQCwVcQCfbkozlW8PI/RxpogwG4CAFtEK8aXi0JcXdQwIAiwiwDAUpEKr4LbV8RbBYIAqwkALBGhwF4uiiu3RVodEARYRQBgqt3F9Eox5VFRvnUgCDCbFwExxe7iebn0K5xRvwVQgfFMRVYAGGp3oVQkmSHCLQIrAowmADCExk8Xu28RCAKM4hYAp+1s/orgaytuA3Rb/v+I8U9WVgA4bFfhU/SIZOftAasBnGEFgKdp/LHNXAVw9f8Yc4QMBACesqOwKWrPmxECNP/nmS9EJgDwEIUsn5EhQPM/x/whIgGAD60uXgrXeVYAYjKXiEQA4C7FKifPAMRnbhHB33ZvADGtLFCfPn9VoGhl9Zjf/Z4OYrICwCurGz9jeQ9ATuYdOwgA/NeqItS5AN06xqOOR7ZvAcw8FlmZg6wkAKDoLPDIMT57fLIEgBXHIjtzkhUEgOZWFJrORebI8T16vKIHgJXHogrzk5k8BNiY4jLX0eN75P9b2fyP/Hsrj0UlK+ZP92PcmW8BNKTxQx4rvj7omwI9WQFoZnbz95O+v5w9zpWuyhyLMVbMLce6FwGgkRXNH5hLCGAUDwE2oPGvNfJ4P3psVz8DcLk89iDgjmPRibnNGVYAilMgoC6rAZzhIcDCZk7erI3fy2e4qjIWZj8k+OW3n1IeFz7mFkBBrvq/t/LlM7uWvSO+ByDiLYDKLyIy93mGFYBiXPW/9szx8FOo2jqMBasBPMMzAIVo/q/tevnMqGOV8Zi/FeVYdHsR0cyxk/WY8D0BoIhZk9Lv+vNY9ZU+XwPMYebcFQJqEAAKmNn8s9r98pmzx+7o/z+7OR/5+3cdi6vdY2E3IYB7BIDkNH/gI0IAt/gVQFIa/32Rnjzf9QW8Gb8IOLu6sONYRBoLUagdXFkBSMgEzuOZ+7Aj79mOvhUw4u/bdSx4zWoAV1YAktH8Pxb5qm/Hy2fOrAbMfKZgxbGIPBZ2U0sQABKZMWErTlZF/3tHQkCFp/2NhY+pK315EVASJilnvGzm74WBCk2f53z6/HV4ffHCoBysACSg+T9vxDGrfoy6MBYeo8704yHA4ExKYIUZdcGDgbFZAQhs9OTp1vjPHL9ux6o6Y+E5ak8PngEIqsMErPI5VnhUljE/+rkAzwTEZAUgoOrNP/qneaMdL8bYORayfoK4ei3qTgAIpvKEU4CJQAB9TuWa1J0AEEjliRblHmyWJVjmmz0Wooz5ESrXps48AxCECbaG48KVsfA4zwTU5GeAAVRv/t0/x0o/Fcd85Nc0c4wAsNnoV5VGa/5AHaNrjBCwlwCwUYf3lI/aR4WCLDqMeSGgBgFgkw7NH6hLCMhPANhA8wcqEAJyEwAW0/yBSoSAvASAhTR/oCIhICcBIKFMzX/UtmbaZ3rrOuazbS8CwDKjUq1JBkS18xXKPE8AWKB78z+73Vn3m746j3khIA8BYLLuzR/oRwjIQQCYSPP/5ug+VNh3euo+5oWA+HwNcBJP/N/n07x003XMq4OxCQATGPSP8Wleuuk45tXDuASACSz9A3yjJsbkGYDBDHSA1zwPEJMVgIGqNP+Oy5RQSdQ5XKVGViEADFJhYHd9UAmqyDCHK9TKKgSAQUYM6l0D+si2m3wQR7Y5nLleVuIZgAEyD+aj2+5eHMSQcQ6PqHdq0HkCwEkGIcAe6u85AsAJ2e9lnd1+kw/2yjyH/TJgPwFgM/exgK7Uv70EgIMy3/e/XMalZukb9qgyhz0PsI8AcED25g8QiRCwhwDwJIMMICb1+TkCwAau/gFeUxfXEwCeYOkfYB63AtYSAB5UrfmP2pZI+wSdVJ3DQsA6AgAANCQAPKDa1f/V2W2KuE/QSdU5bBVgDQHgA1WbP0BkQsB8AsBk0Zv/0e2Lvl/QReU5nGEbM/M54Hd0u/rP8C1x4L6Kc7hbHV5JALij86C7te9Z9wU6qjaHO9fjmQSAO84OOIMNYBw1eTzPANzgwRGAWtT17wkAb1hqAojHrwLGEwAG0/wB5lBfxxIAXpAOAWpT578RAAaSTgHmUmfH8SuA/8j4hGm1n/oAsUWqORlrdjQCwCXfg38VX/YBxBWx5mSr2xEJAJc8SfLIdnYf4MBx0WtOltodVftnALIMoKPb6YEX4IgMNeds/e1eH9sHAADoqHUAqH71P+r/B3rJVHOsAhzXOgAAQFdtA0CXq//Rfw9QW8aaYxXgmLYB4IzuT44CRKMuP69lAOia9gC4rWNfaBkAzpAyAWJSn5/TLgB0THkAfKxbf2gXAM7YkS5H/ZuSMfCI7DVHrXtcqwDQLd0B8JxOfaJVADhjZ6o8+29LxMAzstec3f9+Fm0CQKdUB8BxXfpFmwBwRoQ0eXQbImw7kE/2mhNlOyJr8TngLG/9e1TEb3MDdWWtOdVq/2gCwAciD4Bb+xV5e4HcMtacqvV/hPIBQAIE6EsPuM8zAO+ofOIBOlDH7ysdALo8yQnAHJX7SOkAcIbUCFCDen5b2QBQObUBsE7VflI2AJwhLQLUoq5/TwAAgIZKBgC/+wTgrTP1veJtgJIBAAB4X7kA4OofgHusAnzz4+4N6CrjKzUBzlL74ij1KuAMr3zM+lENgDMi1b4MvWIFAeA/Zp/QI9tWZZABfUWtfZH7xSrlngGI6OhAq3a/CehF7YutTACQ5gB4lIcBCwWAqM4OlCoDDehF7YuvfQBw9Q/QU/f6XyIARE2Ko7Yr6v4B3NKh9kXetkeVCAAAwHPSBwAP/wFwVOeHAdMHAADgeQIAADSUOgBEX/4f9W+4VQFkkq32db0NkDoAAADHtAwAK6+oz/5brv6BjLLVvo61Nm0AyLzsAkAdWftR2gCQydFk2TGR8tqX335KW1xA7Yst7eeAjxbF3QMr0jexientGDEeqCBL7cvaW474cfcGdHMdJLcGWcYBxDjGBJWpffGkXAGI/vM/eMa98Wyswnqd+osVANjkvUKTrZAA+bR6CFBRJYKPHuwzTmGfTvMvXQDwRDSZfTR+OxUfqCZbf3ILABbI8gQ00Ee6FYCjFFd2yXZVAN116RdWAGCSZxp/l4IDxJFqBcCVFFlo/tBTpj6VKgAcpcCykuYP+XWYm24BwCCZkj9AmhUAxZXIjozPDlcYt/zx+z93bwJMlaVfpQkAEJXmD2RU/hbAykLrIxf9ZEn6UVyv/v/4/Z+Xv//r35u3huh219RPn7+WnuPlA8AK7w2Q658JAvV0+mworKSmriEAnPBMAzBoa9H8YTw1da0UzwBEXII5uk0R94XnOIfHvH34z8OAvFStpkbdrpdSBICjJENG6/StcKD2vC0dAGY5m+wyJEO+57wdd+9q3yoAl4uauosAAA84W2AqX0UAOYUPANGS3ajtibZfADtUrqkRt+ml8AEAdnP1f85Hy/xuA8AeZQNA96LLGNETPDBf1X5SNgDAWZo/UJkAABNVvXJ41KPL+24DwHqhA0DEK7BRBb17Y4gu4tiDiqrX1Mi1JHQAgB1GTdioBWmVZ6/qrQLAWiUDwOzCe/bv794YAF7KUFMr1m0fA4IXIi/XZXD2Kv7l/+9zwTBXyRWAFY6mwYopsgrN/7g/fv/n8CX8GX8ncamp61kBOOE68B5pHAZpLx3O96rmbFWgDzV1rR9+/vWXP3dvxC0Zv7p2a5sN0hxGX/1XPe+RrsiFgfqi1dSMfek95VYAdh7kiCcYRojU+K+u2yQI1BWtpn76/LXUrcJyAQCeVWlCjxSx6d/iFgEcIwDAYNGuWo562UwjhwFNH44RAGjN1f9jrk02UhDQ+OEcAQB42O5VAU0fxhEAaMvV/zmrwoCmD3MIAMBpM24RaPwwV8gA4MqMrKo8AHjU2VUBTZ+qvvz2U7j6UOpVwNEOLnEJmcARlfpMqQAAxPHs1byrf1hLAACAhgQA2rH8v86jV/Wu/mE9AQAAGhIAAKChkD8DzCLapyr5mOX/9f7+r3+/+5NAy/88Ss0dSwA44L0mcv0zgxJgDDV3DgHgCc9cPRqUAOeouXN5BuBBR5eOLTnD/WV+y//co+bOFy4AHD15Uh8fURiAEY72m2g1KFwAiOjsSYt20mGHt1f7rv65R81dQwAAgIYEgA+MSpISKcDH1Nx1BABgmeuyv+V/2E8AAICGBABaWLUcaNnxY67+IQYBAAAaEgA+MOr9At5TAPAxNXcdAQAAGhIAHnA2SUqiAI9Tc9cQAGAwDwICGQgADzqaKCVRgOepufP5HPATrgPrkSs8gxDgHDV3LgHggPcGpUEIMJaaO4cAcIKBxz1ffvvJ+IDBzKmxPAMAAA0JAADQkAAAAA0JADCJ9wEAkQkAANCQAAATWQUAohIAAKAhAYAW/H4Y4DUBACZzGwCISAAAgIYEAFjAKgAQjQAAAA0JALCIVQAgkh9+/vWXP3dvxFtHC+WOJ719njKX3U3Y2IBjItXaTD3qPT4HfNB7A+D6Z9FONvv5TDA8R62dRwB40jPJz+DkFiEAPqbWzucZgCccXfbZvewMkIlau4YAQCtRrhAUKmA3AeBBZwu2gs9bxgR8T61dRwAAgIYEgAeMSpSSaQxRbgNcLsYEvKTWriUAwGaKFbCDAAABCAHAaqUCgCLKoyLdBgDyqNRnQgYAxZmOKhUW4LWIfS1kAIhm1ImLOACIRQigM7V2LQGAtqIWCSEAWEEAeNDZZhG12RCTEEBXau06AgCtRS4WQgAwkwDwhKPNInKTITYhgI7U2jUEgCd9+vz14UH2zH/LPtHPkRBAR2rtfD/8/Osvf+7eiFvOFL2VA+HWdhqI+WRossYVnUWotVn60qPCBoDL5fjBjnigiS9DCLhcjG/YpVpPcgsAkskSVKJy/OAvAgD8R9SUfosmdsyX335KdZ5hJgEAXsjUHL789pMg8KDrscp0fmG2kgFAUaQT4/19jg8jVBxHJQMAnJHxKtFqwPfeHpOM5xVmCh0ATFh2yTr2hIC/vD0OWc8n+UUeez/u3gBgrGvzi1x4ZhGA4HGhVwBgp+wNtNNtgff2Nft5hFnKBoAuhY+5KjSPykHgo32rcP7Yr+r8cQsAPvDp89cSBaDKA3GPnovM+wgrhF8BMIlhvIyrAhm3md6i9y8rAPCAKqsAb0V+Wr7ah1cgGgEAHlQ1BLy0MxCMOraaPzwm9NcArzJfCUT4hCVjVQ8BHxkxfmcdQ3Mrr6i1MnP/+UiKAHC55PsM4yPbG31wcF/3EBCR+ZRT9FqZrfc8wy2AwZ4ZLJ1f2JJdh9sBmZhD+aiV+4X/FUAmRxuCRpKTYhSD85CPWhlD+QBgwDCT5rOX489M1ftH+QCwytmBUn2gVaYJ7eG456RWxpEmAJjsRGZ8ruV4E1mW8ZkmAEQ2KpFKtrl9+vw1zcTPyjHOTa2MpUUAMFhYSYOaw3FlpQ59I1UAUADIwlgdy/Eki0xj1XsAYJJrIehwJTFLpmIK2aRaAThDEWYXTewYx41duvSLNgFgplGFSsGry8Nrj3Os6lIrY0kXAJx4MjN+3+f4kFm28ZsuAJwxc1nn7InPNnA4zhXu9xyTPqLXyi7L/5eLhwBhGw8JCr6wU8oVgKhF4+h2Rd0f1uh49dtxn/mmYq2MvG33WAEY7JmruowDhnk6rAgY81yplfv98POvv/y5eyOOOFMkVw6mW9tpMPOoCmHAeOcREWpllr4yihWAyTIOCuJ4OX4yhQHjnmcZM+ulDQCfPn9NVRDhrOhhQAGnq6xjP20AOOPLbz+lPWFwuXxfcHYEAnOISiKG6tlaBgCo5l4zHlHUNHqoKe1DgFfdHtoAYKyufSTlewAAgHMEAABoKH0AOLP80vGhDwC+6br8f7kUCAAAwPNKBIDsKQyAXCr0nRIB4Ay3AQB66l7/vQcgqAjvxQZ4ltqVR/r3ALxU4WEOX8YCMspWuyr0i7OsAATxzGC8/rdVBiGQl9qVV/tnAK523gs6+m93v38F7JW1du3+96MoFQCkSgBmqtRnSgWAjM4mUUkW2EHtyq9cAPBmQADu8fDfN+UCQCajAofgAqykdtVQMgBYBQDgLVf/r5UMAADA+wSAG6wCANSirn+vbACouFwDwHpV+0nZAHDWirQ4alBVHZxATNlql6v/20oHAI0RgDMq95HSAeCsDKsAlQcnEFeW2uXq/77yAUCDBOCI6v2jfAA4K/IqQPXBCcQWvXa5+n/fDz//+sufuzdihSwvgMj2TW2AyyVm7cpS93cRAB4UYeB2GJBAblFqV7aav0ObAHC5SIMAXaj3H/MMwIPcSwLIQb1+TKsA0CXVAXBMpz7RKgCcJVUCxKZOP65dAOiU7gB4XLf+0C4AnCVdAsSkPj+nZQDolvIAeF/HvtAyAJwlZQLEoi4/r9V7AN7q8qKIKC/mAGLKXiO61PLRfty9Aczz3qS4/lnXgQ+oEd21XgG4XGomxyP7FHE/gDkq1YiKNXwVzwAUc3QyuH8GPagRXLUPAGfTn0kBsIer/3PaB4ARooSAs9sRZT+AOSrViEjbkpUAcJECAbpR9wWA/8p+K2DUv797P4A5KtUIS/9jCAADRZgYAJWps+MIAC9IhQC1qfPfCACDSacAc6ivYwkAb4xIhwYpwFgj6qqr/9cEgBsyDpJR25xx34GPda8RWbd7JgFgEqsAAGOop3MIAHdkvBVwdpslZKgtY42w9D+PAPAOgwYgN3X8PgFgsiyrACYJ9JCpRlj6n6v954AfkXUJ6pHt1vihr8g1ImvdzUQAeFDmwXhr200M4CpajchcbzP5cfcGMJ+JALxHjejJMwAPyvirAIBsXP2vIwA8QQgAmEfzX0sA2EAIAHhNXVzPMwBP+vT5q4H6RrQHiKAac+wxjslz/ArgIEtVsX9CBBV0mWPq6R4CwAldB+2R/c64n7BLpznWtY5G4BmAzbLdTji6vdn2E3bpNMcybnMlAsAJo1KnSQB0M6ruufo/TgA4qdPgOzthBR14nzn2nE71dwYBYADvBwB4nPv+MQgAgUQOAaO2LfI+wk5d5lj07etEABjE8wAA73PfPxYBYCAhAOA2zT8eAWAwIQDgNc0/JgEgMCEAyE4di0sAmGBkSo0yeUbtkwQPt1WcYyPrV6T9qkIAmMRgBRhDPZ1DAJio2vMAZ/fHJIb3VZpj7vvHJwBMVi0EAHxE889BAFigUgg4ui8mMjwm+xzT/PPwOeCFqk2MLt8qh12yzbFqNa46AWChqk/E3tqvmdu3+t+Dt4z571Wtb5UJAIuZJMdluxqiHmPwNnUtJwFgA5PlOUeOV4fjwjrG4H3qWV4eAtyg4ouCZjm6f9WPC+sYg/dp/rkJAJsIAUBmmn9+AsBGQsD7zu5TxWPCWsbgbZp/DQLAZqNDQNWCA+w3usZo/nsJAAGMngQVQsCofahwLNjDGHxt9H5o/vsJAEEIAUBUmn9NAkAgQgAQjeZflwAQjBAARKH51yYABCQEALtp/vV5E2Bg3SfgiP1fEaayHdcqVpyLiGNwhe61p4sfd28A9336/HXoRLz+XSbj8947D47rWs7FPDNWC52LuKwAJNB5Up7Z9xH76B3wcew6F7vH4Cqd60xXngFIYMYk8lzAx7wDPg7nYi7NvycBIImuIeDofis+jFJ9DGr+fbkFkMyspp1hwq78FnvXh78iinQuVo7B2TrXEv5iBSCZWZMry2rAvf1/789glCpjUPPncrECkJYJPE/0j51E+Cniqm2Ifi4yUju48jPApK6TbfRk9jOquCL8/C3CNnCMxs9bbgEk1/mWQBfPfIJ11iehI2wDx2n+3CIAFCAE1BXh528RtoHjNH/uEQCKmBkCFHLIZ+bc1fxrEAAKmTkpO4WAUcfx7N9z9piPOGe7tyHKuchm5nztdiwrEwCKmR0COgUByGb2HNX8a/EzwMIUgnN2vgM+ws/fImzDVZf38Z9hvvMsKwCFWQ2A+lz1c5QAUNzO34VnV/0d8Jk4F7fNnn/Vj193XgTUwKyXBl1VfgHMM8eu4v5H4lx8o/EzghWARqwGHFflHfAVdD8Xmj+jeAiwoRWNWhE5L8JX8CJsA38xbxnNLYCGZt8SePl3KyhwjsbPLG4BNLZi0le+LTDb2fMz4vxG2IbONH9mEgCaWxUCBAF43Ko5o/n35hkA/mtVk1Z0nnPkvIw+xhG2oQNzkJUEAF5ZeaWuCD0nws/fImxDReYdOwgA3KQgxXXr3Kw+hhG2oQLzjJ0EAO5afd9egaILc4sIBAA+pFjBGOYSkQgAPGTHU/yKF1WYP0QkAPAUhQweZ74QmQDA03b9pl9hIwtzhAwEAA5T5OA1c4JMBABO2/mWP4WP3Yx/shIAGGL3q34VQlYz5slOAGAoRZHqjHGqEACYYneRvFwUSsYxnqlIAGCqCIXzclE8eZ6xS3UCAEsopmRhrNKFAMBSUYrr5aLA8o1xSUcCAFtEKrhXCm8fxh8IAGwWsRBfLopxRcYavCYAEELU4ny5KNCZGVdwnwBAKJEL9pXCHZfxA48TAAgpQyG/UtD3MU7gOAGA0DIV+JcU+/GMBRhLACCNrA3gSiN4nHMN8wkApJO9ObykUTifsIsAQFqVGsc9FRqK8wQxCQCU0KHJvGdHA3LMNX1yEwAop3tjYh5Nn0oEAMoSBBhF46ciAYAWhAGepelTnQBAO8IA92j6dCIA0J5A0JeGT2cCALwgDNSn6cNfBAB4h0CQn4YPtwkA8CBhIA9NHz4mAMAJQsF+mj0cIwDAQALBfBo+jCEAwGRCwXGaPcwjAMAmgsE3Gj2sJwBAUJUCggYP8QgAUMCOsKCpQ24CAAA09LfdGwAArCcAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBDAgAANCQAAEBD/w9EFgG2N43OSgAAAABJRU5ErkJggg==">
+  <link rel="icon" type="image/png" href="data:image/png;base64,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">
+  <title>عداد التسبيح</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f4f7f5;
+      --surface-color: #ffffff;
+      --primary-color: #0f5132;
+      --primary-light: #e6f2ec;
+      --accent-color: #d4af37;
+      --text-main: #1b2a22;
+      --text-muted: #5c7065;
+      --border-color: #dce6e0;
+      --danger-color: #dc3545;
+      --dhikr-font-size: 26px;
+      --safe-top: env(safe-area-inset-top, 44px);
+      --safe-bottom: env(safe-area-inset-bottom, 34px);
+    }
+
+    [data-theme="navy"] {
+      --bg-color: #f0f4f8;
+      --surface-color: #ffffff;
+      --primary-color: #1e3a8a;
+      --primary-light: #e0e7ff;
+      --accent-color: #f59e0b;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0d1310;
+      --surface-color: #17211c;
+      --primary-color: #10b981;
+      --primary-light: #064e3b;
+      --accent-color: #fbbf24;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #26362e;
+    }
+
+    [data-theme="desert"] {
+      --bg-color: #faf6f0;
+      --surface-color: #ffffff;
+      --primary-color: #7c4a27;
+      --primary-light: #f3e8dc;
+      --accent-color: #c28240;
+      --text-main: #2d1e12;
+      --text-muted: #6e5846;
+      --border-color: #e6d8c8;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Tajawal', sans-serif;
+      overflow: hidden;
+    }
+
+    #app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100dvh;
+      padding-top: var(--safe-top);
+      padding-bottom: var(--safe-bottom);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      background: var(--surface-color);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 10;
+    }
+
+    .header-title {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--primary-color);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: var(--primary-light);
+      color: var(--primary-color);
+      border: none;
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .icon-btn:active {
+      transform: scale(0.92);
+    }
+
+    .tabs-bar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      overflow-x: auto;
+      background: var(--bg-color);
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+
+    .dhikr-chip {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      border-radius: 20px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dhikr-chip.active {
+      background: var(--primary-color);
+      color: #ffffff;
+      border-color: var(--primary-color);
+    }
+
+    .progress-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      display: inline-block;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 18px 14px;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: var(--surface-color);
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      position: relative;
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .step-badge {
+      background: var(--primary-light);
+      color: var(--primary-color);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .card-tools {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tool-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 10px;
+      padding: 5px 10px;
+      font-size: 13px;
+      font-family: 'Tajawal', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tool-btn.delete {
+      color: var(--danger-color);
+      border-color: rgba(220, 53, 69, 0.3);
+    }
+
+    .dhikr-text {
+      font-family: 'Amiri', serif;
+      font-size: var(--dhikr-font-size);
+      line-height: 1.75;
+      text-align: center;
+      color: var(--text-main);
+      margin: 12px 0;
+      font-weight: 700;
+    }
+
+    .virtue-box {
+      background: var(--bg-color);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text-muted);
+      border-right: 3px solid var(--accent-color);
+    }
+
+    .counter-zone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 14px 0;
+      cursor: pointer;
+    }
+
+    .counter-ring {
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      background: var(--surface-color);
+      border: 6px solid var(--primary-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+      transition: transform 0.08s ease;
+    }
+
+    .counter-ring:active {
+      transform: scale(0.95);
+    }
+
+    .count-number {
+      font-size: 56px;
+      font-weight: 800;
+      color: var(--primary-color);
+      line-height: 1;
+    }
+
+    .count-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+
+    .bottom-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ctrl-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      background: var(--surface-color);
+      color: var(--text-main);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ctrl-btn.primary {
+      background: var(--primary-color);
+      color: #fff;
+      border-color: var(--primary-color);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--surface-color);
+      width: 100%;
+      max-width: 400px;
+      max-height: 85dvh;
+      border-radius: 22px;
+      padding: 20px;
+      overflow-y: auto;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 14px;
+      color: var(--primary-color);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-main);
+    }
+
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 15px;
+      user-select: text;
+    }
+
+    .step-item-edit {
+      background: var(--bg-color);
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .step-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 6px;
+      align-items: center;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .theme-option {
+      padding: 10px;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+      text-align: center;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .theme-option.selected {
+      border-color: var(--primary-color);
+      background: var(--primary-light);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="header-title">مسبحتي</div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openAddModal()" title="إضافة ذكر">+</button>
+        <button class="icon-btn" onclick="openSettingsModal()" title="المظهر">⚙️</button>
+      </div>
+    </header>
+
+    <div class="tabs-bar" id="tabsBar"></div>
+
+    <main>
+      <div class="card">
+        <div class="card-top">
+          <span class="step-badge" id="stepBadge">الخطوة 1 من 1</span>
+          <div class="card-tools">
+            <button class="tool-btn" onclick="openEditModal()">تعديل</button>
+            <button class="tool-btn delete" onclick="openDeleteConfirm()">حذف</button>
+          </div>
+        </div>
+        <div class="dhikr-text" id="dhikrText"></div>
+        <div class="virtue-box" id="virtueBox"></div>
+      </div>
+
+      <div class="counter-zone" onclick="handleTap()">
+        <div class="counter-ring" id="counterRing">
+          <div class="count-number" id="countDisplay">100</div>
+          <div class="count-label" id="countLabel">المتبقي</div>
+        </div>
+      </div>
+
+      <div class="bottom-controls">
+        <button class="ctrl-btn" onclick="resetCurrent()">إعادة العداد</button>
+        <button class="ctrl-btn primary" onclick="nextStepOrDhikr()">التالي</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add / Edit Modal -->
+  <div class="modal-backdrop" id="formModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="formModalTitle">إضافة ذكر جديد</h3>
+      <div class="form-group">
+        <label>عنوان الذكر (يظهر في الشريط العلوي)</label>
+        <input type="text" id="inputTitle" placeholder="مثال: أذكار الصباح">
+      </div>
+      <div class="form-group">
+        <label>فضل الذكر (اختياري)</label>
+        <textarea id="inputVirtue" rows="2" placeholder="اكتب فضل الذكر أو الحديث..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>خطوات التسبيح (اجعل العدد 0 للتسبيح المفتوح)</label>
+        <div id="stepsContainer"></div>
+        <button type="button" class="tool-btn" style="width: 100%; margin-top: 6px;" onclick="addStepField()">+ إضافة خطوة أخرى</button>
+      </div>
+      <div class="modal-actions">
+        <button class="ctrl-btn" onclick="closeModal('formModal')">إلغاء</button>
+        <button class="ctrl-btn primary" onclick="saveDhikrForm()">حفظ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-box">
+      <h3 class="modal-title" style="color: var(--danger-color);">تأكيد الحذف</h3>
+      <p id="deleteMsg" style="font-size: 15px; line-height: 1.6; margin-bottom: 18px;">هل أنت متأكد من حذف هذا الذكر نهائياً؟</p>
+      <div class="modal-actions">
+        <button class="ctrl-btn" onclick="closeModal('deleteModal')">تراجع</button>
+        <button class="ctrl-btn" style="background: var(--danger-color); color: #fff; border: none;" onclick="confirmDeleteDhikr()">نعم، احذف</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-box">
+      <h3 class="modal-title">تخصيص المظهر</h3>
+      <div class="form-group">
+        <label>لون التطبيق</label>
+        <div class="theme-grid">
+          <div class="theme-option" data-t="default" onclick="setTheme('default')">أخضر زمردي</div>
+          <div class="theme-option" data-t="navy" onclick="setTheme('navy')">أزرق ملكي</div>
+          <div class="theme-option" data-t="desert" onclick="setTheme('desert')">رملي دافئ</div>
+          <div class="theme-option" data-t="dark" onclick="setTheme('dark')">وضع ليلي</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>حجم خط الذكر: <span id="fontSizeVal">26</span>px</label>
+        <input type="range" id="fontSlider" min="18" max="40" value="26" style="width: 100%;" oninput="setFontSize(this.value)">
+      </div>
+      <div class="modal-actions">
+        <button class="ctrl-btn primary" onclick="closeModal('settingsModal')">تم</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultAdhkar = [
+      {
+        id: 'd1',
+        title: 'سبحان الله وبحمده',
+        virtue: 'قال ﷺ: «من قال سبحان الله وبحمده في يوم مائة مرة حُطَّت خطاياه وإن كانت مثل زبد البحر».',
+        steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', target: 100 }]
+      },
+      {
+        id: 'd2',
+        title: 'التهليل (100 مرة)',
+        virtue: 'كانت له عدل عشر رقاب، وكتبت له مائة حسنة، ومحيت عنه مائة سيئة، وكانت له حرزاً من الشيطان.',
+        steps: [{ text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 100 }]
+      },
+      {
+        id: 'd3',
+        title: 'التسبيح دبر الصلاة',
+        virtue: 'من سبّح الله دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين، وكبّر الله ثلاثاً وثلاثين، وختم المائة بالتهليل غُفرت خطاياه.',
+        steps: [
+          { text: 'سُبْحَانَ اللَّهِ', target: 33 },
+          { text: 'الْحَمْدُ لِلَّهِ', target: 33 },
+          { text: 'اللَّهُ أَكْبَرُ', target: 33 },
+          { text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 1 }
+        ]
+      },
+      {
+        id: 'd4',
+        title: 'التسبيح عند النوم',
+        virtue: 'وصية النبي ﷺ لفاطمة وعلي رضي الله عنهما عند أخذ المضجع، وهي خير من خادم.',
+        steps: [
+          { text: 'سُبْحَانَ اللَّهِ', target: 33 },
+          { text: 'الْحَمْدُ لِلَّهِ', target: 33 },
+          { text: 'اللَّهُ أَكْبَرُ', target: 34 }
+        ]
+      },
+      {
+        id: 'd5',
+        title: 'عدد خلقه (3 مرات)',
+        virtue: 'أربع كلمات إذا قيلت ثلاث مرات وزنت ما قيل من الذكر منذ الصباح.',
+        steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ', target: 3 }]
+      },
+      {
+        id: 'd6',
+        title: 'الباقيات الصالحات',
+        virtue: 'أحب الكلام إلى الله أربع، لا يضرك بأيهن بدأت.',
+        steps: [{ text: 'سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ', target: 0 }]
+      },
+      {
+        id: 'd7',
+        title: 'كلمتان خفيفتان',
+        virtue: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن.',
+        steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', target: 0 }]
+      },
+      {
+        id: 'd8',
+        title: 'الحوقلة',
+        virtue: 'كنز من كنوز الجنة.',
+        steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }]
+      }
+    ];
+
+    let state = {
+      adhkar: JSON.parse(localStorage.getItem('tasbih_adhkar_v5')) || defaultAdhkar,
+      activeIndex: parseInt(localStorage.getItem('tasbih_active_idx_v5') || '0', 10),
+      progressMap: JSON.parse(localStorage.getItem('tasbih_progress_map_v5') || '{}'),
+      theme: localStorage.getItem('tasbih_theme') || 'default',
+      fontSize: parseInt(localStorage.getItem('tasbih_fontsize') || '26', 10),
+      editingMode: false
+    };
+
+    function saveState() {
+      localStorage.setItem('tasbih_adhkar_v5', JSON.stringify(state.adhkar));
+      localStorage.setItem('tasbih_active_idx_v5', state.activeIndex);
+      localStorage.setItem('tasbih_progress_map_v5', JSON.stringify(state.progressMap));
+      localStorage.setItem('tasbih_theme', state.theme);
+      localStorage.setItem('tasbih_fontsize', state.fontSize);
+    }
+
+    function getDhikrProgress(dhikr) {
+      let prog = state.progressMap[dhikr.id];
+      if (!prog || typeof prog.stepIndex !== 'number' || prog.stepIndex >= dhikr.steps.length) {
+        const firstTarget = dhikr.steps[0].target;
+        prog = {
+          stepIndex: 0,
+          count: firstTarget > 0 ? firstTarget : 0
+        };
+        state.progressMap[dhikr.id] = prog;
+      }
+      return prog;
+    }
+
+    function hasActiveProgress(dhikr) {
+      const prog = state.progressMap[dhikr.id];
+      if (!prog) return false;
+      const firstTarget = dhikr.steps[0].target;
+      if (prog.stepIndex > 0) return true;
+      if (firstTarget > 0 && prog.count < firstTarget) return true;
+      if (firstTarget === 0 && prog.count > 0) return true;
+      return false;
+    }
+
+    function init() {
+      if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
+      applyAppearance();
+      render();
+    }
+
+    function getCurrentDhikr() {
+      return state.adhkar[state.activeIndex];
+    }
+
+    function applyAppearance() {
+      if (state.theme === 'default') {
+        document.documentElement.removeAttribute('data-theme');
+      } else {
+        document.documentElement.setAttribute('data-theme', state.theme);
+      }
+      document.documentElement.style.setProperty('--dhikr-font-size', state.fontSize + 'px');
+      document.getElementById('fontSlider').value = state.fontSize;
+      document.getElementById('fontSizeVal').textContent = state.fontSize;
+      document.querySelectorAll('.theme-option').forEach(el => {
+        el.classList.toggle('selected', el.dataset.t === state.theme);
+      });
+    }
+
+    function render() {
+      const tabsBar = document.getElementById('tabsBar');
+      tabsBar.innerHTML = '';
+      state.adhkar.forEach((item, idx) => {
+        const chip = document.createElement('button');
+        chip.className = 'dhikr-chip' + (idx === state.activeIndex ? ' active' : '');
+        if (hasActiveProgress(item)) {
+          const dot = document.createElement('span');
+          dot.className = 'progress-dot';
+          chip.appendChild(dot);
+        }
+        const label = document.createElement('span');
+        label.textContent = item.title;
+        chip.appendChild(label);
+        chip.onclick = () => selectDhikr(idx);
+        tabsBar.appendChild(chip);
+      });
+
+      const dhikr = getCurrentDhikr();
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[prog.stepIndex];
+
+      document.getElementById('stepBadge').textContent = `الخطوة ${prog.stepIndex + 1} من ${dhikr.steps.length}`;
+      document.getElementById('dhikrText').textContent = step.text;
+
+      const virtueBox = document.getElementById('virtueBox');
+      if (dhikr.virtue && dhikr.virtue.trim() !== '') {
+        virtueBox.style.display = 'block';
+        virtueBox.textContent = dhikr.virtue;
+      } else {
+        virtueBox.style.display = 'none';
+      }
+
+      document.getElementById('countDisplay').textContent = prog.count;
+      document.getElementById('countLabel').textContent = step.target > 0 ? `المتبقي من ${step.target}` : 'عداد مفتوح';
+      saveState();
+    }
+
+    function selectDhikr(index) {
+      state.activeIndex = index;
+      render();
+    }
+
+    function handleTap() {
+      if (navigator.vibrate) navigator.vibrate(25);
+      const dhikr = getCurrentDhikr();
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[prog.stepIndex];
+
+      if (step.target > 0) {
+        if (prog.count > 1) {
+          prog.count--;
+        } else {
+          if (navigator.vibrate) navigator.vibrate([50, 40, 50]);
+          if (prog.stepIndex < dhikr.steps.length - 1) {
+            prog.stepIndex++;
+            const nextS = dhikr.steps[prog.stepIndex];
+            prog.count = nextS.target > 0 ? nextS.target : 0;
+          } else {
+            prog.stepIndex = 0;
+            const firstS = dhikr.steps[0];
+            prog.count = firstS.target > 0 ? firstS.target : 0;
+          }
+        }
+      } else {
+        prog.count++;
+      }
+      state.progressMap[dhikr.id] = prog;
+      render();
+    }
+
+    function resetCurrent() {
+      const dhikr = getCurrentDhikr();
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[prog.stepIndex];
+      prog.count = step.target > 0 ? step.target : 0;
+      state.progressMap[dhikr.id] = prog;
+      render();
+    }
+
+    function nextStepOrDhikr() {
+      const dhikr = getCurrentDhikr();
+      const prog = getDhikrProgress(dhikr);
+      if (prog.stepIndex < dhikr.steps.length - 1) {
+        prog.stepIndex++;
+        const nextS = dhikr.steps[prog.stepIndex];
+        prog.count = nextS.target > 0 ? nextS.target : 0;
+        state.progressMap[dhikr.id] = prog;
+      } else {
+        state.activeIndex = (state.activeIndex + 1) % state.adhkar.length;
+      }
+      render();
+    }
+
+    /* Add & Edit */
+    function openAddModal() {
+      state.editingMode = false;
+      document.getElementById('formModalTitle').textContent = 'إضافة ذكر جديد';
+      document.getElementById('inputTitle').value = '';
+      document.getElementById('inputVirtue').value = '';
+      const container = document.getElementById('stepsContainer');
+      container.innerHTML = '';
+      addStepField('', 33);
+      document.getElementById('formModal').classList.add('open');
+    }
+
+    function openEditModal() {
+      state.editingMode = true;
+      const dhikr = getCurrentDhikr();
+      document.getElementById('formModalTitle').textContent = 'تعديل الذكر والخطوات';
+      document.getElementById('inputTitle').value = dhikr.title;
+      document.getElementById('inputVirtue').value = dhikr.virtue || '';
+      const container = document.getElementById('stepsContainer');
+      container.innerHTML = '';
+      dhikr.steps.forEach(s => addStepField(s.text, s.target));
+      document.getElementById('formModal').classList.add('open');
+    }
+
+    function addStepField(text = '', target = 33) {
+      const container = document.getElementById('stepsContainer');
+      const div = document.createElement('div');
+      div.className = 'step-item-edit';
+      div.innerHTML = `
+        <textarea rows="2" placeholder="نص الذكر في هذه الخطوة..." class="step-text-input">${text}</textarea>
+        <div class="step-row">
+          <span style="font-size: 13px; font-weight: 700;">العدد:</span>
+          <input type="number" min="0" value="${target}" class="step-target-input" style="width: 90px;">
+          <button type="button" class="tool-btn delete" onclick="removeStepField(this)">حذف الخطوة</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function removeStepField(btn) {
+      const container = document.getElementById('stepsContainer');
+      if (container.children.length > 1) {
+        btn.closest('.step-item-edit').remove();
+      }
+    }
+
+    function saveDhikrForm() {
+      const title = document.getElementById('inputTitle').value.trim();
+      const virtue = document.getElementById('inputVirtue').value.trim();
+      const stepEls = document.querySelectorAll('.step-item-edit');
+      const steps = [];
+
+      stepEls.forEach(el => {
+        const txt = el.querySelector('.step-text-input').value.trim();
+        const tgt = parseInt(el.querySelector('.step-target-input').value || '0', 10);
+        if (txt) {
+          steps.push({ text: txt, target: isNaN(tgt) || tgt < 0 ? 0 : tgt });
+        }
+      });
+
+      if (!title || steps.length === 0) return;
+
+      if (state.editingMode) {
+        const currentId = state.adhkar[state.activeIndex].id;
+        state.adhkar[state.activeIndex] = {
+          id: currentId,
+          title,
+          virtue,
+          steps
+        };
+        delete state.progressMap[currentId];
+      } else {
+        const newId = 'custom_' + Date.now();
+        state.adhkar.push({
+          id: newId,
+          title,
+          virtue,
+          steps
+        });
+        state.activeIndex = state.adhkar.length - 1;
+      }
+
+      closeModal('formModal');
+      render();
+    }
+
+    /* Delete Confirmation */
+    function openDeleteConfirm() {
+      if (state.adhkar.length <= 1) return;
+      const dhikr = getCurrentDhikr();
+      document.getElementById('deleteMsg').textContent = `هل أنت متأكد من حذف "${dhikr.title}" نهائياً؟`;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    function confirmDeleteDhikr() {
+      if (state.adhkar.length > 1) {
+        const removedId = state.adhkar[state.activeIndex].id;
+        delete state.progressMap[removedId];
+        state.adhkar.splice(state.activeIndex, 1);
+        if (state.activeIndex >= state.adhkar.length) {
+          state.activeIndex = state.adhkar.length - 1;
+        }
+      }
+      closeModal('deleteModal');
+      render();
+    }
+
+    /* Settings */
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.add('open');
+    }
+
+    function setTheme(themeName) {
+      state.theme = themeName;
+      applyAppearance();
+      saveState();
+    }
+
+    function setFontSize(val) {
+      state.fontSize = parseInt(val, 10);
+      applyAppearance();
+      saveState();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    init();
+  </script>
+</body>
+</html>
