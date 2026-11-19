@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="عداد التسبيح">
+  <meta name="theme-color" content="#000000">
+  <link id="appleIcon" rel="apple-touch-icon" href="">
+  <link id="favIcon" rel="icon" type="image/png" href="">
+  <link rel="manifest" href="./manifest.json">
+  <title>عداد التسبيح</title>
+  <link rel="stylesheet" href="https://googleapis.com">
+  <style>
+    @import url('https://googleapis.com');
+    :root {
+      --bg-color: #f4f7f5; --surface-color: #ffffff; --primary-color: #0f5132;
+      --primary-light: #e6f2ec; --accent-color: #d4af37; --text-main: #1b2a22;
+      --text-muted: #5c7065; --border-color: #dce6e0; --danger-color: #dc3545;
+      --dhikr-font-size: 24px; --safe-top: env(safe-area-inset-top, 44px);
+      --safe-bottom: env(safe-area-inset-bottom, 34px);
+    }
+    [data-theme="navy"] { --bg-color: #0b132b; --surface-color: #1c2541; --primary-color: #3a86ff; --primary-light: #1e2d52; --accent-color: #fbbf24; --text-main: #f8fafc; --text-muted: #94a3b8; --border-color: #2b3a67; }
+    [data-theme="desert"] { --bg-color: #faf6f0; --surface-color: #ffffff; --primary-color: #7c4a27; --primary-light: #f3e8dc; --accent-color: #c28240; --text-main: #2d1e12; --text-muted: #6e5846; --border-color: #e6d8c8; }
+    [data-theme="dark"] { --bg-color: #0d1310; --surface-color: #17211c; --primary-color: #10b981; --primary-light: #064e3b; --accent-color: #fbbf24; --text-main: #f1f5f9; --text-muted: #94a3b8; --border-color: #26362e; }
+    [data-theme="oled"] { --bg-color: #000000; --surface-color: #121212; --primary-color: #10b981; --primary-light: #063729; --accent-color: #f59e0b; --text-main: #ffffff; --text-muted: #a1a1aa; --border-color: #27272a; }
+    [data-theme="black-gold"] { --bg-color: #080808; --surface-color: #14120e; --primary-color: #d4af37; --primary-light: #2b2310; --accent-color: #f5d061; --text-main: #fdf8e8; --text-muted: #b5a478; --border-color: #382e16; }
+    [data-theme="royal-navy-gold"] { --bg-color: #050a14; --surface-color: #0d1626; --primary-color: #e2b857; --primary-light: #182640; --accent-color: #f6d37f; --text-main: #f4f7fc; --text-muted: #8fa3c4; --border-color: #1e2f4d; }
+    [data-theme="deep-emerald-gold"] { --bg-color: #050d0a; --surface-color: #0d1a14; --primary-color: #2dd4bf; --primary-light: #132e24; --accent-color: #fbbf24; --text-main: #ecfdf5; --text-muted: #86b3a1; --border-color: #1b3b2e; }
+    [data-theme="charcoal-bronze"] { --bg-color: #0c0a09; --surface-color: #191513; --primary-color: #d99b66; --primary-light: #2b211b; --accent-color: #f2be8d; --text-main: #faf5f0; --text-muted: #a89586; --border-color: #362922; }
+    [data-theme="purple"] { --bg-color: #130b24; --surface-color: #1f1338; --primary-color: #a855f7; --primary-light: #331d5c; --accent-color: #fbbf24; --text-main: #faf5ff; --text-muted: #c4b5fd; --border-color: #3b2369; }
+    [data-theme="pink-light"] { --bg-color: #fdf2f8; --surface-color: #ffffff; --primary-color: #be185d; --primary-light: #fce7f3; --accent-color: #d97706; --text-main: #4a152e; --text-muted: #83385b; --border-color: #fbcfe8; }
+    [data-theme="rose-dark"] { --bg-color: #1f0c16; --surface-color: #2e1321; --primary-color: #f43f5e; --primary-light: #4c182f; --accent-color: #fbbf24; --text-main: #fff1f2; --text-muted: #fda4af; --border-color: #591c38; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif; }
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; background-color: var(--bg-color); color: var(--text-main); font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif; overflow: hidden; }
+    #app { display: flex; flex-direction: column; width: 100%; height: 100dvh; padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--surface-color); border-bottom: 1px solid var(--border-color); z-index: 10; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .header-title { font-size: 18px; font-weight: 800; color: var(--primary-color); }
+    .save-toast { font-size: 11.5px; font-weight: 700; color: var(--primary-color); background: var(--primary-light); padding: 3px 9px; border-radius: 12px; opacity: 0; transition: opacity 0.25s ease; }
+    .save-toast.show { opacity: 1; }
+    .header-actions { display: flex; gap: 6px; }
+    .icon-btn { background: var(--primary-light); color: var(--primary-color); border: none; border-radius: 11px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; transition: transform 0.1s; }
+    .icon-btn:active { transform: scale(0.92); }
+    .tabs-bar { display: flex; gap: 8px; padding: 9px 16px; overflow-x: auto; background: var(--bg-color); scrollbar-width: none; flex-shrink: 0; }
+    .tabs-bar::-webkit-scrollbar { display: none; }
+    .dhikr-chip { flex: 0 0 auto; padding: 7px 13px; border-radius: 20px; background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .dhikr-chip.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+    [data-theme="black-gold"] .dhikr-chip.active, [data-theme="black-gold"] .step-pill-btn.active, [data-theme="black-gold"] .ctrl-btn.primary, [data-theme="black-gold"] .auto-tap-btn.active,
+    [data-theme="royal-navy-gold"] .dhikr-chip.active, [data-theme="royal-navy-gold"] .step-pill-btn.active, [data-theme="royal-navy-gold"] .ctrl-btn.primary, [data-theme="royal-navy-gold"] .auto-tap-btn.active,
+    [data-theme="deep-emerald-gold"] .dhikr-chip.active, [data-theme="deep-emerald-gold"] .step-pill-btn.active, [data-theme="deep-emerald-gold"] .ctrl-btn.primary, [data-theme="deep-emerald-gold"] .auto-tap-btn.active,
+    [data-theme="charcoal-bronze"] .dhikr-chip.active, [data-theme="charcoal-bronze"] .step-pill-btn.active, [data-theme="charcoal-bronze"] .ctrl-btn.primary, [data-theme="charcoal-bronze"] .auto-tap-btn.active { color: #080808; }
+    .progress-dot { width: 7px; height: 7px; border-radius: 50%; background-color: var(--accent-color); display: inline-block; }
+    main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 8px 16px 12px; overflow-y: auto; }
+    .card { background: var(--surface-color); border-radius: 20px; padding: 14px 16px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .steps-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+    .step-pill-btn { background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; }
+    .step-pill-btn.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+    .step-pill-btn .step-dot { width: 5px; height: 5px; border-radius: 50%; background-color: var(--accent-color); }
+    .card-tools { display: flex; gap: 5px; }
+    .tool-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 9px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .tool-btn.delete { color: var(--danger-color); border-color: rgba(220, 53, 69, 0.35); }
+    .dhikr-text { font-size: var(--dhikr-font-size); line-height: 1.8; text-align: center; color: var(--text-main); margin: 10px 0; font-weight: 700; }
+    .virtue-box { background: var(--bg-color); border-radius: 12px; padding: 9px 12px; font-size: 13px; line-height: 1.7; color: var(--text-muted); border-right: 3px solid var(--accent-color); }
+    .counter-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 8px 0; cursor: pointer; border-radius: 22px; transition: background-color 0.2s; gap: 10px; }
+    .counter-zone.focus-active { background: var(--primary-light); border: 2px dashed var(--primary-color); }
+    .timer-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-color); border: 1px solid var(--border-color); padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; color: var(--text-muted); }
+    .timer-pill.running { border-color: var(--primary-color); color: var(--primary-color); background: var(--primary-light); }
+    .ring-wrapper { position: relative; width: 196px; height: 196px; display: flex; align-items: center; justify-content: center; transition: transform 0.08s ease; }
+    .ring-wrapper:active { transform: scale(0.95); }
+    .progress-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+    .progress-bg { fill: var(--surface-color); stroke: var(--border-color); stroke-width: 8; }
+    .progress-bar { fill: none; stroke: var(--primary-color); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.2s ease; }
+    .counter-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .count-number { font-size: 50px; font-weight: 800; color: var(--primary-color); line-height: 1; }
+    .count-label { font-size: 13.5px; color: var(--text-muted); margin-top: 6px; font-weight: 700; }
+    .auto-controls-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .auto-tap-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .auto-tap-btn.ready { border-color: var(--primary-color); color: var(--primary-color); background: var(--primary-light); }
+    .auto-tap-btn.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); animation: pulseAuto 1.5s infinite; }
+    .undo-tap-btn { display: none; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(220, 53, 69, 0.45); background: var(--surface-color); color: var(--danger-color); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: transform 0.1s, background-color 0.2s; }
+    .undo-tap-btn:active { transform: scale(0.93); background: rgba(220, 53, 69, 0.1); }
+    @keyframes pulseAuto { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
+    .bottom-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .ctrl-btn { padding: 11px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; }
+    .ctrl-btn.primary { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
+    .modal-backdrop.open { display: flex; }
+    .modal-box { background: var(--surface-color); width: 100%; max-width: 400px; max-height: 85dvh; border-radius: 22px; padding: 20px; overflow-y: auto; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); }
+    .modal-title { font-size: 18px; font-weight: 800; margin: 0 0 14px; color: var(--primary-color); }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13.5px; font-weight: 700; margin-bottom: 5px; color: var(--text-main); }
+    input[type="text"], input[type="number"], textarea { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-main); font-size: 15px; user-select: text; }
+    .step-item-edit { background: var(--bg-color); padding: 10px; border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+    .step-row { display: flex; gap: 8px; margin-top: 6px; align-items: center; }
+    .manage-item { display: flex; justify-content: space-between; align-items: center; padding: 9px 10px; background: var(--bg-color); border-radius: 12px; margin-bottom: 8px; border: 1px solid var(--border-color); gap: 8px; transition: transform 0.15s, box-shadow 0.15s; }
+    .manage-item.dragging { opacity: 0.75; border-color: var(--primary-color); background: var(--primary-light); box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
+    .drag-handle { cursor: grab; padding: 4px 6px; font-size: 17px; color: var(--text-muted); touch-action: none; display: flex; align-items: center; justify-content: center; }
+    .manage-item-title { font-weight: 700; font-size: 13.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+    .theme-option { padding: 9px; border-radius: 12px; border: 2px solid var(--border-color); text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .theme-option.selected { border-color: var(--primary-color); background: var(--primary-light); }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 8px; text-align: center; }
+    .stat-val { font-size: 22px; font-weight: 800; color: var(--primary-color); }
+    .stat-lbl { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+    .stats-section-title { font-size: 14px; font-weight: 800; color: var(--primary-color); margin: 12px 0 8px; display: flex; align-items: center; gap: 6px; }
+    .stat-detail-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 9px 11px; margin-bottom: 7px; }
+    .stat-detail-header { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 13.5px; color: var(--text-main); gap: 6px; }
+    .stat-badge { background: var(--primary-light); color: var(--primary-color); padding: 2px 8px; border-radius: 10px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .stat-rem-pill { font-size: 11px; font-weight: 700; color: var(--accent-color); margin-top: 3px; }
+    .stat-steps-list { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-color); font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 5px; }
+    .stat-step-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .stat-step-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: var(--bg-color); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 10px; font-weight: 700; font-size: 14px; }
+    .sync-box { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px; margin-top: 12px; }
+    .sync-status { font-size: 12px; font-weight: 700; margin-top: 6px; color: var(--text-muted); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <div class="header-right">
+        <div class="header-title">📿 عداد التسبيح</div>
+        <span class="save-toast" id="saveToast">تم الحفظ</span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openStatsModal()" title="الإحصائيات">📊</button>
+        <button class="icon-btn" onclick="openAddModal()" title="إضافة ذكر">➕</button>
+        <button class="icon-btn" onclick="openManageModal()" title="إدارة الأذكار">📝</button>
+        <button class="icon-btn" onclick="openSettingsModal()" title="المظهر">⚙</button>
+      </div>
+    </header>
+    <div class="tabs-bar" id="tabsBar"></div>
+    <main>
+      <div class="card">
+        <div class="card-top">
+          <div class="steps-pills" id="stepsPills"></div>
+          <div class="card-tools">
+            <button class="tool-btn" onclick="shareSingleDhikr(state.activeIndex)">مشاركة</button>
+            <button class="tool-btn" onclick="openEditModal()">تعديل</button>
+            <button class="tool-btn delete" onclick="openDeleteConfirm(state.activeIndex)">حذف</button>
+          </div>
+        </div>
+        <div class="dhikr-text" id="dhikrText"></div>
+        <div class="virtue-box" id="virtueBox"></div>
+      </div>
+      <div class="counter-zone" id="counterZone" onclick="handleZoneTap(event)">
+        <div class="timer-pill" id="dhikrTimerPill">⏱ 00:00</div>
+        <div class="ring-wrapper" id="ringWrapper" onclick="handleRingTap(event)">
+          <svg class="progress-svg" viewBox="0 0 204 204">
+            <circle class="progress-bg" cx="102" cy="102" r="92"></circle>
+            <circle class="progress-bar" id="progressCircle" cx="102" cy="102" r="92" stroke-dasharray="578.05" stroke-dashoffset="0"></circle>
+          </svg>
+          <div class="counter-content">
+            <div class="count-number" id="countDisplay">100</div>
+            <div class="count-label" id="countLabel">المتبقي</div>
+          </div>
+        </div>
+        <div class="auto-controls-row">
+          <button type="button" class="auto-tap-btn" id="autoTapBtn" onclick="toggleAutoTap(event)">⚡ عدّ آلي (اضغط 3 مرات للقياس)</button>
+          <button type="button" class="undo-tap-btn" id="undoTapBtn" onclick="undoAutoTapDouble(event)">↩ تراجع (2×)</button>
+        </div>
+      </div>
+      <div class="bottom-controls">
+        <button class="ctrl-btn" onclick="prevDhikr()">⏮ الذكر السابق</button>
+        <button class="ctrl-btn" onclick="resetCurrent()">🔄 تصفير</button>
+        <button class="ctrl-btn primary" onclick="nextDhikr()">الذكر التالي ⏭</button>
+      </div>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="statsModal">
+    <div class="modal-box">
+      <h3 class="modal-title">📊 إحصائيات التسبيح</h3>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="statToday">0</div><div class="stat-lbl">تسبيحات اليوم</div></div>
+        <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">الإجمالي الكلي</div></div>
+        <div class="stat-card"><div class="stat-val" id="statStreak">0</div><div class="stat-lbl">أيام متتالية 🔥</div></div>
+      </div>
+      <div class="stats-section-title">✅ الأذكار المقروءة اليوم</div>
+      <div id="statsReadList"></div>
+      <div class="stats-section-title" style="color: var(--text-muted); margin-top: 16px;">⏳ أذكار وخطوات لم تُقرأ اليوم</div>
+      <div id="statsUnreadList"></div>
+      <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('statsModal')">إغلاق</button></div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="formModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="formModalTitle">إضافة ذكر جديد</h3>
+      <div class="form-group"><label>عنوان الذكر (يظهر في الشريط العلوي)</label><input type="text" id="inputTitle" placeholder="مثال: أذكار الصباح"></div>
+      <div class="form-group"><label>فضل الذكر (اختياري)</label><textarea id="inputVirtue" rows="2" placeholder="اكتب فضل الذكر أو الحديث..."></textarea></div>
+      <div class="form-group">
+        <label>خطوات التسبيح (اجعل العدد 0 للتسبيح المفتوح)</label>
+        <div id="stepsContainer"></div>
+        <button type="button" class="tool-btn" style="width: 100%; margin-top: 6px;" onclick="addStepField()">+ إضافة خطوة أخرى</button>
+      </div>
+      <div class="modal-actions">
+        <button class="ctrl-btn" style="flex:1;" onclick="closeModal('formModal')">إلغاء</button>
+        <button class="ctrl-btn primary" style="flex:1;" onclick="saveDhikrForm()">حفظ</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="manageModal">
+    <div class="modal-box">
+      <h3 class="modal-title">إدارة وترتيب الأذكار (اسحب للإفلات)</h3>
+      <div id="manageList"></div>
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="exportAllAdhkar()">📋 نسخ الكل</button>
+        <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="openImportModal()">📥 استيراد كود</button>
+      </div>
+      <button type="button" class="tool-btn delete" style="width: 100%; margin-top: 8px; padding: 9px;" onclick="openResetDefaultsConfirm()">⚠ استعادة الأذكار الافتراضية</button>
+      <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('manageModal')">إغلاق</button></div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-box">
+      <h3 class="modal-title">📥 استيراد ذكر أو نسخة احتياطية</h3>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">الصق كود الذكر المنفرد (ليُضاف لقائمتك) أو كود النسخة الكاملة هنا:</p>
+      <textarea id="importCodeInput" rows="4" placeholder="الصق الكود هنا..."></textarea>
+      <div class="modal-actions">
+        <button class="ctrl-btn" style="flex:1;" onclick="closeModal('importModal')">إلغاء</button>
+        <button class="ctrl-btn primary" style="flex:1;" onclick="importAdhkarCode()">استيراد</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="deleteModal">
+    <div class="modal-box">
+      <h3 class="modal-title" style="color: var(--danger-color);">تأكيد الإجراء</h3>
+      <p id="deleteMsg" style="font-size: 15px; line-height: 1.6; margin-bottom: 18px;"></p>
+      <div class="modal-actions">
+        <button class="ctrl-btn" style="flex:1;" onclick="closeModal('deleteModal')">تراجع</button>
+        <button class="ctrl-btn primary" style="flex:1; background: var(--danger-color); color: #fff; border: none;" onclick="executeConfirmAction()">نعم، نفّذ</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-box">
+      <h3 class="modal-title">المظهر والإعدادات</h3>
+      <div class="form-group">
+        <label>اختر لون الواجهة</label>
+        <div class="theme-grid">
+          <div class="theme-option" data-t="default" onclick="setTheme('default')">أخضر زمردي</div>
+          <div class="theme-option" data-t="navy" onclick="setTheme('navy')">كحلي ليلي</div>
+          <div class="theme-option" data-t="desert" onclick="setTheme('desert')">ذهبي دافئ</div>
+          <div class="theme-option" data-t="dark" onclick="setTheme('dark')">داكن كلاسيكي</div>
+          <div class="theme-option" data-t="oled" onclick="setTheme('oled')">أسود ملكي</div>
+          <div class="theme-option" data-t="black-gold" onclick="setTheme('black-gold')">أسود وذهبي ✨</div>
+          <div class="theme-option" data-t="royal-navy-gold" onclick="setTheme('royal-navy-gold')">كحلي وذهبي 🌌</div>
+          <div class="theme-option" data-t="deep-emerald-gold" onclick="setTheme('deep-emerald-gold')">زمردي ليلي 🌿</div>
+          <div class="theme-option" data-t="charcoal-bronze" onclick="setTheme('charcoal-bronze')">فحمي وبرونزي 🪔</div>
+          <div class="theme-option" data-t="purple" onclick="setTheme('purple')">بنفسجي ليلي</div>
+          <div class="theme-option" data-t="pink-light" onclick="setTheme('pink-light')">وردي ناعم 🌸</div>
+          <div class="theme-option" data-t="rose-dark" onclick="setTheme('rose-dark')">عنابي وردي 🌺</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
+        <input type="range" id="fontSlider" min="18" max="38" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
+      </div>
+      <div class="switch-row"><span>🎯 وضع التركيز (لمس واسع)</span><input type="checkbox" id="focusToggle" onchange="toggleFocusMode(this.checked)" style="width:20px; height:20px;"></div>
+      <div class="switch-row"><span>💡 إبقاء الشاشة مضاءة</span><input type="checkbox" id="wakeLockToggle" onchange="toggleWakeLock(this.checked)" style="width:20px; height:20px;"></div>
+      <div class="sync-box">
+        <label style="display:block; font-size:14px; font-weight:800; color:var(--primary-color); margin-bottom:6px;">☁ المزامنة بين الأجهزة (اختياري)</label>
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 8px;">اكتب رمزاً سرياً موحداً في أجهزتك لمزامنة الأذكار والعدّادات تلقائياً، أو اتركه فارغاً للعمل المحلي:</p>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="syncCodeInput" placeholder="مثال: khalid2026" style="padding:8px 10px; font-size:14px;">
+          <button type="button" class="ctrl-btn primary" style="padding:8px 14px;" onclick="saveSyncCode()">ربط</button>
+        </div>
+        <div class="sync-status" id="syncStatusText">الحالة: تخزين محلي على هذا الجهاز فقط</div>
+      </div>
+      <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('settingsModal')">إغلاق</button></div>
+    </div>
+  </div>
+  <script>
+    (function generateBlackAndWhiteIcon() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 512, 512);
+        const cardX = 96, cardY = 96, cardW = 320, cardH = 320, radius = 78;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(cardX + radius, cardY);
+        ctx.lineTo(cardX + cardW - radius, cardY);
+        ctx.quadraticCurveTo(cardX + cardW, cardY, cardX + cardW, cardY + radius);
+        ctx.lineTo(cardX + cardW, cardY + cardH - radius);
+        ctx.quadraticCurveTo(cardX + cardW, cardY + cardH, cardX + cardW - radius, cardY + cardH);
+        ctx.lineTo(cardX + radius, cardY + cardH);
+        ctx.quadraticCurveTo(cardX, cardY + cardH, cardX, cardY + cardH - radius);
+        ctx.lineTo(cardX, cardY + radius);
+        ctx.quadraticCurveTo(cardX, cardY, cardX + radius, cardY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#000000';
+        const beads = [
+          { x: 158, y: 215, r: 16 }, { x: 186, y: 185, r: 18 }, { x: 220, y: 168, r: 20 },
+          { x: 256, y: 162, r: 22 }, { x: 292, y: 168, r: 20 }, { x: 326, y: 185, r: 18 }, { x: 354, y: 215, r: 16 }
+        ];
+        beads.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill(); });
+        ctx.beginPath(); ctx.arc(256, 208, 12, 0, Math.PI * 2); ctx.fill();
+        const shaftW = 24, shaftH = 68, shaftX = 256 - shaftW / 2, shaftY = 226, shaftR = 10;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(shaftX, shaftY, shaftW, shaftH, shaftR);
+        else ctx.fillRect(shaftX, shaftY, shaftW, shaftH);
+        ctx.fill();
+        ctx.beginPath(); ctx.arc(256, 314, 15, 0, Math.PI * 2); ctx.fill();
+        const dataUrl = canvas.toDataURL('image/png');
+        document.getElementById('appleIcon').href = dataUrl;
+        const fav = document.getElementById('favIcon');
+        if (fav) fav.href = dataUrl;
+      } catch (e) {}
+    })();
+    const defaultAdhkar = [
+      { id: 'd1', title: 'سبحان الله وبحمده', virtue: 'قَالَ ﷺ: «مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ».', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', target: 100 }] },
+      { id: 'd2', title: 'التهليل (100 مرة)', virtue: 'كَانَتْ لَهُ عَدْلَ عَشْرِ رِقَابٍ، وَكُتِبَتْ لَهُ مِائَةُ حَسَنَةٍ، وَمُحِيَتْ عَنْهُ مِائَةُ سَيِّئَةٍ، وَكَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ.', steps: [{ text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 100 }] },
+      { id: 'd3', title: 'التسبيح دبر الصلاة', virtue: 'مَنْ سَبَّحَ اللَّهَ دُبُرَ كُلِّ صَلَاةٍ ثَلَاثًا وَثَلَاثِينَ، وَحَمِدَ اللَّهَ ثَلَاثًا وَثَلَاثِينَ، وَكَبَّرَ اللَّهَ ثَلَاثًا وَثَلَاثِينَ، وَخَتَمَ الْمِائَةَ بِالتَّهْلِيلِ غُفِرَتْ خَطَايَاهُ.', steps: [{ text: 'سُبْحَانَ اللَّهِ', target: 33 }, { text: 'الْحَمْدُ لِلَّهِ', target: 33 }, { text: 'اللَّهُ أَكْبَرُ', target: 33 }, { text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 1 }] },
+      { id: 'd4', title: 'التسبيح عند النوم', virtue: 'وَصِيَّةُ النَّبِيِّ ﷺ لِفَاطِمَةَ وَعَلِيٍّ رَضِيَ اللَّهُ عَنْهُمَا عِنْدَ أَخْذِ الْمَضْجَعِ، وَهِيَ خَيْرٌ مِنْ خَادِمٍ.', steps: [{ text: 'سُبْحَانَ اللَّهِ', target: 33 }, { text: 'الْحَمْدُ لِلَّهِ', target: 33 }, { text: 'اللَّهُ أَكْبَرُ', target: 34 }] },
+      { id: 'd5', title: 'عدد خلقه (3 مرات)', virtue: 'أَرْبَعُ كَلِمَاتٍ إِذَا قِيلَتْ ثَلَاثَ مَرَّاتٍ وَزَنَتْ مَا قِيلَ مِنَ الذِّكْرِ مُنْذُ الصَّبَاحِ.', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ', target: 3 }] },
+      { id: 'd6', title: 'الباقيات الصالحات', virtue: 'أَحَبُّ الْكَلِمِ إِلَى اللَّهِ أَرْبَعٌ، لَا يَضُرُّكَ بِأَيِّهِنَّ بَدَأْتَ.', steps: [{ text: 'سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ', target: 0 }] },
+      { id: 'd7', title: 'كلمتان خفيفتان', virtue: 'كَلِمَتَانِ خَفِيفَتَانِ عَلَى اللِّسَانِ، ثَقِيلَتَانِ فِي الْمِيزَانِ، حَبِيبَتَانِ إِلَى الرَّحْمَنِ.', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', target: 0 }] },
+      { id: 'd8', title: 'الحوقلة', virtue: 'كَنْزٌ مِنْ كُنُوزِ الْجَنَّةِ.', steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }] }
+    ];
+
+    function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+    function formatDuration(ms) { const totalSec = Math.floor(ms / 1000); const mins = Math.floor(totalSec / 60); const secs = totalSec % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; }
+
+    const FIREBASE_DB_URL = 'https://firebaseio.com';
+    let state = {
+      adhkar: JSON.parse(localStorage.getItem('tasbih_adhkar_v14')) || JSON.parse(localStorage.getItem('tasbih_adhkar_v13')) || JSON.parse(JSON.stringify(defaultAdhkar)),
+      activeIndex: parseInt(localStorage.getItem('tasbih_active_idx_v14') || localStorage.getItem('tasbih_active_idx_v13') || '0', 10),
+      progressMap: JSON.parse(localStorage.getItem('tasbih_progress_map_v14') || localStorage.getItem('tasbih_progress_map_v13') || '{}'),
+      theme: localStorage.getItem('tasbih_theme_v14') || localStorage.getItem('tasbih_theme_v13') || 'default',
+      fontSize: parseInt(localStorage.getItem('tasbih_fontsize_v14') || localStorage.getItem('tasbih_fontsize_v13') || '24', 10),
+      focusMode: (localStorage.getItem('tasbih_focus_v14') ?? localStorage.getItem('tasbih_focus_v13')) === 'true',
+      wakeLockEnabled: (localStorage.getItem('tasbih_wakelock_v14') ?? localStorage.getItem('tasbih_wakelock_v13')) === 'true',
+      stats: JSON.parse(localStorage.getItem('tasbih_stats_v14') || localStorage.getItem('tasbih_stats_v13') || '{"todayCount":0,"totalCount":0,"streak":0,"lastDate":"","dailyDetails":{}}'),
+      syncCode: localStorage.getItem('tasbih_sync_code_v15') || '',
+      editingIndex: -1,
+      pendingConfirmAction: null
+    };
+    if (!state.stats.dailyDetails) state.stats.dailyDetails = {};
+    let tapTimestamps = [], measuredIntervalMs = null, autoTapTimer = null, isAutoTapping = false, autoTapUsedInStep = false;
+    let dhikrElapsedMs = {}, activeTimerStart = null, activeTimerDhikrId = null, uiTimerInterval = null;
+
+    function startDhikrTimer(dhikrId) {
+      if (activeTimerDhikrId && activeTimerDhikrId !== dhikrId) pauseDhikrTimer();
+      if (!activeTimerStart) { activeTimerDhikrId = dhikrId; activeTimerStart = Date.now(); }
+      if (!uiTimerInterval) uiTimerInterval = setInterval(updateTimerUI, 500);
+      updateTimerUI();
+    }
+    function pauseDhikrTimer() {
+      if (activeTimerStart && activeTimerDhikrId) {
+        dhikrElapsedMs[activeTimerDhikrId] = (dhikrElapsedMs[activeTimerDhikrId] || 0) + (Date.now() - activeTimerStart);
+        activeTimerStart = null;
+      }
+      if (uiTimerInterval) { clearInterval(uiTimerInterval); uiTimerInterval = null; }
+      updateTimerUI();
+    }
+    function getCurrentDhikrElapsed(dhikrId) {
+      let base = dhikrElapsedMs[dhikrId] || 0;
+      if (activeTimerStart && activeTimerDhikrId === dhikrId) base += (Date.now() - activeTimerStart);
+      return base;
+    }
+    function updateTimerUI() {
+      const dhikr = getCurrentDhikr(); if (!dhikr) return;
+      const pill = document.getElementById('dhikrTimerPill');
+      pill.textContent = `⏱ ${formatDuration(getCurrentDhikrElapsed(dhikr.id))}`;
+      pill.classList.toggle('running', activeTimerStart !== null && activeTimerDhikrId === dhikr.id);
+    }
+    function stopAutoTap() { if (autoTapTimer) { clearInterval(autoTapTimer); autoTapTimer = null; } isAutoTapping = false; updateAutoTapButtonUI(); }
+    function resetAutoTapCalibration() { stopAutoTap(); tapTimestamps = []; measuredIntervalMs = null; autoTapUsedInStep = false; updateAutoTapButtonUI(); }
+    function updateAutoTapButtonUI() {
+      const btn = document.getElementById('autoTapBtn');
+      const undoBtn = document.getElementById('undoTapBtn');
+      const dhikr = getCurrentDhikr();
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[prog.stepIndex];
+      const currentVal = prog.stepCounts[prog.stepIndex];
+      const doneInStep = step.target > 0 ? (step.target - currentVal) : currentVal;
+
+      if (step.target > 0 && step.target <= 5) {
+        btn.style.display = 'none';
+        undoBtn.style.display = 'none';
+        return;
+      }
+
+      btn.style.display = 'inline-flex'; btn.classList.remove('ready', 'active');
+      if (isAutoTapping) {
+        btn.classList.add('active'); btn.textContent = `⏸ إيقاف مؤقت (${(measuredIntervalMs / 1000).toFixed(1)}ث)`;
+      } else if (measuredIntervalMs) {
+        btn.classList.add('ready'); btn.textContent = `▶ تشغيل العدّ الآلي (${(measuredIntervalMs / 1000).toFixed(1)}ث)`;
+      } else {
+        const rem = Math.max(0, 3 - tapTimestamps.length);
+        btn.textContent = rem === 3 ? '⚡ عدّ آلي (اضغط 3 مرات للقياس)' : `⚡ جاري القياس (باقي ${rem} ضغطات)`;
+      }
+
+      if ((isAutoTapping || autoTapUsedInStep || measuredIntervalMs) && doneInStep > 0) {
+        const undoAmount = Math.min(2, doneInStep);
+        undoBtn.style.display = 'inline-flex';
+        undoBtn.textContent = `↩ تراجع (${undoAmount}×)`;
+      } else {
+        undoBtn.style.display = 'none';
+      }
+    }
+    function toggleAutoTap(e) {
+      if (e) e.stopPropagation();
+      if (isAutoTapping) { stopAutoTap(); pauseDhikrTimer(); return; }
+      if (!measuredIntervalMs) { showSaveToast('اضغط 3 مرات متتالية أولاً لقياس سرعتك'); return; }
+      isAutoTapping = true; autoTapUsedInStep = true; updateAutoTapButtonUI();
+      autoTapTimer = setInterval(() => performIncrement(true), measuredIntervalMs);
+    }
+    function undoAutoTapDouble(e) {
+      if (e) e.stopPropagation();
+      const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
+      let actualReverted = 0;
+
+      if (step.target > 0) {
+        const doneInStep = step.target - prog.stepCounts[sIdx];
+        if (doneInStep <= 0) { showSaveToast('العداد عند البداية بالفعل'); return; }
+        actualReverted = Math.min(2, doneInStep);
+        prog.stepCounts[sIdx] += actualReverted;
+      } else {
+        if (prog.stepCounts[sIdx] <= 0) { showSaveToast('العداد عند الصفر بالفعل'); return; }
+        actualReverted = Math.min(2, prog.stepCounts[sIdx]);
+        prog.stepCounts[sIdx] -= actualReverted;
+      }
+
+      if (isAutoTapping) {
+        stopAutoTap();
+        pauseDhikrTimer();
+      }
+
+      revertTasbihStat(dhikr, sIdx, actualReverted);
+      if (navigator.vibrate) navigator.vibrate(40);
+      state.progressMap[dhikr.id] = prog;
+      render();
+      showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
+    }
+    let wakeLockSentinel = null;
+    async function applyWakeLock() {
+      try {
+        if (state.wakeLockEnabled && 'wakeLock' in navigator) {
+          if (!wakeLockSentinel) wakeLockSentinel = await navigator.wakeLock.request('screen');
+        } else if (wakeLockSentinel) { await wakeLockSentinel.release(); wakeLockSentinel = null; }
+      } catch (e) {}
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (state.wakeLockEnabled) { wakeLockSentinel = null; applyWakeLock(); }
+        if (state.syncCode) pullFromCloud(false);
+      }
+    });
+    function checkStatsDate() {
+      const today = getTodayStr(), yesterday = getYesterdayStr();
+      if (state.stats.lastDate && state.stats.lastDate !== today) {
+        state.stats.todayCount = 0; state.stats.dailyDetails = {};
+        if (state.stats.lastDate !== yesterday) state.stats.streak = 0;
+      }
+      if (!state.stats.dailyDetails) state.stats.dailyDetails = {};
+    }
+    function recordTasbihStat(dhikr, stepIndex, completedDurationMs = 0) {
+      const today = getTodayStr(), yesterday = getYesterdayStr();
+      if (state.stats.lastDate !== today) {
+        state.stats.todayCount = 0; state.stats.dailyDetails = {};
+        state.stats.streak = (state.stats.lastDate === yesterday) ? (state.stats.streak || 0) + 1 : 1;
+        state.stats.lastDate = today;
+      }
+      state.stats.todayCount += 1; state.stats.totalCount = (state.stats.totalCount || 0) + 1;
+      if (!state.stats.dailyDetails[dhikr.id]) state.stats.dailyDetails[dhikr.id] = { title: dhikr.title, total: 0, steps: {}, durationMs: 0 };
+      const entry = state.stats.dailyDetails[dhikr.id];
+      entry.title = dhikr.title; entry.total += 1;
+      entry.steps[stepIndex] = (entry.steps[stepIndex] || 0) + 1;
+      if (completedDurationMs > 0) entry.durationMs = (entry.durationMs || 0) + completedDurationMs;
+    }
+    function revertTasbihStat(dhikr, stepIndex, amount) {
+      if (amount <= 0) return;
+      state.stats.todayCount = Math.max(0, (state.stats.todayCount || 0) - amount);
+      state.stats.totalCount = Math.max(0, (state.stats.totalCount || 0) - amount);
+      const entry = state.stats.dailyDetails?.[dhikr.id];
+      if (entry) {
+        entry.total = Math.max(0, (entry.total || 0) - amount);
+        if (entry.steps && entry.steps[stepIndex]) {
+          entry.steps[stepIndex] = Math.max(0, entry.steps[stepIndex] - amount);
+        }
+      }
+    }
+    let toastTimer = null, cloudPushTimer = null;
+    function showSaveToast(msg = 'تم الحفظ') {
+      const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+    }
+    function pushToCloud() {
+      if (!state.syncCode || !navigator.onLine) return;
+      clearTimeout(cloudPushTimer);
+      cloudPushTimer = setTimeout(() => {
+        const cleanCode = encodeURIComponent(state.syncCode.trim());
+        const payload = { adhkar: state.adhkar, progressMap: state.progressMap, stats: state.stats, updatedAt: Date.now() };
+        fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      }, 900);
+    }
+    async function pullFromCloud(notify = false) {
+      if (!state.syncCode || !navigator.onLine) return;
+      try {
+        const cleanCode = encodeURIComponent(state.syncCode.trim());
+        const res = await fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && Array.isArray(data.adhkar) && data.adhkar.length > 0) {
+          state.adhkar = data.adhkar;
+          state.progressMap = data.progressMap || {};
+          if (data.stats) {
+            state.stats = data.stats;
+            if (!state.stats.dailyDetails) state.stats.dailyDetails = {};
+            checkStatsDate();
+          }
+          if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
+          saveState(false, '', true);
+          render(true);
+          if (notify) showSaveToast('تمت المزامنة السحابية ✓');
+        } else if (notify) {
+          pushToCloud();
+          showSaveToast('تم ربط الجهاز ورفع بياناتك ✓');
+        }
+      } catch (e) {}
+    }
+    function saveSyncCode() {
+      const val = document.getElementById('syncCodeInput').value.trim();
+      state.syncCode = val;
+      localStorage.setItem('tasbih_sync_code_v15', val);
+      updateSyncUI();
+      if (val) pullFromCloud(true);
+      else showSaveToast('تم إيقاف المزامنة السحابية');
+    }
+    function updateSyncUI() {
+      const inp = document.getElementById('syncCodeInput');
+      const st = document.getElementById('syncStatusText');
+      if (inp) inp.value = state.syncCode;
+      if (st) {
+        st.textContent = state.syncCode ? `الحالة: متصل بالمزامنة (${state.syncCode}) ☁` : 'الحالة: تخزين محلي على هذا الجهاز فقط';
+        st.style.color = state.syncCode ? 'var(--primary-color)' : 'var(--text-muted)';
+      }
+    }
+    function saveState(notify = false, msg = 'تم الحفظ', skipCloud = false) {
+      localStorage.setItem('tasbih_adhkar_v14', JSON.stringify(state.adhkar));
+      localStorage.setItem('tasbih_active_idx_v14', state.activeIndex);
+      localStorage.setItem('tasbih_progress_map_v14', JSON.stringify(state.progressMap));
+      localStorage.setItem('tasbih_theme_v14', state.theme);
+      localStorage.setItem('tasbih_fontsize_v14', state.fontSize);
+      localStorage.setItem('tasbih_focus_v14', state.focusMode);
+      localStorage.setItem('tasbih_wakelock_v14', state.wakeLockEnabled);
+      localStorage.setItem('tasbih_stats_v14', JSON.stringify(state.stats));
+      if (!skipCloud && state.syncCode) pushToCloud();
+      if (notify) showSaveToast(msg);
+    }
+    function getDhikrProgress(dhikr) {
+      let prog = state.progressMap[dhikr.id];
+      if (!prog || !Array.isArray(prog.stepCounts) || prog.stepCounts.length !== dhikr.steps.length) {
+        prog = { stepIndex: 0, stepCounts: dhikr.steps.map(s => (s.target > 0 ? s.target : 0)) };
+        state.progressMap[dhikr.id] = prog;
+      }
+      if (prog.stepIndex < 0 || prog.stepIndex >= dhikr.steps.length) prog.stepIndex = 0;
+      return prog;
+    }
+    function isStepInProgress(dhikr, sIdx) {
+      const prog = getDhikrProgress(dhikr), target = dhikr.steps[sIdx].target, cnt = prog.stepCounts[sIdx];
+      return (target > 0 && cnt < target) || (target === 0 && cnt > 0);
+    }
+    function hasActiveProgress(dhikr) {
+      for (let i = 0; i < dhikr.steps.length; i++) if (isStepInProgress(dhikr, i)) return true;
+      return false;
+    }
+    function init() {
+      checkStatsDate();
+      if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
+      applyAppearance();
+      applyWakeLock();
+      updateSyncUI();
+      render();
+      if (state.syncCode) pullFromCloud(false);
+    }
+    function getCurrentDhikr() { return state.adhkar[state.activeIndex]; }
+    function applyAppearance() {
+      if (state.theme === 'default') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', state.theme);
+      document.documentElement.style.setProperty('--dhikr-font-size', state.fontSize + 'px');
+      document.getElementById('fontSlider').value = state.fontSize;
+      document.getElementById('fontSizeVal').textContent = state.fontSize;
+      document.getElementById('focusToggle').checked = state.focusMode;
+      document.getElementById('wakeLockToggle').checked = state.wakeLockEnabled;
+      document.getElementById('counterZone').classList.toggle('focus-active', state.focusMode);
+      document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.t === state.theme));
+    }
+    function updateProgressRing(current, target) {
+      const circle = document.getElementById('progressCircle'), circumference = 578.05;
+      if (target > 0) {
+        const ratio = Math.max(0, Math.min(1, (target - current) / target));
+        circle.style.strokeDashoffset = circumference * (1 - ratio);
+      } else {
+        const mod = (current % 33) / 33;
+        circle.style.strokeDashoffset = current === 0 ? circumference : circumference * (1 - mod);
+      }
+    }
+    function render(skipCloud = false) {
+      const tabsBar = document.getElementById('tabsBar'); tabsBar.innerHTML = '';
+      state.adhkar.forEach((item, idx) => {
+        const chip = document.createElement('button');
+        chip.className = 'dhikr-chip' + (idx === state.activeIndex ? ' active' : '');
+        chip.innerHTML = `${hasActiveProgress(item) ? '<span class="progress-dot"></span>' : ''}<span>${item.title}</span>`;
+        chip.onclick = () => selectDhikr(idx);
+        tabsBar.appendChild(chip);
+      });
+      const activeChip = tabsBar.children[state.activeIndex];
+      if (activeChip) activeChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr), step = dhikr.steps[prog.stepIndex], currentVal = prog.stepCounts[prog.stepIndex];
+      const stepsPills = document.getElementById('stepsPills'); stepsPills.innerHTML = '';
+      dhikr.steps.forEach((st, sIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'step-pill-btn' + (sIdx === prog.stepIndex ? ' active' : '');
+        btn.innerHTML = `${isStepInProgress(dhikr, sIdx) ? '<span class="step-dot"></span>' : ''}<span>خطوة ${sIdx + 1}</span>`;
+        btn.onclick = () => jumpToStep(sIdx);
+        stepsPills.appendChild(btn);
+      });
+      document.getElementById('dhikrText').textContent = step.text;
+      const virtueBox = document.getElementById('virtueBox');
+      if (dhikr.virtue && dhikr.virtue.trim() !== '') { virtueBox.style.display = 'block'; virtueBox.textContent = dhikr.virtue; }
+      else virtueBox.style.display = 'none';
+      document.getElementById('countDisplay').textContent = currentVal;
+      document.getElementById('countLabel').textContent = step.target > 0 ? `المتبقي من ${step.target}` : 'عداد مفتوح';
+      updateProgressRing(currentVal, step.target);
+      updateTimerUI(); updateAutoTapButtonUI(); saveState(false, '', skipCloud);
+    }
+    function jumpToStep(stepIdx) { pauseDhikrTimer(); resetAutoTapCalibration(); const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr); prog.stepIndex = stepIdx; state.progressMap[dhikr.id] = prog; render(); }
+    function selectDhikr(index) { if (index !== state.activeIndex) { pauseDhikrTimer(); resetAutoTapCalibration(); } state.activeIndex = index; render(); }
+    function prevDhikr() { pauseDhikrTimer(); resetAutoTapCalibration(); state.activeIndex = (state.activeIndex - 1 + state.adhkar.length) % state.adhkar.length; render(); }
+    function nextDhikr() { pauseDhikrTimer(); resetAutoTapCalibration(); state.activeIndex = (state.activeIndex + 1) % state.adhkar.length; render(); }
+    function handleZoneTap(e) { if (state.focusMode) performIncrement(false); }
+    function handleRingTap(e) { if (!state.focusMode) { e.stopPropagation(); performIncrement(false); } }
+    function performIncrement(fromAuto = false) {
+      const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
+      if (!fromAuto && (step.target === 0 || step.target > 5)) {
+        const now = Date.now();
+        if (tapTimestamps.length > 0 && (now - tapTimestamps.at(-1)) > 8000) tapTimestamps = [];
+        tapTimestamps.push(now);
+        if (tapTimestamps.length >= 3) {
+          const diff1 = tapTimestamps.at(-2) - tapTimestamps.at(-3);
+          const diff2 = tapTimestamps.at(-1) - tapTimestamps.at(-2);
+          measuredIntervalMs = Math.max(300, Math.round((diff1 + diff2) / 2));
+        }
+      }
+      startDhikrTimer(dhikr.id);
+      if (navigator.vibrate) navigator.vibrate(25);
+      let completedDuration = 0;
+      if (step.target > 0) {
+        if (prog.stepCounts[sIdx] > 1) {
+          prog.stepCounts[sIdx] -= 1; recordTasbihStat(dhikr, sIdx, 0);
+        } else {
+          if (navigator.vibrate) navigator.vibrate(150);
+          prog.stepCounts[sIdx] = step.target;
+          if (sIdx < dhikr.steps.length - 1) {
+            prog.stepIndex = sIdx + 1; stopAutoTap(); tapTimestamps = []; measuredIntervalMs = null; autoTapUsedInStep = false; recordTasbihStat(dhikr, sIdx, 0);
+          } else {
+            prog.stepIndex = 0; pauseDhikrTimer(); completedDuration = dhikrElapsedMs[dhikr.id] || 0; dhikrElapsedMs[dhikr.id] = 0;
+            resetAutoTapCalibration(); recordTasbihStat(dhikr, sIdx, completedDuration);
+            showSaveToast(`أتممت الذكر في ${formatDuration(completedDuration)}`);
+          }
+        }
+      } else { prog.stepCounts[sIdx] += 1; recordTasbihStat(dhikr, sIdx, 0); }
+      state.progressMap[dhikr.id] = prog; render();
+    }
+    function resetCurrent() {
+      pauseDhikrTimer(); resetAutoTapCalibration();
+      const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
+      prog.stepCounts[sIdx] = step.target > 0 ? step.target : 0; dhikrElapsedMs[dhikr.id] = 0;
+      state.progressMap[dhikr.id] = prog; render(); showSaveToast('تم التصفير');
+    }
+    function getRemainingToCompleteDhikr(dhikr) {
+      const hasFiniteTarget = dhikr.steps.some(s => s.target > 0);
+      if (!hasFiniteTarget) return null;
+      const prog = getDhikrProgress(dhikr);
+      let totalRem = 0;
+      dhikr.steps.forEach((st, idx) => {
+        if (st.target > 0) {
+          if (idx < prog.stepIndex) totalRem += 0;
+          else if (idx === prog.stepIndex) totalRem += prog.stepCounts[idx];
+          else totalRem += st.target;
+        }
+      });
+      return totalRem;
+    }
+    function openStatsModal() {
+      checkStatsDate();
+      document.getElementById('statToday').textContent = state.stats.todayCount || 0;
+      document.getElementById('statTotal').textContent = state.stats.totalCount || 0;
+      document.getElementById('statStreak').textContent = state.stats.streak || 0;
+      const readListEl = document.getElementById('statsReadList'), unreadListEl = document.getElementById('statsUnreadList');
+      readListEl.innerHTML = ''; unreadListEl.innerHTML = '';
+      const details = state.stats.dailyDetails || {};
+      let hasReadAny = false, hasUnreadAny = false;
+      state.adhkar.forEach((dhikr) => {
+        const entry = details[dhikr.id], totalDone = entry ? (entry.total || 0) : 0;
+        const prog = getDhikrProgress(dhikr);
+        if (totalDone > 0) {
+          hasReadAny = true;
+          const card = document.createElement('div'); card.className = 'stat-detail-card';
+          const durText = (entry.durationMs && entry.durationMs > 0) ? ` • ⏱ ${formatDuration(entry.durationMs)}` : '';
+          const totalRem = getRemainingToCompleteDhikr(dhikr);
+          let remStatusHtml = '';
+          if (totalRem !== null) {
+            if (hasActiveProgress(dhikr) && totalRem > 0) {
+              remStatusHtml = `<div class="stat-rem-pill">⏳ المتبقي لإتمام الدورة الحالية: ${totalRem} تسبيحة</div>`;
+            } else {
+              remStatusHtml = `<div class="stat-rem-pill" style="color: var(--primary-color);">✨ مكتمل حالياً (جاهز لدورة جديدة)</div>`;
+            }
+          }
+          let stepsHtml = '';
+          dhikr.steps.forEach((st, sIdx) => {
+            const stCount = (entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
+            const shortTxt = st.text.length > 22 ? st.text.slice(0, 22) + '...' : st.text;
+            let stepRemTag = '';
+            if (st.target > 0) {
+              const stepRem = (sIdx < prog.stepIndex) ? 0 : (sIdx === prog.stepIndex ? prog.stepCounts[sIdx] : st.target);
+              if (hasActiveProgress(dhikr) && stepRem > 0 && stepRem < st.target) {
+                stepRemTag = ` <span style="color:var(--accent-color); font-size:11px;">(متبقي ${stepRem})</span>`;
+              } else if (hasActiveProgress(dhikr) && sIdx > prog.stepIndex) {
+                stepRemTag = ` <span style="color:var(--text-muted); font-size:11px;">(متبقي ${st.target})</span>`;
+              }
+            }
+            stepsHtml += `<div class="stat-step-row"><span class="stat-step-name">خطوة ${sIdx + 1}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag}</span></div>`;
+          });
+          card.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge">${totalDone} مرة${durText}</span></div>${remStatusHtml}<div class="stat-steps-list">${stepsHtml}</div>`;
+          readListEl.appendChild(card);
+        }
+        const unreadSteps = [];
+        dhikr.steps.forEach((st, sIdx) => {
+          const stCount = (entry && entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
+          if (stCount === 0) unreadSteps.push(`خطوة ${sIdx + 1}: ${st.text.length > 26 ? st.text.slice(0, 26) + '...' : st.text}`);
+        });
+        if (totalDone === 0 || unreadSteps.length > 0) {
+          hasUnreadAny = true;
+          const uCard = document.createElement('div'); uCard.className = 'stat-detail-card'; uCard.style.opacity = '0.85';
+          if (totalDone === 0) {
+            uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">لم يُقرأ بعد</span></div>`;
+          } else {
+            uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">خطوات متبقية</span></div><div class="stat-steps-list">${unreadSteps.map(s => `<div>• ${s}</div>`).join('')}</div>`;
+          }
+          unreadListEl.appendChild(uCard);
+        }
+      });
+      if (!hasReadAny) readListEl.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:6px 0;">لم تقم بأي تسبيح اليوم بعد.</div>';
+      if (!hasUnreadAny) unreadListEl.innerHTML = '<div style="font-size:13px; color:var(--primary-color); font-weight:700; padding:6px 0;">ما شاء الله! أتممت جميع الأذكار والخطوات اليوم.</div>';
+      document.getElementById('statsModal').classList.add('open');
+    }
+    function openAddModal() {
+      state.editingIndex = -1; document.getElementById('formModalTitle').textContent = 'إضافة ذكر جديد';
+      document.getElementById('inputTitle').value = ''; document.getElementById('inputVirtue').value = '';
+      const container = document.getElementById('stepsContainer'); container.innerHTML = '';
+      addStepField('', 33); document.getElementById('formModal').classList.add('open');
+    }
+    function openEditModal(idx = state.activeIndex) {
+      closeModal('manageModal'); state.editingIndex = idx; const dhikr = state.adhkar[idx];
+      document.getElementById('formModalTitle').textContent = 'تعديل الذكر والخطوات';
+      document.getElementById('inputTitle').value = dhikr.title; document.getElementById('inputVirtue').value = dhikr.virtue || '';
+      const container = document.getElementById('stepsContainer'); container.innerHTML = '';
+      dhikr.steps.forEach(s => addStepField(s.text, s.target)); document.getElementById('formModal').classList.add('open');
+    }
+    function addStepField(text = '', target = 33) {
+      const container = document.getElementById('stepsContainer'), div = document.createElement('div');
+      div.className = 'step-item-edit';
+      div.innerHTML = `<textarea rows="2" placeholder="نص الذكر في هذه الخطوة..." class="step-text-input">${text}</textarea><div class="step-row"><span style="font-size: 13px; font-weight: 700;">العدد:</span><input type="number" min="0" value="${target}" class="step-target-input" style="width: 90px;"><button type="button" class="tool-btn delete" onclick="removeStepField(this)">حذف الخطوة</button></div>`;
+      container.appendChild(div);
+    }
+    function removeStepField(btn) { const container = document.getElementById('stepsContainer'); if (container.children.length > 1) btn.closest('.step-item-edit').remove(); }
+    function saveDhikrForm() {
+      const title = document.getElementById('inputTitle').value.trim(), virtue = document.getElementById('inputVirtue').value.trim();
+      const stepEls = document.querySelectorAll('.step-item-edit'), steps = [];
+      stepEls.forEach(el => {
+        const txt = el.querySelector('.step-text-input').value.trim(), tgt = parseInt(el.querySelector('.step-target-input').value || '0', 10);
+        if (txt) steps.push({ text: txt, target: isNaN(tgt) || tgt < 0 ? 0 : tgt });
+      });
+      if (!title || steps.length === 0) return;
+      if (state.editingIndex >= 0) {
+        const currentId = state.adhkar[state.editingIndex].id;
+        state.adhkar[state.editingIndex] = { id: currentId, title, virtue, steps }; delete state.progressMap[currentId];
+      } else {
+        const newId = 'custom_' + Date.now();
+        state.adhkar.push({ id: newId, title, virtue, steps }); state.activeIndex = state.adhkar.length - 1;
+      }
+      closeModal('formModal'); render(); showSaveToast('تم الحفظ');
+    }
+    let dragSrcIndex = null;
+    function openManageModal() {
+      const list = document.getElementById('manageList'); list.innerHTML = '';
+      state.adhkar.forEach((item, idx) => {
+        const row = document.createElement('div'); row.className = 'manage-item'; row.dataset.index = idx;
+        row.innerHTML = `<div class="drag-handle" title="اسحب لإعادة الترتيب">☰</div><span class="manage-item-title">${item.title}</span><div style="display:flex; gap:4px;"><button class="tool-btn" onclick="shareSingleDhikr(${idx})">مشاركة</button><button class="tool-btn" onclick="openEditModal(${idx})">تعديل</button><button class="tool-btn delete" onclick="openDeleteConfirm(${idx})">حذف</button></div>`;
+        row.querySelector('.drag-handle').addEventListener('pointerdown', (e) => startRowDrag(e, row, idx));
+        list.appendChild(row);
+      });
+      document.getElementById('manageModal').classList.add('open');
+    }
+    function startRowDrag(e, row, idx) {
+      e.preventDefault(); dragSrcIndex = idx; row.classList.add('dragging');
+      const list = document.getElementById('manageList');
+      function onPointerMove(moveEvent) {
+        const items = Array.from(list.querySelectorAll('.manage-item')), clientY = moveEvent.clientY;
+        for (let i = 0; i < items.length; i++) {
+          const targetRow = items[i]; if (targetRow === row) continue;
+          const rect = targetRow.getBoundingClientRect(), midY = rect.top + rect.height / 2;
+          if (clientY < midY && i < dragSrcIndex) { list.insertBefore(row, targetRow); reorderAdhkarArray(dragSrcIndex, i); dragSrcIndex = i; break; }
+          else if (clientY > midY && i > dragSrcIndex) { list.insertBefore(row, targetRow.nextSibling); reorderAdhkarArray(dragSrcIndex, i); dragSrcIndex = i; break; }
+        }
+      }
+      function onPointerUp() {
+        row.classList.remove('dragging');
+        document.removeEventListener('pointermove', onPointerMove); document.removeEventListener('pointerup', onPointerUp);
+        openManageModal(); render(); showSaveToast('تم تحديث الترتيب');
+      }
+      document.addEventListener('pointermove', onPointerMove); document.addEventListener('pointerup', onPointerUp);
+    }
+    function reorderAdhkarArray(fromIdx, toIdx) {
+      const activeId = state.adhkar[state.activeIndex]?.id;
+      const [moved] = state.adhkar.splice(fromIdx, 1); state.adhkar.splice(toIdx, 0, moved);
+      if (activeId) { const newActive = state.adhkar.findIndex(a => a.id === activeId); if (newActive >= 0) state.activeIndex = newActive; }
+      saveState(false);
+    }
+    function shareSingleDhikr(idx) {
+      const item = state.adhkar[idx], code = JSON.stringify({ type: 'single_dhikr', dhikr: { title: item.title, virtue: item.virtue || '', steps: item.steps } });
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(() => showSaveToast(`تم نسخ "${item.title}"`));
+      else prompt('انسخ كود الذكر التالي لمشاركته:', code);
+    }
+    function exportAllAdhkar() {
+      const code = JSON.stringify({ type: 'full_backup', list: state.adhkar });
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(() => showSaveToast('تم نسخ جميع الأذكار'));
+      else prompt('انسخ الكود التالي:', code);
+    }
+    function openImportModal() { closeModal('manageModal'); document.getElementById('importCodeInput').value = ''; document.getElementById('importModal').classList.add('open'); }
+    function importAdhkarCode() {
+      try {
+        const raw = document.getElementById('importCodeInput').value.trim(), parsed = JSON.parse(raw);
+        if (parsed && parsed.type === 'single_dhikr' && parsed.dhikr && parsed.dhikr.title && Array.isArray(parsed.dhikr.steps)) {
+          const newItem = { id: 'shared_' + Date.now(), title: parsed.dhikr.title, virtue: parsed.dhikr.virtue || '', steps: parsed.dhikr.steps };
+          state.adhkar.push(newItem); state.activeIndex = state.adhkar.length - 1; closeModal('importModal'); render(); showSaveToast(`تمت إضافة "${newItem.title}"`); return;
+        }
+        const list = Array.isArray(parsed) ? parsed : parsed.list;
+        if (Array.isArray(list) && list.length > 0 && list.at(0).title && Array.isArray(list.at(0).steps)) {
+          state.adhkar = list; state.progressMap = {}; state.activeIndex = 0; closeModal('importModal'); render(); showSaveToast('تم استيراد القائمة بنجاح');
+        } else showSaveToast('الكود غير صحيح');
+      } catch (e) { showSaveToast('الكود غير صالح'); }
+    }
+    function openDeleteConfirm(idx) {
+      if (state.adhkar.length <= 1) return; closeModal('manageModal');
+      const dhikr = state.adhkar[idx];
+      document.getElementById('deleteMsg').textContent = `هل أنت متأكد من حذف "${dhikr.title}" نهائياً؟`;
+      state.pendingConfirmAction = () => {
+        const removedId = state.adhkar[idx].id; delete state.progressMap[removedId]; state.adhkar.splice(idx, 1);
+        if (state.activeIndex >= state.adhkar.length) state.activeIndex = state.adhkar.length - 1;
+        render(); showSaveToast('تم الحذف');
+      };
+      document.getElementById('deleteModal').classList.add('open');
+    }
+    function openResetDefaultsConfirm() {
+      closeModal('manageModal');
+      document.getElementById('deleteMsg').textContent = 'هل تريد استعادة جميع الأذكار الافتراضية وحذف التعديلات؟';
+      state.pendingConfirmAction = () => { state.adhkar = JSON.parse(JSON.stringify(defaultAdhkar)); state.progressMap = {}; state.activeIndex = 0; render(); showSaveToast('تمت الاستعادة'); };
+      document.getElementById('deleteModal').classList.add('open');
+    }
+    function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
+    function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
+    function setTheme(themeName) { state.theme = themeName; applyAppearance(); saveState(true); }
+    function setFontSize(val) { state.fontSize = parseInt(val, 10); applyAppearance(); saveState(true); }
+    function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
+    function toggleWakeLock(val) { state.wakeLockEnabled = val; applyWakeLock(); saveState(true); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    init();
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); }); }
+  </script>
+</body>
+</html>
