@@ -79,9 +79,11 @@
     [data-theme="carbon-silver"] .dhikr-chip.active, [data-theme="carbon-silver"] .step-pill-btn.active, [data-theme="carbon-silver"] .ctrl-btn.primary, [data-theme="carbon-silver"] .auto-tap-btn.active, [data-theme="carbon-silver"] .list-chip.active,
     [data-theme="walnut-charcoal"] .dhikr-chip.active, [data-theme="walnut-charcoal"] .step-pill-btn.active, [data-theme="walnut-charcoal"] .ctrl-btn.primary, [data-theme="walnut-charcoal"] .auto-tap-btn.active, [data-theme="walnut-charcoal"] .list-chip.active { color: #080808; }
     .progress-dot { width: 7px; height: 7px; border-radius: 50%; background-color: var(--accent-color); display: inline-block; }
+    .resume-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 16px 6px; padding: 6px 12px; border-radius: 12px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+    .resume-banner.show { display: flex; }
     main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 16px 8px; overflow: hidden; }
-    .card { background: var(--surface-color); border-radius: 20px; padding: 12px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; justify-content: flex-start; flex: 1; min-height: 0; overflow-y: auto; }
-    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; flex-shrink: 0; }
+    .card { background: var(--surface-color); border-radius: 20px; padding: 12px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; justify-content: flex-start; flex: 1; min-height: 0; overflow-y: auto; touch-action: pan-y; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-bottom: 6px; flex-shrink: 0; }
     .steps-pills { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 2px; }
     .steps-pills::-webkit-scrollbar { display: none; }
     .step-pill-btn { flex: 0 0 auto; background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -118,6 +120,23 @@
     .bottom-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-shrink: 0; }
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+
+    /* وضع القراءة بكامل الشاشة */
+    body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
+    body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
+    body.reading-mode .counter-top-bar { width: auto; justify-content: flex-start; }
+    body.reading-mode .ring-wrapper { width: 58px; height: 58px; }
+    body.reading-mode .progress-svg { display: none; }
+    body.reading-mode .ring-wrapper { background: var(--primary-color); border-radius: 14px; }
+    body.reading-mode .count-number { font-size: 22px; color: #ffffff; }
+    body.reading-mode .count-label { font-size: 9px; color: rgba(255,255,255,0.85); margin-top: 1px; }
+
+    /* تقويم الالتزام الشهري */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
+    .cal-day { aspect-ratio: 1; border-radius: 8px; background: var(--bg-color); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+    .cal-day.active-day { background: var(--primary-light); color: var(--primary-color); border-color: var(--primary-color); }
+    .cal-day.goal-day { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+    .cal-day.today-ring { box-shadow: 0 0 0 2px var(--accent-color); }
 
     @media (orientation: landscape) and (max-height: 550px) {
       header { padding: 3px 12px; }
@@ -240,13 +259,26 @@
         <span id="activeListLabel">الكل</span>
         <span>▾</span>
       </button>
+      <button type="button" class="fav-icon-btn" onclick="openQuickSearchModal()" title="بحث سريع في الأذكار" style="width:32px; height:32px; border-radius:16px;">
+        <svg class="ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
       <div class="tabs-bar" id="tabsBar"></div>
     </div>
+    <div class="resume-banner" id="resumeBanner" onclick="jumpToResumeDhikr()">
+      <span id="resumeBannerText">استكمال الورد...</span>
+      <span style="font-size:11px; opacity:0.85;" onclick="dismissResumeBanner(event)">✕</span>
+    </div>
     <main>
-      <div class="card">
+      <div class="card" id="dhikrCard">
         <div class="card-top">
           <div class="steps-pills" id="stepsPills"></div>
           <button type="button" class="step-count-btn" id="stepCounterBtn" onclick="openStepsIndexModal()">1 / 1 ▾</button>
+          <button type="button" class="fav-icon-btn" onclick="generateDhikrShareImage()" title="مشاركة الذكر كصورة">
+            <svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </button>
+          <button type="button" class="fav-icon-btn" id="readingModeBtn" onclick="toggleReadingMode()" title="وضع القراءة بكامل الشاشة">
+            <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
           <button type="button" class="fav-icon-btn" id="favToggleBtn" onclick="toggleCurrentDhikrInActiveList()" title="إضافة للمفضلة أو القائمة الحالية">
             <svg class="ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </button>
@@ -291,7 +323,7 @@
           <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           <span>الذكر السابق</span>
         </button>
-        <button class="ctrl-btn" onclick="resetCurrent()">
+        <button class="ctrl-btn" onclick="openResetOptions()">
           <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           <span>تصفير</span>
         </button>
@@ -301,6 +333,27 @@
         </button>
       </div>
     </main>
+  </div>
+  <div class="modal-backdrop" id="resetChoiceModal">
+    <div class="modal-box">
+      <h3 class="modal-title">خيارات التصفير</h3>
+      <p style="font-size:13.5px; color:var(--text-muted); margin-bottom:14px;">اختر طريقة التصفير المطلوبة لهذا الذكر:</p>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button type="button" class="ctrl-btn primary" style="padding:12px;" onclick="resetCurrentStepOnly()">تصفير الخطوة الحالية فقط</button>
+        <button type="button" class="ctrl-btn" style="padding:12px; color:var(--danger-color); border-color:rgba(220,53,69,0.4);" onclick="resetAllStepsOfCurrentDhikr()">تصفير جميع خطوات الذكر والعودة للبداية</button>
+        <button type="button" class="ctrl-btn" style="padding:10px;" onclick="closeModal('resetChoiceModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="shareCardModal">
+    <div class="modal-box" style="text-align:center;">
+      <h3 class="modal-title" style="justify-content:center;">بطاقة الذكر للمشاركة</h3>
+      <img id="shareCardPreview" style="width:100%; border-radius:14px; border:1px solid var(--border-color); margin-bottom:12px;" alt="بطاقة الذكر">
+      <div class="modal-actions">
+        <button type="button" class="ctrl-btn" style="flex:1;" onclick="closeModal('shareCardModal')">إغلاق</button>
+        <button type="button" class="ctrl-btn primary" style="flex:1;" onclick="shareGeneratedImage()">مشاركة / حفظ الصورة</button>
+      </div>
+    </div>
   </div>
   <div class="modal-backdrop" id="statsModal">
     <div class="modal-box">
@@ -321,6 +374,13 @@
         <div style="width:100%; height:7px; background:var(--border-color); border-radius:10px; overflow:hidden;">
           <div id="statsGoalBar" style="height:100%; width:0%; background:var(--primary-color); transition:width 0.3s;"></div>
         </div>
+      </div>
+      <div style="background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px; padding:10px 12px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:800; color:var(--primary-color);">
+          <span id="calMonthTitle">تقويم الالتزام الشهري</span>
+          <span style="font-size:11px; color:var(--text-muted);">داكن: أتم الهدف • فاتح: سبّح</span>
+        </div>
+        <div class="cal-grid" id="monthlyCalGrid"></div>
       </div>
  
     <div class="stats-section-title">
@@ -651,6 +711,49 @@
           { title: 'أعوذ بكلمات الله التامات', text: 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ', target: 3 },
           { title: 'أسأل الله العظيم', text: 'أَسْأَلُ اللَّهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ', target: 7 },
           { title: 'بسم الله وأعوذ بالله', text: 'ضع يدك على الذي تألّم من جسدك وقل: «بِسْمِ اللَّهِ» (ثلاثاً)، وقل سبع مرات: «أَعُوذُ بِاللَّهِ وَقُدْرَتِهِ مِنْ شَرِّ مَا أَجِدُ وَأُحَاذِرُ»', target: 7 }
+        ]
+      },
+      {
+        id: 'after_prayer_adhkar',
+        title: 'أذكار بعد الصلاة',
+        virtue: 'الأذكار الواردة بعد السلام من الصلاة المفروضة من كتاب حصن المسلم.',
+        steps: [
+          { title: 'الاستغفار واللهم أنت السلام', text: 'أَسْتَغْفِرُ اللَّهَ (ثلاثاً) .. اللَّهُمَّ أَنْتَ السَّلَامُ، وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ', target: 1 },
+          { title: 'لا إله إلا الله وحده', text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ، وَلَا مُعْطِيَ لِمَا مَنَعْتَ، وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ', target: 1 },
+          { title: 'لا حول ولا قوة إلا بالله', text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ، لَا إِلَهَ إِلَّا اللَّهُ، وَلَا نَعْبُدُ إِلَّا إِيَّاهُ، لَهُ النِّعْمَةُ وَلَهُ الْفَضْلُ وَلَهُ الثَّنَاءُ الْحَسَنُ، لَا إِلَهَ إِلَّا اللَّهُ مُخْلِصِينَ لَهُ الدِّينَ وَلَوْ كَرِهَ الْكَافِرُونَ', target: 1 },
+          { title: 'التسبيح (33 مرة)', text: 'سُبْحَانَ اللَّهِ', target: 33 },
+          { title: 'التحميد (33 مرة)', text: 'الْحَمْدُ لِلَّهِ', target: 33 },
+          { title: 'التكبير (33 مرة)', text: 'اللَّهُ أَكْبَرُ', target: 33 },
+          { title: 'تمام المائة', text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 1 },
+          { title: 'آية الكرسي', text: 'اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَن ذَا الَّذِي يَشْفَعُ عِندَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ', target: 1 },
+          { title: 'المعوذات', text: 'قُلْ هُوَ اللَّهُ أَحَدٌ... وقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ... وقُلْ أَعُوذُ بِرَبِّ النَّاسِ... (تُقرأ مرة بعد كل صلاة، وثلاث مرات بعد الفجر والمغرب)', target: 1 },
+          { title: 'بعد الفجر والمغرب (10 مرات)', text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 10 },
+          { title: 'بعد السلام من الفجر', text: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا', target: 1 }
+        ]
+      },
+     
+ {
+        id: 'daily_occasions_adhkar',
+        title: 'أذكار المنزل والسفر',
+        virtue: 'أذكار الخروج من المنزل ودخوله، وركوب السيارة والسفر من كتاب حصن المسلم.',
+        steps: [
+          { title: 'الخروج من المنزل', text: 'بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 1 },
+          { title: 'دخول المنزل', text: 'بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى رَبِّنَا تَوَكَّلْنَا (ثم يسلم على أهله)', target: 1 },
+          { title: 'ركوب السيارة والسفر', text: 'بِسْمِ اللَّهِ، الْحَمْدُ لِلَّهِ ﴿سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ (١٣) وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ (١٤)﴾ الْحَمْدُ لِلَّهِ، الْحَمْدُ لِلَّهِ، الْحَمْدُ لِلَّهِ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، سُبْحَانَكَ اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ', target: 1 },
+          { title: 'دعاء السفر', text: 'اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ', target: 1 },
+          { title: 'دخول السوق', text: 'لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ حَيٌّ لَا يَمُوتُ، بِيَدِهِ الْخَيْرُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ', target: 1 }
+        ]
+      },
+      {
+        id: 'comprehensive_duas',
+        title: 'الأدعية الجامعة',
+        virtue: 'باقة من الأدعية النبوية الجامعة للكرب والهم والاستخارة وقضاء الدين من حصن المسلم.',
+        steps: [
+          { title: 'دعاء الهم والحزن', text: 'اللَّهُمَّ إِنِّي عَبْدُكَ، ابْنُ عَبْدِكَ، ابْنُ أَمَتِكَ، نَاصِيَتِي بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي', target: 1 },
+          { title: 'دعاء الكرب', text: 'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ', target: 1 },
+          { title: 'دعاء قضاء الدين', text: 'اللَّهُمَّ اكْفِنِي بِحَلَالِكَ عَنْ حَرَامِكَ، وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ', target: 1 },
+          { title: 'دعاء الاستخارة', text: 'اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ، وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ، وَأَسْأَلُكَ مِنْ فَضْلِكَ الْعَظِيمِ، فَإِنَّكَ تَقْدِرُ وَلَا أَقْدِرُ، وَتَعْلَمُ وَلَا أَعْلَمُ، وَأَنْتَ عَلَّامُ الْغُيُوبِ، اللَّهُمَّ إِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ خَيْرٌ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي فَاقْدُرْهُ لِي وَيَسِّرْهُ لِي ثُمَّ بَارِكْ لِي فِيِهِ، وَإِنْ كُنْتَ تَعْلَمُ أَنَّ هَذَا الْأَمْرَ شَرٌّ لِي فِي دِينِي وَمَعَاشِي وَعَاقِبَةِ أَمْرِي فَاصْرِفْهُ عَنِّي وَاصْرِفْنِي عَنْهُ وَاقْدُرْ لِيَ الْخَيْرَ حَيْثُ كَانَ ثُمَّ أَرْضِنِي بِهِ', target: 1 },
+          { title: 'دعاء زيارة المريض', text: 'لَا بَأْسَ طَهُورٌ إِنْ شَاءَ اللَّهُ .. أَسْأَلُ اللَّهَ الْعَظِيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفِيَكَ (سبع مرات)', target: 7 }
         ]
       },
       { id: 'd1', title: 'سبحان الله وبحمده', virtue: 'قال ﷺ: «مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ».', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', target: 100 }] },
@@ -1058,6 +1161,35 @@ function getFilteredAdhkarEntries() {
       if (target > 0) { const ratio = Math.max(0, Math.min(1, (target - current) / target)); circle.style.strokeDashoffset = circumference * (1 - ratio); }
       else { const mod = (current % 33) / 33; circle.style.strokeDashoffset = current === 0 ? circumference : circumference * (1 - mod); }
     }
+    let resumeTargetIdx = -1, resumeDismissedId = '';
+    function updateResumeBanner() {
+      const banner = document.getElementById('resumeBanner');
+      const txt = document.getElementById('resumeBannerText');
+      if (!banner || !txt) return;
+      const currentDhikr = getCurrentDhikr();
+      const inProgIdx = state.adhkar.findIndex((d, idx) => idx !== state.activeIndex && d.id !== resumeDismissedId && d.steps.length > 1 && hasActiveProgress(d));
+      if (inProgIdx >= 0 && currentDhikr) {
+        const d = state.adhkar[inProgIdx];
+        const prog = getDhikrProgress(d);
+        resumeTargetIdx = inProgIdx;
+        txt.textContent = `استكمال «${d.title}» (خطوة ${prog.stepIndex + 1} من ${d.steps.length})`;
+        banner.classList.add('show');
+      } else {
+        resumeTargetIdx = -1;
+        banner.classList.remove('show');
+      }
+    }
+    function jumpToResumeDhikr() {
+      if (resumeTargetIdx >= 0 && resumeTargetIdx < state.adhkar.length) {
+        state.activeListId = 'all';
+        selectDhikr(resumeTargetIdx);
+      }
+    }
+    function dismissResumeBanner(e) {
+      if (e) e.stopPropagation();
+      if (resumeTargetIdx >= 0 && state.adhkar[resumeTargetIdx]) resumeDismissedId = state.adhkar[resumeTargetIdx].id;
+      document.getElementById('resumeBanner').classList.remove('show');
+    }
     function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
       if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
@@ -1109,7 +1241,7 @@ function getFilteredAdhkarEntries() {
       fitDhikrTextToCard();
       document.getElementById('countDisplay').textContent = currentVal;
       document.getElementById('countLabel').textContent = step.target > 0 ? `المتبقي من ${step.target}` : 'عداد مفتوح';
-      updateProgressRing(currentVal, step.target); updateDailyGoalUI(); updateTimerUI(); updateAutoTapButtonUI(); saveState(false, '', skipCloud);
+      updateProgressRing(currentVal, step.target); updateDailyGoalUI(); updateTimerUI(); updateAutoTapButtonUI(); updateResumeBanner(); saveState(false, '', skipCloud);
     }
     function jumpToStep(stepIdx) {
       pauseDhikrTimer(); resetAutoTapCalibration();
@@ -1161,14 +1293,167 @@ function getFilteredAdhkarEntries() {
           }
         }
       } else { prog.stepCounts[sIdx] += 1; recordTasbihStat(dhikr, sIdx, 0); }
+      if (!state.stats.history) state.stats.history = {};
+      state.stats.history[getTodayStr()] = state.stats.todayCount;
       state.progressMap[dhikr.id] = prog; render();
     }
-    function resetCurrent() {
+
+    function openResetOptions() {
+      const dhikr = getCurrentDhikr();
+      if (dhikr && dhikr.steps.length > 1) {
+        document.getElementById('resetChoiceModal').classList.add('open');
+      } else {
+        resetCurrentStepOnly();
+      }
+    }
+    function resetCurrentStepOnly() {
+      closeModal('resetChoiceModal');
       pauseDhikrTimer(); resetAutoTapCalibration();
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
       prog.stepCounts[sIdx] = step.target > 0 ? step.target : 0; dhikrElapsedMs[dhikr.id] = 0;
-      state.progressMap[dhikr.id] = prog; render(); showSaveToast('تم التصفير');
+      state.progressMap[dhikr.id] = prog; render(); showSaveToast('تم تصفير الخطوة');
     }
+    function resetAllStepsOfCurrentDhikr() {
+      closeModal('resetChoiceModal');
+      pauseDhikrTimer(); resetAutoTapCalibration();
+      const dhikr = getCurrentDhikr();
+      delete state.progressMap[dhikr.id];
+      dhikrElapsedMs[dhikr.id] = 0;
+      render(); showSaveToast('تم تصفير الذكر بالكامل');
+    }
+    function toggleReadingMode() {
+      const isActive = document.body.classList.toggle('reading-mode');
+      const btn = document.getElementById('readingModeBtn');
+      if (btn) btn.classList.toggle('fav-active', isActive);
+      fitDhikrTextToCard();
+      showSaveToast(isActive ? 'وضع القراءة الكاملة' : 'الوضع القياسي');
+    }
+    function openQuickSearchModal() {
+      modalSelectedListId = 'all';
+      document.getElementById('dhikrSearchInput').value = '';
+      renderIndexModalList();
+      document.getElementById('indexModal').classList.add('open');
+      setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
+    }
+    let lastGeneratedBlob = null;
+    function generateDhikrShareImage() {
+      const dhikr = getCurrentDhikr(); if (!dhikr) return;
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[prog.stepIndex] || { text: '' };
+      const styles = getComputedStyle(document.documentElement);
+      const bgCol = styles.getPropertyValue('--bg-color').trim() || '#f4f7f5';
+      const surfCol = styles.getPropertyValue('--surface-color').trim() || '#ffffff';
+      const primCol = styles.getPropertyValue('--primary-color').trim() || '#0f5132';
+      const textCol = styles.getPropertyValue('--text-main').trim() || '#1b2a22';
+      const mutedCol = styles.getPropertyValue('--text-muted').trim() || '#5c7065';
+      const accCol = styles.getPropertyValue('--accent-color').trim() || '#d4af37';
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080; canvas.height = 1080;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = bgCol; ctx.fillRect(0, 0, 1080, 1080);
+
+      ctx.fillStyle = surfCol;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(60, 60, 960, 960, 44); else ctx.fillRect(60, 60, 960, 960);
+      ctx.fill();
+      ctx.strokeStyle = accCol; ctx.lineWidth = 4; ctx.stroke();
+
+      ctx.fillStyle = primCol;
+      ctx.font = 'bold 38px Tajawal, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(dhikr.title, 540, 150);
+
+      ctx.fillStyle = textCol;
+      const rawText = step.text || '';
+      const fontSize = rawText.length > 260 ? 34 : (rawText.length > 140 ? 42 : 50);
+      ctx.font = `bold ${fontSize}px Amiri, serif`;
+      const words = rawText.split(' ');
+      const lines = []; let curLine = '';
+      for (let w of words) {
+        const test = curLine ? curLine + ' ' + w : w;
+        if (ctx.measureText(test).width > 820) { lines.push(curLine); curLine = w; }
+        else curLine = test;
+      }
+      if (curLine) lines.push(curLine);
+      const lineHeight = fontSize * 1.65;
+      const startY = 520 - ((lines.length - 1) * lineHeight) / 2;
+      lines.slice(0, 11).forEach((ln, i) => ctx.fillText(ln, 540, startY + i * lineHeight));
+
+      if (dhikr.virtue && dhikr.virtue.trim()) {
+        ctx.fillStyle = mutedCol;
+        ctx.font = 'bold 24px Tajawal, sans-serif';
+        const vShort = dhikr.virtue.length > 95 ? dhikr.virtue.slice(0, 95) + '...' : dhikr.virtue;
+        ctx.fillText(vShort, 540, 895);
+      }
+      ctx.fillStyle = primCol;
+      ctx.font = 'bold 26px Tajawal, sans-serif';
+      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 965);
+
+      const dataUrl = canvas.toDataURL('image/png');
+      document.getElementById('shareCardPreview').src = dataUrl;
+      canvas.toBlob(b => { lastGeneratedBlob = b; }, 'image/png');
+      document.getElementById('shareCardModal').classList.add('open');
+    }
+    async function shareGeneratedImage() {
+      const dhikr = getCurrentDhikr();
+      if (lastGeneratedBlob && navigator.canShare) {
+        const file = new File([lastGeneratedBlob], 'dhikr.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          try { await navigator.share({ files: [file], title: dhikr ? dhikr.title : 'الباقيات' }); return; } catch (e) {}
+        }
+      }
+      const a = document.createElement('a');
+      a.href = document.getElementById('shareCardPreview').src;
+      a.download = 'al-baqiyat-dhikr.png';
+      a.click();
+      showSaveToast('تم حفظ الصورة');
+    }
+    function renderMonthlyCalendar() {
+      const grid = document.getElementById('monthlyCalGrid');
+      const titleEl = document.getElementById('calMonthTitle');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const now = new Date(), year = now.getFullYear(), month = now.getMonth();
+      const monthsAr = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+      if (titleEl) titleEl.textContent = `تقويم الالتزام • ${monthsAr[month]} ${year}`;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const hist = state.stats.history || {};
+      const todayStr = getTodayStr();
+      const goal = state.dailyGoal || 1000;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const cnt = dateStr === todayStr ? (state.stats.todayCount || 0) : (hist[dateStr] || 0);
+        const cell = document.createElement('div');
+        cell.className = 'cal-day' + (cnt >= goal && goal > 0 ? ' goal-day' : (cnt > 0 ? ' active-day' : '')) + (dateStr === todayStr ? ' today-ring' : '');
+        cell.textContent = d;
+        grid.appendChild(cell);
+      }
+    }
+    (function setupCardSwipe() {
+      let touchStartX = 0, touchStartY = 0;
+      document.addEventListener('touchstart', (e) => {
+        if (!e.target.closest('#dhikrCard')) return;
+        touchStartX = e.changedTouches.screenX;
+        touchStartY = e.changedTouches.screenY;
+      }, { passive: true });
+      document.addEventListener('touchend', (e) => {
+        if (!touchStartX) return;
+        const dx = e.changedTouches.screenX - touchStartX;
+        const dy = e.changedTouches.screenY - touchStartY;
+        touchStartX = 0;
+        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
+          if (dx > 0) {
+            if (dhikr.steps.length > 1 && prog.stepIndex < dhikr.steps.length - 1) jumpToStep(prog.stepIndex + 1);
+            else nextDhikr();
+          } else {
+            if (dhikr.steps.length > 1 && prog.stepIndex > 0) jumpToStep(prog.stepIndex - 1);
+            else prevDhikr();
+          }
+        }
+      }, { passive: true });
+    })();
 
     function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
