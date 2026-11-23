@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tasbih-app-v83';
+const CACHE_NAME = 'tasbih-app-v84';
 const ASSETS = [
   './',
   './index.html',

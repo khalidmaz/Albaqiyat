@@ -94,7 +94,7 @@
     .tool-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 9px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
     .tool-btn.delete { color: var(--danger-color); border-color: rgba(220, 53, 69, 0.35); }
    
- .dhikr-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.85; text-align: center; color: var(--text-main); margin: auto 0; padding: 2px 0; font-weight: 700; width: 100%; }
+  .dhikr-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.85; text-align: center; color: var(--text-main); margin: auto 0; padding: 2px 0; font-weight: 700; width: 100%; }
     .virtue-box { background: var(--bg-color); border-radius: 12px; padding: 7px 11px; font-size: 12.5px; line-height: 1.55; color: var(--text-muted); border-right: 3px solid var(--accent-color); margin-top: 6px; flex-shrink: 0; }
     .virtue-box.compact-virtue { padding: 5px 9px; font-size: 11.5px; line-height: 1.45; }
     .counter-zone { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 4px 0; padding: 6px 10px; cursor: pointer; border-radius: 22px; transition: background-color 0.2s; gap: 6px; }
@@ -119,6 +119,32 @@
     .bottom-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-shrink: 0; }
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+
+    @media (orientation: landscape) and (max-height: 550px) {
+      header { padding: 5px 16px; }
+      .tabs-wrapper { padding: 5px 16px; }
+      main {
+        display: grid;
+        grid-template-columns: 1.35fr 1fr;
+        grid-template-rows: 1fr auto;
+        column-gap: 12px;
+        row-gap: 6px;
+        padding: 4px 16px 8px;
+      }
+      .card { grid-column: 1; grid-row: 1; padding: 8px 12px; }
+      .bottom-controls { grid-column: 1; grid-row: 2; }
+      .ctrl-btn { padding: 7px 6px; font-size: 12.5px; }
+      .counter-zone { grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 4px 8px; justify-content: center; gap: 6px; }
+      .ring-wrapper { width: 146px; height: 146px; }
+      .count-number { font-size: 38px; }
+      .count-label { font-size: 11.5px; margin-top: 3px; }
+      .virtue-box { display: none !important; }
+
+      main.landscape-swap { grid-template-columns: 1fr 1.35fr; }
+      main.landscape-swap .card { grid-column: 2; }
+      main.landscape-swap .bottom-controls { grid-column: 2; }
+      main.landscape-swap .counter-zone { grid-column: 1; }
+    }
 
    .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
     .modal-backdrop.open { display: flex; }
@@ -428,7 +454,7 @@
         </div>
       </div>
           
-  <div class="form-group">
+    <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="38" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -439,6 +465,10 @@
       <div class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg><span>وضع التركيز (لمس واسع)</span></span>
         <input type="checkbox" id="focusToggle" onchange="toggleFocusMode(this.checked)" style="width:20px; height:20px;">
+      </div>
+      <div class="switch-row">
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span>الوضع العرضي: العداد يمين والذكر يسار</span></span>
+        <input type="checkbox" id="landscapeSwapToggle" onchange="toggleLandscapeSwap(this.checked)" style="width:20px; height:20px;">
       </div>
       <div class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg><span>إبقاء الشاشة مضاءة</span></span>
@@ -936,7 +966,7 @@
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-    function getFilteredAdhkarEntries() {
+function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1002,6 +1032,9 @@
       const goalInp = document.getElementById('dailyGoalInput'); if (goalInp) goalInp.value = state.dailyGoal || 0;
       const atmTgl = document.getElementById('autoTimeListToggle'); if (atmTgl) atmTgl.checked = state.autoTimeList;
       const adkTgl = document.getElementById('autoDarkToggle'); if (adkTgl) adkTgl.checked = state.autoDarkMode;
+      const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
+      const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
+      const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
       document.getElementById('focusToggle').checked = state.focusMode;
       document.getElementById('wakeLockToggle').checked = state.wakeLockEnabled;
       document.getElementById('counterZone').classList.toggle('focus-active', state.focusMode);
@@ -1375,7 +1408,7 @@
       });
     }
   
-    function openStepsIndexModal() {
+        function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -1447,6 +1480,7 @@
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
+    function toggleLandscapeSwap(val) { localStorage.setItem('tasbih_landscape_swap', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleWakeLock(val) { state.wakeLockEnabled = val; applyWakeLock(); saveState(true); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     init();
