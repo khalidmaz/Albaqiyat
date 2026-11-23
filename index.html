@@ -122,9 +122,26 @@
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
 
+    /* وضع السرد المتصل (صفحة واحدة) */
+    .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
+    body.continuous-mode .continuous-list { display: flex; }
+    body.continuous-mode #dhikrText, body.continuous-mode .counter-zone, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
+    .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; }
+    .cont-step-card.done-step { opacity: 0.62; border-color: var(--primary-color); background: var(--primary-light); }
+    .cont-step-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .cont-step-title { font-size: 12.5px; font-weight: 800; color: var(--primary-color); }
+    .cont-step-tap { background: var(--primary-color); color: #ffffff; border: none; border-radius: 10px; padding: 4px 12px; font-size: 13px; font-weight: 800; cursor: pointer; min-width: 58px; text-align: center; }
+    .cont-step-tap:active { transform: scale(0.94); }
+    .cont-step-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.8; color: var(--text-main); font-weight: 700; text-align: right; }
+
+    /* كبسولة التحكم بحجم الخط في وضع القراءة الكاملة */
+    .reading-font-pill { display: none; align-items: center; background: var(--primary-light); border: 1px solid var(--primary-color); border-radius: 10px; height: 26px; overflow: hidden; flex-shrink: 0; }
+    body.reading-mode .reading-font-pill, body.continuous-mode .reading-font-pill { display: inline-flex; }
+    .reading-font-pill button { background: transparent; border: none; color: var(--primary-color); width: 27px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .reading-font-pill button:active { background: var(--primary-color); color: #ffffff; }
+    .reading-font-pill .pill-sep { width: 1px; height: 14px; background: var(--primary-color); opacity: 0.35; }
+
     /* وضع القراءة بكامل الشاشة (مستقل عن تدوير الهاتف) */
-    .reading-font-btn { display: none; font-size: 12.5px; font-weight: 800; color: var(--primary-color); border-color: var(--primary-color); background: var(--primary-light); width: 32px; }
-    body.reading-mode .reading-font-btn { display: inline-flex; }
     body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
     body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
     body.reading-mode.reading-counter-right .counter-zone { flex-direction: row-reverse; }
@@ -277,8 +294,18 @@
         <div class="card-top">
           <div class="steps-pills" id="stepsPills"></div>
           <button type="button" class="step-count-btn" id="stepCounterBtn" onclick="openStepsIndexModal()">1 / 1 ▾</button>
-          <button type="button" class="fav-icon-btn reading-font-btn" onclick="adjustReadingFontSize(-2)" title="تصغير الخط">أ-</button>
-          <button type="button" class="fav-icon-btn reading-font-btn" onclick="adjustReadingFontSize(2)" title="تكبير الخط">أ+</button>
+          <div class="reading-font-pill" role="group" aria-label="حجم الخط">
+            <button type="button" onclick="adjustReadingFontSize(-2)" title="تصغير الخط">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+            <span class="pill-sep"></span>
+            <button type="button" onclick="adjustReadingFontSize(2)" title="تكبير الخط">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+          <button type="button" class="fav-icon-btn" id="continuousModeBtn" onclick="toggleContinuousMode()" title="عرض كصفحة واحدة متصلة">
+            <svg class="ico-sm" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
           <button type="button" class="fav-icon-btn" onclick="generateDhikrShareImage()" title="مشاركة الذكر كصورة">
             <svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           </button>
@@ -290,6 +317,7 @@
           </button>
         </div>
         <div class="dhikr-text" id="dhikrText"></div>
+        <div class="continuous-list" id="continuousList"></div>
         <div class="virtue-box" id="virtueBox"></div>
       </div>
  
@@ -522,7 +550,7 @@
         </div>
       </div>
           
-                <div class="form-group">
+                        <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="48" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -533,6 +561,10 @@
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg><span>وضع التركيز (لمس واسع)</span></span>
         <input type="checkbox" id="focusToggle" onchange="toggleFocusMode(this.checked)" style="width:20px; height:20px; cursor:pointer;">
+      </label>
+      <label class="switch-row">
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg><span>تصفير خطوات الأذكار تلقائياً كل يوم</span></span>
+        <input type="checkbox" id="autoDailyResetToggle" onchange="toggleAutoDailyReset(this.checked)" style="width:20px; height:20px; cursor:pointer;">
       </label>
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg><span>وضع القراءة الكاملة: العداد يمين</span></span>
@@ -776,7 +808,7 @@
       { id: 'd8', title: 'الحوقلة', virtue: 'كنزٌ من كنوز الجنّة.', steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }] }
     ];
  
-      function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+            function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function formatDuration(ms) { const totalSec = Math.floor(ms / 1000); const mins = Math.floor(totalSec / 60); const secs = totalSec % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; }
     const FIREBASE_DB_URL = 'https://' + 'tasbih-app-588ed-default-rtdb' + '.firebaseio.com';
@@ -795,26 +827,23 @@
     try { savedAdhkar = JSON.parse(localStorage.getItem('tasbih_adhkar_v14')); } catch (e) {}
     if (Array.isArray(savedAdhkar)) {
       savedAdhkar = savedAdhkar.filter(a => a && a.id && a.title && Array.isArray(a.steps) && a.steps.length > 0);
-      new Array('morning_adhkar', 'evening_adhkar', 'sleep_adhkar', 'wakeup_adhkar', 'ruqyah_shariah', 'after_prayer_adhkar', 'daily_occasions_adhkar', 'comprehensive_duas').forEach((idKey, idxPos) => {
-        const obj = defaultAdhkar.find(a => a.id === idKey);
-        const existingIdx = savedAdhkar.findIndex(a => a.id === idKey);
-        if (obj) {
-          if (existingIdx >= 0) savedAdhkar[existingIdx] = JSON.parse(JSON.stringify(obj));
-          else savedAdhkar.splice(Math.min(idxPos, savedAdhkar.length), 0, JSON.parse(JSON.stringify(obj)));
+      defaultAdhkar.forEach((defObj, idxPos) => {
+        const existingIdx = savedAdhkar.findIndex(a => a.id === defObj.id);
+        if (existingIdx >= 0) {
+          if (!savedAdhkar[existingIdx].userModified) {
+            savedAdhkar[existingIdx] = JSON.parse(JSON.stringify(defObj));
+          }
+        } else {
+          savedAdhkar.splice(Math.min(idxPos, savedAdhkar.length), 0, JSON.parse(JSON.stringify(defObj)));
         }
       });
     }
     let savedLists = null;
     try { savedLists = JSON.parse(localStorage.getItem('tasbih_lists_v24')); } catch (e) {}
     if (Array.isArray(savedLists) && savedLists.length > 0) {
-      if (!savedLists.some(l => l.id === 'morning_list')) savedLists.push({ id: 'morning_list', name: 'أذكار الصباح', ids: new Array('morning_adhkar') });
-      if (!savedLists.some(l => l.id === 'evening_list')) savedLists.push({ id: 'evening_list', name: 'أذكار المساء', ids: new Array('evening_adhkar') });
-      if (!savedLists.some(l => l.id === 'sleep_list')) savedLists.push({ id: 'sleep_list', name: 'أذكار النوم', ids: new Array('sleep_adhkar') });
-      if (!savedLists.some(l => l.id === 'wakeup_list')) savedLists.push({ id: 'wakeup_list', name: 'أذكار الاستيقاظ', ids: new Array('wakeup_adhkar') });
-      if (!savedLists.some(l => l.id === 'ruqyah_list')) savedLists.push({ id: 'ruqyah_list', name: 'الرقية الشرعية', ids: new Array('ruqyah_shariah') });
-      if (!savedLists.some(l => l.id === 'prayer_list')) savedLists.push({ id: 'prayer_list', name: 'أذكار بعد الصلاة', ids: new Array('after_prayer_adhkar', 'd3') });
-      if (!savedLists.some(l => l.id === 'occasions_list')) savedLists.push({ id: 'occasions_list', name: 'المنزل والسفر', ids: new Array('daily_occasions_adhkar') });
-      if (!savedLists.some(l => l.id === 'duas_list')) savedLists.push({ id: 'duas_list', name: 'الأدعية الجامعة', ids: new Array('comprehensive_duas') });
+      DEFAULT_LISTS.forEach(defList => {
+        if (!savedLists.some(l => l.id === defList.id)) savedLists.push(JSON.parse(JSON.stringify(defList)));
+      });
     }
     const VALID_THEMES = new Array('default','desert','oled','black-gold','royal-navy-gold','pink-light','twilight-marigold','raven-apricot','ricotta-prussian','aubergine-cyan','outer-space-red','plum-milk','charcoal-orange','meringue-clementine','bone-oxblood','abyss-sand','carbon-silver','chantilly-amalfi','milk-turbo','walnut-charcoal','espresso-terracotta','olive-cream');
     let savedTheme = localStorage.getItem('tasbih_theme_v14') || 'default';
@@ -828,6 +857,7 @@
       theme: savedTheme,
       fontSize: parseInt(localStorage.getItem('tasbih_fontsize_v14') || '24', 10),
       focusMode: localStorage.getItem('tasbih_focus_v14') === 'true',
+      autoDailyReset: localStorage.getItem('tasbih_autodaily_reset') === 'true',
       wakeLockEnabled: localStorage.getItem('tasbih_wakelock_v14') === 'true',
       autoTimeList: localStorage.getItem('tasbih_autotime_v63') === 'true',
       autoDarkMode: localStorage.getItem('tasbih_autodark_v63') === 'true',
@@ -921,7 +951,7 @@
       showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
     }
   
-  let wakeLockSentinel = null;
+    let wakeLockSentinel = null;
     async function applyWakeLock() {
       try {
         if (state.wakeLockEnabled && 'wakeLock' in navigator) { if (!wakeLockSentinel) wakeLockSentinel = await navigator.wakeLock.request('screen'); }
@@ -936,6 +966,12 @@
     });
     function checkStatsDate() {
       const today = getTodayStr(), yesterday = getYesterdayStr();
+      const lastResetDay = localStorage.getItem('tasbih_last_progress_reset_day') || '';
+      if (state.autoDailyReset && lastResetDay !== today) {
+        state.progressMap = {};
+        localStorage.setItem('tasbih_last_progress_reset_day', today);
+        localStorage.setItem('tasbih_progress_map_v14', '{}');
+      }
       if (state.stats.lastDate && state.stats.lastDate !== today) {
         state.stats.todayCount = 0; state.stats.dailyDetails = {};
         if (state.stats.lastDate !== yesterday) state.stats.streak = 0;
@@ -1097,7 +1133,7 @@ function getFilteredAdhkarEntries() {
     function fitDhikrTextToCard() {
       const card = document.querySelector('.card');
       const textEl = document.getElementById('dhikrText');
-      if (!card || !textEl) return;
+      if (!card || !textEl || document.body.classList.contains('continuous-mode')) return;
       const isLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 550;
       const isReading = document.body.classList.contains('reading-mode');
       let size = state.fontSize + (isLandscape ? 16 : (isReading ? 4 : 2));
@@ -1142,6 +1178,7 @@ function getFilteredAdhkarEntries() {
       const goalInp = document.getElementById('dailyGoalInput'); if (goalInp) goalInp.value = state.dailyGoal || 0;
       const atmTgl = document.getElementById('autoTimeListToggle'); if (atmTgl) atmTgl.checked = state.autoTimeList;
       const adkTgl = document.getElementById('autoDarkToggle'); if (adkTgl) adkTgl.checked = state.autoDarkMode;
+      const adrTgl = document.getElementById('autoDailyResetToggle'); if (adrTgl) adrTgl.checked = state.autoDailyReset;
       const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
       const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
@@ -1212,7 +1249,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('resumeBanner').classList.remove('show');
     }
 
-    function render(skipCloud = false) {
+        function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
       if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
       const activeListObj = state.lists.find(l => l.id === state.activeListId);
@@ -1251,9 +1288,10 @@ function getFilteredAdhkarEntries() {
       const len = (step.text || '').length;
       const hasVirtue = Boolean(dhikr.virtue && dhikr.virtue.trim() !== '');
       dhikrTextEl.textContent = step.text || '';
+      renderContinuousList(dhikr, prog);
       const virtueBox = document.getElementById('virtueBox');
       virtueBox.classList.remove('compact-virtue');
-      if (hasVirtue && len <= 220) {
+      if (hasVirtue && (len <= 220 || document.body.classList.contains('continuous-mode'))) {
         virtueBox.style.display = 'block';
         if (len > 85) virtueBox.classList.add('compact-virtue');
         virtueBox.textContent = dhikr.virtue;
@@ -1320,7 +1358,59 @@ function getFilteredAdhkarEntries() {
       state.progressMap[dhikr.id] = prog; render();
     }
 
-        function openResetOptions() {
+            function toggleContinuousMode() {
+      const isActive = document.body.classList.toggle('continuous-mode');
+      const btn = document.getElementById('continuousModeBtn');
+      if (btn) btn.classList.toggle('fav-active', isActive);
+      if (isActive) { pauseDhikrTimer(); stopAutoTap(); }
+      render(true);
+      showSaveToast(isActive ? 'عرض كصفحة واحدة متصلة' : 'العرض التفاعلي خطوة بخطوة');
+    }
+    function renderContinuousList(dhikr, prog) {
+      const container = document.getElementById('continuousList');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!document.body.classList.contains('continuous-mode')) return;
+      dhikr.steps.forEach((st, sIdx) => {
+        const curVal = prog.stepCounts[sIdx];
+        const isDone = st.target > 0 && curVal === st.target && prog.stepIndex > sIdx;
+        const card = document.createElement('div');
+        card.className = 'cont-step-card' + (isDone ? ' done-step' : '');
+        const stTitle = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
+        const badgeText = st.target > 0 ? (isDone ? 'تم ✓' : `${curVal} / ${st.target}`) : `${curVal}`;
+        card.innerHTML = `<div class="cont-step-header"><span class="cont-step-title">${sIdx + 1}. ${stTitle}</span><button type="button" class="cont-step-tap">${badgeText}</button></div><div class="cont-step-text">${st.text}</div>`;
+        card.querySelector('.cont-step-tap').onclick = (e) => {
+          e.stopPropagation();
+          tapContinuousStep(sIdx);
+        };
+        container.appendChild(card);
+      });
+    }
+    function tapContinuousStep(sIdx) {
+      const dhikr = getCurrentDhikr(); if (!dhikr) return;
+      const prog = getDhikrProgress(dhikr);
+      const step = dhikr.steps[sIdx];
+      if (step.target > 0) {
+        if (prog.stepCounts[sIdx] > 1) {
+          prog.stepCounts[sIdx] -= 1;
+          prog.stepIndex = sIdx;
+          recordTasbihStat(dhikr, sIdx, 0);
+        } else {
+          prog.stepCounts[sIdx] = step.target;
+          prog.stepIndex = Math.min(dhikr.steps.length - 1, sIdx + 1);
+          recordTasbihStat(dhikr, sIdx, 0);
+          showSaveToast(`تمت: ${step.title || ('خطوة ' + (sIdx + 1))}`);
+        }
+      } else {
+        prog.stepCounts[sIdx] += 1;
+        recordTasbihStat(dhikr, sIdx, 0);
+      }
+      if (!state.stats.history) state.stats.history = {};
+      state.stats.history[getTodayStr()] = state.stats.todayCount;
+      state.progressMap[dhikr.id] = prog;
+      render();
+    }
+    function openResetOptions() {
       const dhikr = getCurrentDhikr();
       if (dhikr && dhikr.steps.length > 1) {
         document.getElementById('resetChoiceModal').classList.add('open');
@@ -1357,6 +1447,8 @@ function getFilteredAdhkarEntries() {
       document.getElementById('indexModal').classList.add('open');
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
+
+
     let lastGeneratedBlob = null;
     function wrapCanvasText(ctx, text, maxWidth) {
       const words = (text || '').split(/\s+/).filter(Boolean);
@@ -1492,7 +1584,7 @@ function getFilteredAdhkarEntries() {
     (function setupCardSwipe() {
       let touchStartX = 0, touchStartY = 0, isSwipeTracking = false;
       document.addEventListener('touchstart', (e) => {
-        if (!e.target.closest('.card') || e.target.closest('button') || e.target.closest('.steps-pills')) {
+        if (document.body.classList.contains('continuous-mode') || !e.target.closest('.card') || e.target.closest('button') || e.target.closest('.steps-pills')) {
           isSwipeTracking = false;
           return;
         }
@@ -1632,10 +1724,10 @@ function getFilteredAdhkarEntries() {
       if (!title || steps.length === 0) return;
       if (state.editingIndex >= 0) {
         const currentId = state.adhkar[state.editingIndex].id;
-        state.adhkar[state.editingIndex] = { id: currentId, title, virtue, steps }; delete state.progressMap[currentId];
+        state.adhkar[state.editingIndex] = { id: currentId, title, virtue, steps, userModified: true }; delete state.progressMap[currentId];
       } else {
         const newId = 'custom_' + Date.now();
-        state.adhkar.push({ id: newId, title, virtue, steps }); state.activeIndex = state.adhkar.length - 1;
+        state.adhkar.push({ id: newId, title, virtue, steps, userModified: true }); state.activeIndex = state.adhkar.length - 1;
       }
       closeModal('formModal'); render(); showSaveToast('تم الحفظ');
     }
@@ -1778,7 +1870,7 @@ function getFilteredAdhkarEntries() {
       }
     }
   
-        function openStepsIndexModal() {
+                function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -1809,7 +1901,7 @@ function getFilteredAdhkarEntries() {
       try {
         const raw = document.getElementById('importCodeInput').value.trim(), parsed = JSON.parse(raw);
         if (parsed && parsed.type === 'single_dhikr' && parsed.dhikr && parsed.dhikr.title && Array.isArray(parsed.dhikr.steps) && parsed.dhikr.steps.length > 0) {
-          const newItem = { id: 'shared_' + Date.now(), title: parsed.dhikr.title, virtue: parsed.dhikr.virtue || '', steps: parsed.dhikr.steps };
+          const newItem = { id: 'shared_' + Date.now(), title: parsed.dhikr.title, virtue: parsed.dhikr.virtue || '', steps: parsed.dhikr.steps, userModified: true };
           state.adhkar.push(newItem); state.activeIndex = state.adhkar.length - 1; closeModal('importModal'); render(); showSaveToast(`تمت إضافة "${newItem.title}"`); return;
         }
         const list = Array.isArray(parsed) ? parsed : parsed.list;
@@ -1860,6 +1952,7 @@ function getFilteredAdhkarEntries() {
     function setDailyGoal(val) { const g = parseInt(val, 10); state.dailyGoal = isNaN(g) || g < 0 ? 0 : g; localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal); updateDailyGoalUI(); if (state.syncCode) pushToCloud(); showSaveToast('تم حفظ الهدف اليومي'); }
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
+    function toggleAutoDailyReset(val) { state.autoDailyReset = val; localStorage.setItem('tasbih_autodaily_reset', val); if (val) checkStatsDate(); render(); showSaveToast('تم الحفظ'); }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
     function toggleReadingCounterRight(val) { localStorage.setItem('tasbih_reading_right', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleLandscapeSwap(val) { localStorage.setItem('tasbih_landscape_swap', val); applyAppearance(); showSaveToast('تم الحفظ'); }
