@@ -65,7 +65,7 @@
     .ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .ico-sm { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
  
-  .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
+    .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
     .list-filter-btn { flex: 0 0 auto; padding: 7px 12px; border-radius: 20px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .tabs-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; }
     .tabs-bar::-webkit-scrollbar { display: none; }
@@ -83,8 +83,9 @@
     .resume-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 16px 6px; padding: 6px 12px; border-radius: 12px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
     .resume-banner.show { display: flex; }
     main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 16px 8px; overflow: hidden; }
-    .card { background: var(--surface-color); border-radius: 20px; padding: 12px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; justify-content: flex-start; flex: 1; min-height: 0; overflow-y: auto; touch-action: pan-y; }
-    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-bottom: 6px; flex-shrink: 0; }
+    .card { background: var(--surface-color); border-radius: 20px; padding: 10px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .card-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; touch-action: pan-y; padding-top: 2px; }
     .steps-pills { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 2px; }
     .steps-pills::-webkit-scrollbar { display: none; }
     .step-pill-btn { flex: 0 0 auto; background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -126,6 +127,7 @@
     .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
     body.continuous-mode .continuous-list { display: flex; }
     body.continuous-mode #dhikrText, body.continuous-mode .counter-zone, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
+    body.continuous-mode .card-top { justify-content: flex-end; }
     .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; }
     .cont-step-card.done-step { opacity: 0.62; border-color: var(--primary-color); background: var(--primary-light); }
     .cont-step-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
@@ -141,16 +143,14 @@
     .reading-font-pill button:active { background: var(--primary-color); color: #ffffff; }
     .reading-font-pill .pill-sep { width: 1px; height: 14px; background: var(--primary-color); opacity: 0.35; }
 
-    /* وضع القراءة بكامل الشاشة (مستقل عن تدوير الهاتف) */
+    /* وضع القراءة بكامل الشاشة (العداد بالنص تحت) */
     body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
-    body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
-    body.reading-mode.reading-counter-right .counter-zone { flex-direction: row-reverse; }
-    body.reading-mode .counter-top-bar { width: auto; justify-content: flex-start; flex: 1; }
-    body.reading-mode.reading-counter-right .counter-top-bar { justify-content: flex-end; }
-    body.reading-mode .ring-wrapper { width: 62px; height: 62px; background: var(--primary-color); border-radius: 14px; flex-shrink: 0; }
+    body.reading-mode .counter-zone { flex-direction: column; align-items: center; justify-content: center; padding: 6px 12px; margin: 4px 0; border-radius: 16px; background: var(--surface-color); border: 1px solid var(--border-color); gap: 5px; }
+    body.reading-mode .counter-top-bar { width: 100%; justify-content: center; }
+    body.reading-mode .ring-wrapper { width: 112px; height: 56px; background: var(--primary-color); border-radius: 15px; flex-shrink: 0; margin: 0 auto; }
     body.reading-mode .progress-svg { display: none; }
-    body.reading-mode .count-number { font-size: 23px; color: #ffffff; }
-    body.reading-mode .count-label { font-size: 9px; color: rgba(255,255,255,0.85); margin-top: 1px; }
+    body.reading-mode .count-number { font-size: 24px; color: #ffffff; }
+    body.reading-mode .count-label { font-size: 9.5px; color: rgba(255,255,255,0.85); margin-top: 1px; }
 
     /* تقويم الالتزام الشهري */
     .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
@@ -171,7 +171,7 @@
         padding: 2px 12px 5px;
       }
       .card { grid-column: 1; grid-row: 1; padding: 5px 10px; }
-      .card-top { margin-bottom: 2px; }
+      .card-top { margin-bottom: 2px; padding-bottom: 4px; }
       .bottom-controls { grid-column: 1; grid-row: 2; gap: 6px; }
       .ctrl-btn { padding: 5px 6px; font-size: 12px; }
       .counter-zone { grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 2px; justify-content: center; gap: 4px; }
@@ -316,9 +316,11 @@
             <svg class="ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </button>
         </div>
-        <div class="dhikr-text" id="dhikrText"></div>
-        <div class="continuous-list" id="continuousList"></div>
-        <div class="virtue-box" id="virtueBox"></div>
+        <div class="card-body">
+          <div class="dhikr-text" id="dhikrText"></div>
+          <div class="continuous-list" id="continuousList"></div>
+          <div class="virtue-box" id="virtueBox"></div>
+        </div>
       </div>
  
     <div class="counter-zone" id="counterZone" onclick="handleZoneTap(event)">
@@ -550,7 +552,7 @@
         </div>
       </div>
           
-                        <div class="form-group">
+        <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="48" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -567,11 +569,7 @@
         <input type="checkbox" id="autoDailyResetToggle" onchange="toggleAutoDailyReset(this.checked)" style="width:20px; height:20px; cursor:pointer;">
       </label>
       <label class="switch-row">
-        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg><span>وضع القراءة الكاملة: العداد يمين</span></span>
-        <input type="checkbox" id="readingCounterRightToggle" onchange="toggleReadingCounterRight(this.checked)" style="width:20px; height:20px; cursor:pointer;">
-      </label>
-      <label class="switch-row">
-        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span>الوضع العرضي: العداد يمين والذكر يسار</span></span>
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span>الوضع العرضي: العداد يمين</span></span>
         <input type="checkbox" id="landscapeSwapToggle" onchange="toggleLandscapeSwap(this.checked)" style="width:20px; height:20px; cursor:pointer;">
       </label>
       <label class="switch-row">
@@ -808,7 +806,7 @@
       { id: 'd8', title: 'الحوقلة', virtue: 'كنزٌ من كنوز الجنّة.', steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }] }
     ];
  
-            function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+      function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function formatDuration(ms) { const totalSec = Math.floor(ms / 1000); const mins = Math.floor(totalSec / 60); const secs = totalSec % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; }
     const FIREBASE_DB_URL = 'https://' + 'tasbih-app-588ed-default-rtdb' + '.firebaseio.com';
@@ -857,7 +855,7 @@
       theme: savedTheme,
       fontSize: parseInt(localStorage.getItem('tasbih_fontsize_v14') || '24', 10),
       focusMode: localStorage.getItem('tasbih_focus_v14') === 'true',
-      autoDailyReset: localStorage.getItem('tasbih_autodaily_reset') === 'true',
+      autoDailyReset: localStorage.getItem('tasbih_autodaily_reset') !== 'false',
       wakeLockEnabled: localStorage.getItem('tasbih_wakelock_v14') === 'true',
       autoTimeList: localStorage.getItem('tasbih_autotime_v63') === 'true',
       autoDarkMode: localStorage.getItem('tasbih_autodark_v63') === 'true',
@@ -1131,15 +1129,15 @@ function getFilteredAdhkarEntries() {
     function isStepInProgress(dhikr, sIdx) { const prog = getDhikrProgress(dhikr), target = dhikr.steps[sIdx].target, cnt = prog.stepCounts[sIdx]; return (target > 0 && cnt < target) || (target === 0 && cnt > 0); }
     function hasActiveProgress(dhikr) { if (!dhikr || !Array.isArray(dhikr.steps)) return false; for (let i = 0; i < dhikr.steps.length; i++) if (isStepInProgress(dhikr, i)) return true; return false; }
     function fitDhikrTextToCard() {
-      const card = document.querySelector('.card');
+      const cardBody = document.querySelector('.card-body');
       const textEl = document.getElementById('dhikrText');
-      if (!card || !textEl || document.body.classList.contains('continuous-mode')) return;
+      if (!cardBody || !textEl || document.body.classList.contains('continuous-mode')) return;
       const isLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 550;
       const isReading = document.body.classList.contains('reading-mode');
       let size = state.fontSize + (isLandscape ? 16 : (isReading ? 4 : 2));
       textEl.style.fontSize = size + 'px';
       textEl.style.lineHeight = isLandscape ? '1.48' : (size > 24 ? '1.85' : '1.75');
-      while (card.scrollHeight > card.clientHeight + 1 && size > 15) {
+      while (cardBody.scrollHeight > cardBody.clientHeight + 1 && size > 15) {
         size -= 0.5;
         textEl.style.fontSize = size + 'px';
         if (!isLandscape) {
@@ -1182,9 +1180,6 @@ function getFilteredAdhkarEntries() {
       const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
       const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
-      const isReadingRight = localStorage.getItem('tasbih_reading_right') === 'true';
-      const readRightTgl = document.getElementById('readingCounterRightToggle'); if (readRightTgl) readRightTgl.checked = isReadingRight;
-      document.body.classList.toggle('reading-counter-right', isReadingRight);
       document.getElementById('focusToggle').checked = state.focusMode;
       document.getElementById('wakeLockToggle').checked = state.wakeLockEnabled;
       document.getElementById('counterZone').classList.toggle('focus-active', state.focusMode);
