@@ -7,13 +7,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="الباقيات">
   <meta name="theme-color" content="#f4f7f5">
-  <link id="appleIcon" rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23000000'/%3E%3Crect x='96' y='96' width='320' height='320' rx='78' fill='%23ffffff'/%3E%3Ccircle cx='158' cy='215' r='16' fill='%23000000'/%3E%3Ccircle cx='186' cy='185' r='18' fill='%23000000'/%3E%3Ccircle cx='220' cy='168' r='20' fill='%23000000'/%3E%3Ccircle cx='256' cy='162' r='22' fill='%23000000'/%3E%3Ccircle cx='292' cy='168' r='20' fill='%23000000'/%3E%3Ccircle cx='326' cy='185' r='18' fill='%23000000'/%3E%3Ccircle cx='354' cy='215' r='16' fill='%23000000'/%3E%3Ccircle cx='256' cy='208' r='12' fill='%23000000'/%3E%3Crect x='244' y='226' width='24' height='68' rx='10' fill='%23000000'/%3E%3Ccircle cx='256' cy='314' r='15' fill='%23000000'/%3E%3C/svg%3E">
-  <link id="favIcon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23000000'/%3E%3Crect x='96' y='96' width='320' height='320' rx='78' fill='%23ffffff'/%3E%3Ccircle cx='158' cy='215' r='16' fill='%23000000'/%3E%3Ccircle cx='186' cy='185' r='18' fill='%23000000'/%3E%3Ccircle cx='220' cy='168' r='20' fill='%23000000'/%3E%3Ccircle cx='256' cy='162' r='22' fill='%23000000'/%3E%3Ccircle cx='292' cy='168' r='20' fill='%23000000'/%3E%3Ccircle cx='326' cy='185' r='18' fill='%23000000'/%3E%3Ccircle cx='354' cy='215' r='16' fill='%23000000'/%3E%3Ccircle cx='256' cy='208' r='12' fill='%23000000'/%3E%3Crect x='244' y='226' width='24' height='68' rx='10' fill='%23000000'/%3E%3Ccircle cx='256' cy='314' r='15' fill='%23000000'/%3E%3C/svg%3E">
+  <link id="appleIcon" rel="apple-touch-icon" sizes="512x512" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23F7C616'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='28'%3E%3Ccircle cx='256' cy='116' r='36'/%3E%3Ccircle cx='365.5' cy='168.7' r='36'/%3E%3Ccircle cx='392.5' cy='287.1' r='36'/%3E%3Ccircle cx='316.7' cy='382.1' r='36'/%3E%3Ccircle cx='195.3' cy='382.1' r='36'/%3E%3Ccircle cx='119.5' cy='287.1' r='36'/%3E%3Ccircle cx='146.5' cy='168.7' r='36'/%3E%3C/g%3E%3C/svg%3E">
+  <link id="favIcon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23F7C616'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='28'%3E%3Ccircle cx='256' cy='116' r='36'/%3E%3Ccircle cx='365.5' cy='168.7' r='36'/%3E%3Ccircle cx='392.5' cy='287.1' r='36'/%3E%3Ccircle cx='316.7' cy='382.1' r='36'/%3E%3Ccircle cx='195.3' cy='382.1' r='36'/%3E%3Ccircle cx='119.5' cy='287.1' r='36'/%3E%3Ccircle cx='146.5' cy='168.7' r='36'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="manifest" href="./manifest.json">
   <title>الباقيات</title>
   <script>var l=document.createElement('link');l.rel='stylesheet';l.href='https'+':/'+'/fonts.googleapis.'+'com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap';document.head.appendChild(l);</script>
   <style>
-
 
    :root {
       --bg-color: #f4f7f5; --surface-color: #ffffff; --primary-color: #0f5132;
@@ -498,7 +497,7 @@
         <div class="sync-status" id="syncStatusText">الحالة: تخزين محلي على هذا الجهاز فقط</div>
       </div>
   
-   <div class="sync-box" style="margin-top: 10px;">
+      <div class="sync-box" style="margin-top: 10px;">
         <label style="display:flex; align-items:center; gap:6px; font-size:14px; font-weight:800; color:var(--primary-color); margin-bottom:6px;">
           <svg class="ico-sm" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           <span>شارك التطبيق</span>
@@ -513,42 +512,26 @@
     </div>
   </div>
   <script>
-    (function generateBlackAndWhiteIcon() {
+    (function generateYellowAndBlackIcon() {
       try {
         const canvas = document.createElement('canvas');
         canvas.width = 512;
         canvas.height = 512;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#F7C616';
         ctx.fillRect(0, 0, 512, 512);
-        const cardX = 96, cardY = 96, cardW = 320, cardH = 320, radius = 78;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.moveTo(cardX + radius, cardY);
-        ctx.lineTo(cardX + cardW - radius, cardY);
-        ctx.quadraticCurveTo(cardX + cardW, cardY, cardX + cardW, cardY + radius);
-        ctx.lineTo(cardX + cardW, cardY + cardH - radius);
-        ctx.quadraticCurveTo(cardX + cardW, cardY + cardH, cardX + cardW - radius, cardY + cardH);
-        ctx.lineTo(cardX + radius, cardY + cardH);
-        ctx.quadraticCurveTo(cardX, cardY + cardH, cardX, cardY + cardH - radius);
-        ctx.lineTo(cardX, cardY + radius);
-        ctx.quadraticCurveTo(cardX, cardY, cardX + radius, cardY);
-        ctx.closePath();
-        ctx.fill();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 28;
+        const centerX = 256, centerY = 256, orbitR = 140, ringR = 36, count = 7;
+        for (let i = 0; i < count; i++) {
+          const angle = -Math.PI / 2 + (i * 2 * Math.PI) / count;
+          const x = centerX + orbitR * Math.cos(angle);
+          const y = centerY + orbitR * Math.sin(angle);
+          ctx.beginPath();
+          ctx.arc(x, y, ringR, 0, Math.PI * 2);
+          ctx.stroke();
+        }
   
-     ctx.fillStyle = '#000000';
-        const beads = [
-          { x: 158, y: 215, r: 16 }, { x: 186, y: 185, r: 18 }, { x: 220, y: 168, r: 20 },
-          { x: 256, y: 162, r: 22 }, { x: 292, y: 168, r: 20 }, { x: 326, y: 185, r: 18 }, { x: 354, y: 215, r: 16 }
-        ];
-        beads.forEach(b => { ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill(); });
-        ctx.beginPath(); ctx.arc(256, 208, 12, 0, Math.PI * 2); ctx.fill();
-        const shaftW = 24, shaftH = 68, shaftX = 256 - shaftW / 2, shaftY = 226, shaftR = 10;
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(shaftX, shaftY, shaftW, shaftH, shaftR);
-        else ctx.fillRect(shaftX, shaftY, shaftW, shaftH);
-        ctx.fill();
-        ctx.beginPath(); ctx.arc(256, 314, 15, 0, Math.PI * 2); ctx.fill();
         const dataUrl = canvas.toDataURL('image/png');
         document.getElementById('appleIcon').href = dataUrl;
         const fav = document.getElementById('favIcon');
