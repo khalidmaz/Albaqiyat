@@ -831,7 +831,7 @@
       }
     }
 
-       let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
+           let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
     function showSaveToast(msg = 'تم الحفظ') {
       const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
       clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
@@ -843,7 +843,19 @@
       cloudPushTimer = setTimeout(() => {
         const cleanCode = encodeURIComponent(state.syncCode.trim());
         lastCloudStamp = Date.now();
-        const payload = { adhkar: state.adhkar, progressMap: state.progressMap, lists: state.lists, stats: state.stats, updatedAt: lastCloudStamp };
+        const payload = {
+          adhkar: state.adhkar,
+          activeIndex: state.activeIndex,
+          activeListId: state.activeListId,
+          progressMap: state.progressMap,
+          lists: state.lists,
+          stats: state.stats,
+          theme: state.theme,
+          fontSize: state.fontSize,
+          dailyGoal: state.dailyGoal,
+          focusMode: state.focusMode,
+          updatedAt: lastCloudStamp
+        };
         fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
       }, 350);
     }
@@ -869,8 +881,16 @@
           if (validCloudAdhkar.length > 0) state.adhkar = validCloudAdhkar;
           state.progressMap = data.progressMap || {};
           if (Array.isArray(data.lists) && data.lists.length > 0) state.lists = data.lists;
+          if (typeof data.activeListId === 'string') state.activeListId = data.activeListId;
+          if (typeof data.activeIndex === 'number' && data.activeIndex >= 0 && data.activeIndex < state.adhkar.length) state.activeIndex = data.activeIndex;
+          else if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
           if (data.stats) { state.stats = data.stats; if (!state.stats.dailyDetails) state.stats.dailyDetails = {}; checkStatsDate(); }
-          if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
+          let appearanceChanged = false;
+          if (typeof data.theme === 'string' && VALID_THEMES.includes(data.theme) && state.theme !== data.theme) { state.theme = data.theme; appearanceChanged = true; }
+          if (typeof data.fontSize === 'number' && state.fontSize !== data.fontSize) { state.fontSize = data.fontSize; appearanceChanged = true; }
+          if (typeof data.dailyGoal === 'number' && state.dailyGoal !== data.dailyGoal) { state.dailyGoal = data.dailyGoal; localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal); appearanceChanged = true; }
+          if (typeof data.focusMode === 'boolean' && state.focusMode !== data.focusMode) { state.focusMode = data.focusMode; appearanceChanged = true; }
+          if (appearanceChanged) applyAppearance();
           saveState(false, '', true); render(true);
           if (notify) showSaveToast('تمت المزامنة السحابية');
         } else if (notify) { pushToCloud(); showSaveToast('تم ربط الجهاز ورفع بياناتك'); }
@@ -901,6 +921,7 @@
       if (notify) showSaveToast(msg);
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
+
 
     
 function getFilteredAdhkarEntries() {
@@ -1410,7 +1431,7 @@ function getFilteredAdhkarEntries() {
     function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
     function setTheme(themeName) { state.theme = themeName; applyAppearance(); saveState(true); }
     function setFontSize(val) { state.fontSize = parseInt(val, 10); applyAppearance(); saveState(true); }
-    function setDailyGoal(val) { const g = parseInt(val, 10); state.dailyGoal = isNaN(g) || g < 0 ? 0 : g; localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal); updateDailyGoalUI(); showSaveToast('تم حفظ الهدف اليومي'); }
+    function setDailyGoal(val) { const g = parseInt(val, 10); state.dailyGoal = isNaN(g) || g < 0 ? 0 : g; localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal); updateDailyGoalUI(); if (state.syncCode) pushToCloud(); showSaveToast('تم حفظ الهدف اليومي'); }
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
