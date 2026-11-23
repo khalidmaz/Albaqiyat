@@ -1379,7 +1379,7 @@ function getFilteredAdhkarEntries() {
       }
     }
 
-        function toggleContinuousMode(forceState) {
+    function toggleContinuousMode(forceState) {
       const isActive = (typeof forceState === 'boolean')
         ? document.body.classList.toggle('continuous-mode', forceState)
         : document.body.classList.toggle('continuous-mode');
@@ -1389,6 +1389,16 @@ function getFilteredAdhkarEntries() {
       const tgl = document.getElementById('continuousModeToggle');
       if (tgl) tgl.checked = isActive;
       render(true);
+      if (isActive) {
+        const dhikr = getCurrentDhikr();
+        if (dhikr) {
+          const prog = getDhikrProgress(dhikr);
+          setTimeout(() => {
+            const activeCard = document.querySelector(`.cont-step-card[data-step-idx="${prog.stepIndex}"]`);
+            if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+      }
       showSaveToast(isActive ? 'عرض كصفحة واحدة متصلة' : 'العرض التفاعلي خطوة بخطوة');
     }
     function renderContinuousList(dhikr, prog) {
