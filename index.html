@@ -64,36 +64,83 @@
     .ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .ico-sm { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
  
-  .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
-    .list-filter-btn { flex: 0 0 auto; padding: 7px 12px; border-radius: 20px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
-    .tabs-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; }
-    .tabs-bar::-webkit-scrollbar { display: none; }
-    .dhikr-chip { flex: 0 0 auto; padding: 7px 13px; border-radius: 20px; background: var(--surface-color); border: 1px solid var(--border-color); color: var(--text-muted); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-    .dhikr-chip.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
-    [data-theme="black-gold"] .dhikr-chip.active, [data-theme="black-gold"] .step-pill-btn.active, [data-theme="black-gold"] .ctrl-btn.primary, [data-theme="black-gold"] .auto-tap-btn.active, [data-theme="black-gold"] .list-chip.active,
-    [data-theme="royal-navy-gold"] .dhikr-chip.active, [data-theme="royal-navy-gold"] .step-pill-btn.active, [data-theme="royal-navy-gold"] .ctrl-btn.primary, [data-theme="royal-navy-gold"] .auto-tap-btn.active, [data-theme="royal-navy-gold"] .list-chip.active,
-    [data-theme="twilight-marigold"] .dhikr-chip.active, [data-theme="twilight-marigold"] .step-pill-btn.active, [data-theme="twilight-marigold"] .ctrl-btn.primary, [data-theme="twilight-marigold"] .auto-tap-btn.active, [data-theme="twilight-marigold"] .list-chip.active,
-    [data-theme="raven-apricot"] .dhikr-chip.active, [data-theme="raven-apricot"] .step-pill-btn.active, [data-theme="raven-apricot"] .ctrl-btn.primary, [data-theme="raven-apricot"] .auto-tap-btn.active, [data-theme="raven-apricot"] .list-chip.active,
-    [data-theme="aubergine-cyan"] .dhikr-chip.active, [data-theme="aubergine-cyan"] .step-pill-btn.active, [data-theme="aubergine-cyan"] .ctrl-btn.primary, [data-theme="aubergine-cyan"] .auto-tap-btn.active, [data-theme="aubergine-cyan"] .list-chip.active,
-    [data-theme="abyss-sand"] .dhikr-chip.active, [data-theme="abyss-sand"] .step-pill-btn.active, [data-theme="abyss-sand"] .ctrl-btn.primary, [data-theme="abyss-sand"] .auto-tap-btn.active, [data-theme="abyss-sand"] .list-chip.active,
-    [data-theme="carbon-silver"] .dhikr-chip.active, [data-theme="carbon-silver"] .step-pill-btn.active, [data-theme="carbon-silver"] .ctrl-btn.primary, [data-theme="carbon-silver"] .auto-tap-btn.active, [data-theme="carbon-silver"] .list-chip.active,
-    [data-theme="walnut-charcoal"] .dhikr-chip.active, [data-theme="walnut-charcoal"] .step-pill-btn.active, [data-theme="walnut-charcoal"] .ctrl-btn.primary, [data-theme="walnut-charcoal"] .auto-tap-btn.active, [data-theme="walnut-charcoal"] .list-chip.active { color: #080808; }
-    .progress-dot { width: 7px; height: 7px; border-radius: 50%; background-color: var(--accent-color); display: inline-block; }
-    .resume-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 16px 6px; padding: 6px 12px; border-radius: 12px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
-    .resume-banner.show { display: flex; }
-    main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 16px 8px; overflow: hidden; }
-    .card { background: var(--surface-color); border-radius: 20px; padding: 12px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; justify-content: flex-start; flex: 1; min-height: 0; overflow-y: auto; touch-action: pan-y; }
-    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; margin-bottom: 6px; flex-shrink: 0; }
-    .steps-pills { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 2px; }
-    .steps-pills::-webkit-scrollbar { display: none; }
-    .step-pill-btn { flex: 0 0 auto; background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-    .step-pill-btn.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
-    .step-pill-btn .step-dot { width: 5px; height: 5px; border-radius: 50%; background-color: var(--accent-color); }
-    .step-count-btn { flex: 0 0 auto; background: var(--primary-light); color: var(--primary-color); border: 1px solid var(--primary-color); font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
-    .fav-icon-btn { flex: 0 0 auto; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 10px; width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
-    .fav-icon-btn.fav-active { color: var(--accent-color); border-color: var(--accent-color); background: var(--primary-light); }
-    .tool-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 9px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
-    .tool-btn.delete { color: var(--danger-color); border-color: rgba(220, 53, 69, 0.35); }
+.dhikr-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.85; text-align: center; color: var(--text-main); margin: auto 0; padding: 2px 0; font-weight: 700; width: 100%; }
+    .virtue-box { background: var(--bg-color); border-radius: 12px; padding: 7px 11px; font-size: 12.5px; line-height: 1.55; color: var(--text-muted); border-right: 3px solid var(--accent-color); margin-top: 6px; flex-shrink: 0; }
+    .virtue-box.compact-virtue { padding: 5px 9px; font-size: 11.5px; line-height: 1.45; }
+    .counter-zone { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 4px 0; padding: 6px 10px; cursor: pointer; border-radius: 22px; transition: background-color 0.2s; gap: 6px; }
+    .counter-zone.focus-active { background: var(--primary-light); border: 2px dashed var(--primary-color); }
+    .counter-top-bar { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; width: 100%; }
+    .timer-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--surface-color); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; }
+    .timer-pill.running { border-color: var(--primary-color); color: var(--primary-color); background: var(--primary-light); }
+    .ring-wrapper { position: relative; width: 174px; height: 174px; display: flex; align-items: center; justify-content: center; transition: transform 0.08s ease; }
+    .ring-wrapper:active { transform: scale(0.95); }
+    .progress-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+    .progress-bg { fill: var(--surface-color); stroke: var(--border-color); stroke-width: 8; }
+    .progress-bar { fill: none; stroke: var(--primary-color); stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.2s ease; }
+    .counter-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .count-number { font-size: 46px; font-weight: 800; color: var(--primary-color); line-height: 1; }
+    .count-label { font-size: 13px; color: var(--text-muted); margin-top: 5px; font-weight: 700; }
+    .auto-tap-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .auto-tap-btn.ready { border-color: var(--primary-color); color: var(--primary-color); background: var(--primary-light); }
+    .auto-tap-btn.active { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); animation: pulseAuto 1.5s infinite; }
+    .undo-tap-btn { display: none; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(220, 53, 69, 0.45); background: var(--surface-color); color: var(--danger-color); font-size: 12px; font-weight: 700; cursor: pointer; transition: transform 0.1s, background-color 0.2s; }
+    .undo-tap-btn:active { transform: scale(0.93); background: rgba(220, 53, 69, 0.1); }
+    @keyframes pulseAuto { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
+    .bottom-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; flex-shrink: 0; }
+    .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+
+    /* وضع القراءة بكامل الشاشة */
+    body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
+    body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
+    body.reading-mode .counter-top-bar { width: auto; justify-content: flex-start; }
+    body.reading-mode .ring-wrapper { width: 62px; height: 54px; background: var(--primary-color); border-radius: 13px; }
+    body.reading-mode .progress-svg { display: none; }
+    body.reading-mode .count-number { font-size: 22px; color: #ffffff; }
+    body.reading-mode .count-label { font-size: 9px; color: rgba(255,255,255,0.85); margin-top: 1px; }
+
+    /* تقويم الالتزام الشهري */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
+    .cal-day { aspect-ratio: 1; border-radius: 8px; background: var(--surface-color); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--text-muted); }
+    .cal-day.active-day { background: var(--primary-light); color: var(--primary-color); border-color: var(--primary-color); }
+    .cal-day.goal-day { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+    .cal-day.today-ring { box-shadow: 0 0 0 2px var(--accent-color); }
+
+    @media (orientation: landscape) and (max-height: 550px) {
+      header { padding: 3px 12px; }
+      .tabs-wrapper { padding: 3px 12px; }
+      main {
+        display: grid;
+        grid-template-columns: 1fr 165px;
+        grid-template-rows: 1fr auto;
+        column-gap: 8px;
+        row-gap: 4px;
+        padding: 2px 12px 5px;
+      }
+      .card { grid-column: 1; grid-row: 1; padding: 5px 10px; }
+      .card-top { margin-bottom: 2px; }
+      .bottom-controls { grid-column: 1; grid-row: 2; gap: 6px; }
+      .ctrl-btn { padding: 5px 6px; font-size: 12px; }
+      .counter-zone { grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 2px; justify-content: center; gap: 4px; }
+      .counter-top-bar { gap: 4px; }
+      .timer-pill, .auto-tap-btn, .undo-tap-btn { padding: 2px 7px; font-size: 10.5px; }
+      .ring-wrapper { width: 124px; height: 124px; }
+      .count-number { font-size: 32px; }
+      .count-label { font-size: 10.5px; margin-top: 2px; }
+      .virtue-box { display: none !important; }
+
+      main.landscape-swap { grid-template-columns: 165px 1fr; }
+      main.landscape-swap .card { grid-column: 2; }
+      main.landscape-swap .bottom-controls { grid-column: 2; }
+      main.landscape-swap .counter-zone { grid-column: 1; }
+
+      body.reading-mode main { grid-template-columns: 1fr 145px; }
+      body.reading-mode main.landscape-swap { grid-template-columns: 145px 1fr; }
+      body.reading-mode .counter-zone { flex-direction: column; justify-content: center; margin: 0; padding: 4px; }
+      body.reading-mode .counter-top-bar { justify-content: center; }
+      body.reading-mode .ring-wrapper { width: 110px; height: 90px; }
+      body.reading-mode .count-number { font-size: 30px; }
+    }
    
 .dhikr-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.85; text-align: center; color: var(--text-main); margin: auto 0; padding: 2px 0; font-weight: 700; width: 100%; }
     .virtue-box { background: var(--bg-color); border-radius: 12px; padding: 7px 11px; font-size: 12.5px; line-height: 1.55; color: var(--text-muted); border-right: 3px solid var(--accent-color); margin-top: 6px; flex-shrink: 0; }
@@ -1134,170 +1181,6 @@ function getFilteredAdhkarEntries() {
       fitDhikrTextToCard();
     }
  
-  function updateDailyGoalUI() {
-      const track = document.getElementById('dailyGoalTrack');
-      const fill = document.getElementById('dailyGoalFill');
-      const pill = document.getElementById('goalCountdownPill');
-      const txt = document.getElementById('goalCountdownText');
-      if (!track || !fill) return;
-      if (!state.dailyGoal || state.dailyGoal <= 0) {
-        track.style.display = 'none';
-        if (pill) pill.style.display = 'none';
-        return;
-      }
-      track.style.display = 'block';
-      const todayCnt = state.stats.todayCount || 0;
-      const rem = Math.max(0, state.dailyGoal - todayCnt);
-      const pct = Math.min(100, Math.round((todayCnt / state.dailyGoal) * 100));
-      fill.style.width = pct + '%';
-      if (pill && txt) {
-        pill.style.display = 'inline-flex';
-        pill.classList.toggle('running', rem === 0);
-        txt.textContent = rem > 0 ? `متبقي ${rem}` : 'تم الهدف اليومي';
-      }
-    }
-    function updateProgressRing(current, target) {
-      const circle = document.getElementById('progressCircle'), circumference = 578.05;
-      if (target > 0) { const ratio = Math.max(0, Math.min(1, (target - current) / target)); circle.style.strokeDashoffset = circumference * (1 - ratio); }
-      else { const mod = (current % 33) / 33; circle.style.strokeDashoffset = current === 0 ? circumference : circumference * (1 - mod); }
-    }
-    let resumeTargetIdx = -1, resumeDismissedId = '';
-    function updateResumeBanner() {
-      const banner = document.getElementById('resumeBanner');
-      const txt = document.getElementById('resumeBannerText');
-      if (!banner || !txt) return;
-      const currentDhikr = getCurrentDhikr();
-      const inProgIdx = state.adhkar.findIndex((d, idx) => idx !== state.activeIndex && d.id !== resumeDismissedId && d.steps.length > 1 && hasActiveProgress(d));
-      if (inProgIdx >= 0 && currentDhikr) {
-        const d = state.adhkar[inProgIdx];
-        const prog = getDhikrProgress(d);
-        resumeTargetIdx = inProgIdx;
-        txt.textContent = `استكمال «${d.title}» (خطوة ${prog.stepIndex + 1} من ${d.steps.length})`;
-        banner.classList.add('show');
-      } else {
-        resumeTargetIdx = -1;
-        banner.classList.remove('show');
-      }
-    }
-    function jumpToResumeDhikr() {
-      if (resumeTargetIdx >= 0 && resumeTargetIdx < state.adhkar.length) {
-        state.activeListId = 'all';
-        selectDhikr(resumeTargetIdx);
-      }
-    }
-    function dismissResumeBanner(e) {
-      if (e) e.stopPropagation();
-      if (resumeTargetIdx >= 0 && state.adhkar[resumeTargetIdx]) resumeDismissedId = state.adhkar[resumeTargetIdx].id;
-      document.getElementById('resumeBanner').classList.remove('show');
-    }
-    function render(skipCloud = false) {
-      let entries = getFilteredAdhkarEntries();
-      if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
-      const activeListObj = state.lists.find(l => l.id === state.activeListId);
-      document.getElementById('activeListLabel').textContent = state.activeListId === 'all' ? 'الكل' : (activeListObj ? activeListObj.name : 'الكل');
-      const tabsBar = document.getElementById('tabsBar'); tabsBar.innerHTML = ''; let activeChipEl = null;
-      entries.forEach(({ item, idx }) => {
-        const chip = document.createElement('button'), isAct = idx === state.activeIndex;
-        chip.className = 'dhikr-chip' + (isAct ? ' active' : '');
-        chip.innerHTML = `${hasActiveProgress(item) ? '<span class="progress-dot"></span>' : ''}<span>${item.title}</span>`;
-        chip.onclick = () => selectDhikr(idx); tabsBar.appendChild(chip); if (isAct) activeChipEl = chip;
-      });
-      if (activeChipEl) activeChipEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      const dhikr = getCurrentDhikr(); if (!dhikr) return;
-      const prog = getDhikrProgress(dhikr), step = dhikr.steps[prog.stepIndex] || { text: '', target: 0 }, currentVal = prog.stepCounts[prog.stepIndex] || 0;
-      const defaultFavList = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
-      const targetList = state.activeListId === 'all' ? defaultFavList : activeListObj;
-      const favBtn = document.getElementById('favToggleBtn');
-      if (favBtn && targetList) {
-        const inList = Array.isArray(targetList.ids) && targetList.ids.includes(dhikr.id);
-        favBtn.classList.toggle('fav-active', inList);
-        favBtn.title = inList ? `إزالة من ${targetList.name.replace('★ ', '')}` : `إضافة إلى ${targetList.name.replace('★ ', '')}`;
-        const poly = favBtn.querySelector('polygon');
-        if (poly) poly.setAttribute('fill', inList ? 'currentColor' : 'none');
-      }
-      const stepsPills = document.getElementById('stepsPills'); stepsPills.innerHTML = '';
-      dhikr.steps.forEach((st, sIdx) => {
-        const btn = document.createElement('button'); btn.className = 'step-pill-btn' + (sIdx === prog.stepIndex ? ' active' : '');
-        const stepLabel = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
-        btn.innerHTML = `${isStepInProgress(dhikr, sIdx) ? '<span class="step-dot"></span>' : ''}<span>${stepLabel}</span>`;
-        btn.onclick = () => jumpToStep(sIdx); stepsPills.appendChild(btn);
-      });
-      const activeStepPill = stepsPills.children[prog.stepIndex];
-      if (activeStepPill) activeStepPill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-      document.getElementById('stepCounterBtn').textContent = `${prog.stepIndex + 1} / ${dhikr.steps.length} ▾`;
-      const dhikrTextEl = document.getElementById('dhikrText');
-      const len = (step.text || '').length;
-      const hasVirtue = Boolean(dhikr.virtue && dhikr.virtue.trim() !== '');
-      dhikrTextEl.textContent = step.text || '';
-      const virtueBox = document.getElementById('virtueBox');
-      virtueBox.classList.remove('compact-virtue');
-      if (hasVirtue && len <= 220) {
-        virtueBox.style.display = 'block';
-        if (len > 85) virtueBox.classList.add('compact-virtue');
-        virtueBox.textContent = dhikr.virtue;
-      } else {
-        virtueBox.style.display = 'none';
-      }
-      fitDhikrTextToCard();
-      document.getElementById('countDisplay').textContent = currentVal;
-      document.getElementById('countLabel').textContent = step.target > 0 ? `المتبقي من ${step.target}` : 'عداد مفتوح';
-      updateProgressRing(currentVal, step.target); updateDailyGoalUI(); updateTimerUI(); updateAutoTapButtonUI(); updateResumeBanner(); saveState(false, '', skipCloud);
-    }
-    function jumpToStep(stepIdx) {
-      pauseDhikrTimer(); resetAutoTapCalibration();
-      const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
-      prog.stepIndex = stepIdx; state.progressMap[dhikr.id] = prog; render();
-    }
-    function selectDhikr(index) {
-      if (index !== state.activeIndex) { pauseDhikrTimer(); resetAutoTapCalibration(); }
-      state.activeIndex = index; render();
-    }
-    function prevDhikr() {
-      pauseDhikrTimer(); resetAutoTapCalibration();
-      const entries = getFilteredAdhkarEntries(), pos = entries.findIndex(e => e.idx === state.activeIndex);
-      state.activeIndex = entries[(pos - 1 + entries.length) % entries.length].idx; render();
-    }
-    function nextDhikr() {
-      pauseDhikrTimer(); resetAutoTapCalibration();
-      const entries = getFilteredAdhkarEntries(), pos = entries.findIndex(e => e.idx === state.activeIndex);
-      state.activeIndex = entries[(pos + 1) % entries.length].idx; render();
-    }
-    function handleZoneTap(e) { if (state.focusMode) performIncrement(false); }
-    function handleRingTap(e) { if (!state.focusMode) { e.stopPropagation(); performIncrement(false); } }
-    function performIncrement(fromAuto = false) {
-      const dhikr = getCurrentDhikr(); if (!dhikr || !dhikr.steps || dhikr.steps.length === 0) return;
-      const prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
-      if (!fromAuto && (step.target === 0 || step.target > 5)) {
-        const now = Date.now();
-        if (tapTimestamps.length > 0 && (now - tapTimestamps.at(-1)) > 8000) tapTimestamps = new Array();
-        tapTimestamps.push(now);
-        if (tapTimestamps.length >= 3) {
-          const diff1 = tapTimestamps.at(-2) - tapTimestamps.at(-3), diff2 = tapTimestamps.at(-1) - tapTimestamps.at(-2);
-          measuredIntervalMs = Math.max(300, Math.round((diff1 + diff2) / 2));
-        }
-      }
-      startDhikrTimer(dhikr.id); let completedDuration = 0;
-      if (step.target > 0) {
-        if (prog.stepCounts[sIdx] > 1) { prog.stepCounts[sIdx] -= 1; recordTasbihStat(dhikr, sIdx, 0); }
-        else {
-          prog.stepCounts[sIdx] = step.target;
-          if (sIdx < dhikr.steps.length - 1) {
-            prog.stepIndex = sIdx + 1; stopAutoTap(); tapTimestamps = new Array(); measuredIntervalMs = null; autoTapUsedInStep = false; recordTasbihStat(dhikr, sIdx, 0);
-          } else {
-            prog.stepIndex = 0; pauseDhikrTimer(); completedDuration = dhikrElapsedMs[dhikr.id] || 0; dhikrElapsedMs[dhikr.id] = 0;
-            resetAutoTapCalibration(); recordTasbihStat(dhikr, sIdx, completedDuration); showSaveToast(`أتممت الذكر في ${formatDuration(completedDuration)}`);
-            if (state.activeListId !== 'all') {
-              const entries = getFilteredAdhkarEntries();
-              if (entries.length > 1) { const pos = entries.findIndex(e => e.idx === state.activeIndex); state.activeIndex = entries[(pos + 1) % entries.length].idx; }
-            }
-          }
-        }
-      } else { prog.stepCounts[sIdx] += 1; recordTasbihStat(dhikr, sIdx, 0); }
-      if (!state.stats.history) state.stats.history = {};
-      state.stats.history[getTodayStr()] = state.stats.todayCount;
-      state.progressMap[dhikr.id] = prog; render();
-    }
-
     function openResetOptions() {
       const dhikr = getCurrentDhikr();
       if (dhikr && dhikr.steps.length > 1) {
@@ -1355,39 +1238,48 @@ function getFilteredAdhkarEntries() {
 
       ctx.fillStyle = surfCol;
       ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(60, 60, 960, 960, 44); else ctx.fillRect(60, 60, 960, 960);
+      if (ctx.roundRect) ctx.roundRect(45, 45, 990, 990, 48); else ctx.fillRect(45, 45, 990, 990);
       ctx.fill();
-      ctx.strokeStyle = accCol; ctx.lineWidth = 4; ctx.stroke();
+      ctx.strokeStyle = accCol; ctx.lineWidth = 5; ctx.stroke();
 
+      ctx.strokeStyle = primCol; ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(65, 65, 950, 950, 36); else ctx.strokeRect(65, 65, 950, 950);
+      ctx.stroke();
+
+      const headerTitle = (step.title && step.title.trim() && step.title !== dhikr.title) ? `${dhikr.title} • ${step.title}` : dhikr.title;
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 38px Tajawal, sans-serif';
+      ctx.font = 'bold 40px Tajawal, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(dhikr.title, 540, 150);
+      ctx.fillText(headerTitle, 540, 145);
+
+      ctx.strokeStyle = accCol; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(360, 175); ctx.lineTo(720, 175); ctx.stroke();
 
       ctx.fillStyle = textCol;
       const rawText = step.text || '';
-      const fontSize = rawText.length > 260 ? 34 : (rawText.length > 140 ? 42 : 50);
+      const fontSize = rawText.length > 320 ? 40 : (rawText.length > 180 ? 48 : (rawText.length > 90 ? 58 : 68));
       ctx.font = `bold ${fontSize}px Amiri, serif`;
       const words = rawText.split(' ');
       const lines = []; let curLine = '';
       for (let w of words) {
         const test = curLine ? curLine + ' ' + w : w;
-        if (ctx.measureText(test).width > 820) { lines.push(curLine); curLine = w; }
+        if (ctx.measureText(test).width > 870) { lines.push(curLine); curLine = w; }
         else curLine = test;
       }
       if (curLine) lines.push(curLine);
-      const lineHeight = fontSize * 1.65;
-      const startY = 520 - ((lines.length - 1) * lineHeight) / 2;
+      const lineHeight = fontSize * 1.55;
+      const startY = 515 - ((lines.length - 1) * lineHeight) / 2;
       lines.slice(0, 11).forEach((ln, i) => ctx.fillText(ln, 540, startY + i * lineHeight));
 
       if (dhikr.virtue && dhikr.virtue.trim()) {
         ctx.fillStyle = mutedCol;
-        ctx.font = 'bold 24px Tajawal, sans-serif';
-        const vShort = dhikr.virtue.length > 95 ? dhikr.virtue.slice(0, 95) + '...' : dhikr.virtue;
+        ctx.font = 'bold 26px Tajawal, sans-serif';
+        const vShort = dhikr.virtue.length > 85 ? dhikr.virtue.slice(0, 85) + '...' : dhikr.virtue;
         ctx.fillText(vShort, 540, 895);
       }
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 26px Tajawal, sans-serif';
+      ctx.font = 'bold 28px Tajawal, sans-serif';
       ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 965);
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -1433,16 +1325,16 @@ function getFilteredAdhkarEntries() {
     (function setupCardSwipe() {
       let touchStartX = 0, touchStartY = 0;
       document.addEventListener('touchstart', (e) => {
-        if (!e.target.closest('#dhikrCard')) return;
-        touchStartX = e.changedTouches.screenX;
-        touchStartY = e.changedTouches.screenY;
+        if (!e.target.closest('.card') || e.target.closest('button')) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
         if (!touchStartX) return;
-        const dx = e.changedTouches.screenX - touchStartX;
-        const dy = e.changedTouches.screenY - touchStartY;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
         touchStartX = 0;
-        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        if (Math.abs(dx) > 38 && Math.abs(dx) > Math.abs(dy) * 1.2) {
           const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
           if (dx > 0) {
             if (dhikr.steps.length > 1 && prog.stepIndex < dhikr.steps.length - 1) jumpToStep(prog.stepIndex + 1);
@@ -1454,6 +1346,76 @@ function getFilteredAdhkarEntries() {
         }
       }, { passive: true });
     })();
+
+    function getRemainingToCompleteDhikr(dhikr) {
+      if (!dhikr.steps.some(s => s.target > 0)) return null;
+      const prog = getDhikrProgress(dhikr); let totalRem = 0;
+      dhikr.steps.forEach((st, idx) => {
+        if (st.target > 0) totalRem += (idx < prog.stepIndex) ? 0 : (idx === prog.stepIndex ? prog.stepCounts[idx] : st.target);
+      });
+      return totalRem;
+    }
+    function openStatsModal() {
+      checkStatsDate();
+      renderMonthlyCalendar();
+      const todayCnt = state.stats.todayCount || 0;
+      document.getElementById('statToday').textContent = todayCnt;
+      document.getElementById('statTotal').textContent = state.stats.totalCount || 0;
+      document.getElementById('statStreak').textContent = state.stats.streak || 0;
+      const goalBox = document.getElementById('statsGoalBox');
+      if (goalBox && state.dailyGoal > 0) {
+        goalBox.style.display = 'block';
+        const pct = Math.min(100, Math.round((todayCnt / state.dailyGoal) * 100));
+        document.getElementById('statsGoalLabel').textContent = `${todayCnt} / ${state.dailyGoal} (${pct}%)`;
+        document.getElementById('statsGoalBar').style.width = pct + '%';
+      } else if (goalBox) { goalBox.style.display = 'none'; }
+      const readListEl = document.getElementById('statsReadList'), unreadListEl = document.getElementById('statsUnreadList');
+      readListEl.innerHTML = ''; unreadListEl.innerHTML = '';
+      const details = state.stats.dailyDetails || {}; let hasReadAny = false, hasUnreadAny = false;
+      state.adhkar.forEach((dhikr) => {
+        const entry = details[dhikr.id], totalDone = entry ? (entry.total || 0) : 0, prog = getDhikrProgress(dhikr);
+        if (totalDone > 0) {
+          hasReadAny = true; const card = document.createElement('div'); card.className = 'stat-detail-card';
+          const durText = (entry.durationMs && entry.durationMs > 0) ? ` • ${formatDuration(entry.durationMs)}` : '';
+          const totalRem = getRemainingToCompleteDhikr(dhikr); let remStatusHtml = '';
+          if (totalRem !== null) {
+            remStatusHtml = (hasActiveProgress(dhikr) && totalRem > 0)
+              ? `<div class="stat-rem-pill">المتبقي لإتمام الدورة الحالية: ${totalRem} تسبيحة</div>`
+              : `<div class="stat-rem-pill" style="color: var(--primary-color);">مكتمل حالياً (جاهز لدورة جديدة)</div>`;
+          }
+          let stepsHtml = '';
+          dhikr.steps.forEach((st, sIdx) => {
+            const stCount = (entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
+            const shortTxt = st.text.length > 22 ? st.text.slice(0, 22) + '...' : st.text;
+            let stepRemTag = '';
+            if (st.target > 0) {
+              const stepRem = (sIdx < prog.stepIndex) ? 0 : (sIdx === prog.stepIndex ? prog.stepCounts[sIdx] : st.target);
+              if (hasActiveProgress(dhikr) && stepRem > 0 && stepRem < st.target) stepRemTag = ` <span style="color:var(--accent-color); font-size:11px;">(متبقي ${stepRem})</span>`;
+              else if (hasActiveProgress(dhikr) && sIdx > prog.stepIndex) stepRemTag = ` <span style="color:var(--text-muted); font-size:11px;">(متبقي ${st.target})</span>`;
+            }
+            const stName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
+            stepsHtml += `<div class="stat-step-row"><span class="stat-step-name">${stName}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag}</span></div>`;
+          });
+          card.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge">${totalDone} مرة${durText}</span></div>${remStatusHtml}<div class="stat-steps-list">${stepsHtml}</div>`;
+          readListEl.appendChild(card);
+        }
+        const unreadSteps = new Array();
+        dhikr.steps.forEach((st, sIdx) => {
+          const stCount = (entry && entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
+          const uStName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
+          if (stCount === 0) unreadSteps.push(`${uStName}: ${st.text.length > 26 ? st.text.slice(0, 26) + '...' : st.text}`);
+        });
+        if (totalDone === 0 || unreadSteps.length > 0) {
+          hasUnreadAny = true; const uCard = document.createElement('div'); uCard.className = 'stat-detail-card'; uCard.style.opacity = '0.85';
+          if (totalDone === 0) uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">لم يُقرأ بعد</span></div>`;
+          else uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">خطوات متبقية</span></div><div class="stat-steps-list">${unreadSteps.map(s => `<div>• ${s}</div>`).join('')}</div>`;
+          unreadListEl.appendChild(uCard);
+        }
+      });
+      if (!hasReadAny) readListEl.innerHTML = '<div style="font-size:13px; color:var(--text-muted); padding:6px 0;">لم تقم بأي تسبيح اليوم بعد.</div>';
+      if (!hasUnreadAny) unreadListEl.innerHTML = '<div style="font-size:13px; color:var(--primary-color); font-weight:700; padding:6px 0;">ما شاء الله! أتممت جميع الأذكار والخطوات اليوم.</div>';
+      document.getElementById('statsModal').classList.add('open');
+    }
 
     function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
@@ -1603,7 +1565,10 @@ function getFilteredAdhkarEntries() {
       saveState(false);
     }
 
-   let modalSelectedListId = 'all';
+      let modalSelectedListId = 'all';
+    function normalizeArabicForSearch(str) {
+      return (str || '').replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ة/g, 'ه').replace(/ى/g, 'ي').toLowerCase();
+    }
     function openIndexModal() {
       modalSelectedListId = state.activeListId; document.getElementById('dhikrSearchInput').value = '';
       renderIndexModalList(); document.getElementById('indexModal').classList.add('open');
@@ -1658,15 +1623,21 @@ function getFilteredAdhkarEntries() {
         chip.innerHTML = `<span>${l.name} (${idsLen})</span>` + (l.id !== 'fav' ? `<span onclick="deleteCustomList('${l.id}', event)" style="opacity:0.75; margin-right:3px;">✕</span>` : '');
         chip.onclick = () => switchActiveList(l.id); listsRow.appendChild(chip);
       });
-      const q = document.getElementById('dhikrSearchInput').value.trim().toLowerCase(), container = document.getElementById('indexDhikrList'); container.innerHTML = '';
+      const rawQ = document.getElementById('dhikrSearchInput').value.trim();
+      const q = normalizeArabicForSearch(rawQ);
+      const container = document.getElementById('indexDhikrList'); container.innerHTML = '';
       const defaultFav = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
       const targetList = modalSelectedListId === 'all' ? defaultFav : (state.lists.find(l => l.id === modalSelectedListId) || defaultFav);
       if (!targetList) return;
       const hint = document.createElement('div');
       hint.style.cssText = 'font-size:12px; font-weight:700; color:var(--primary-color); margin-bottom:8px;';
       hint.textContent = `تضيف وتزيل من: ${targetList.name} (اضغط النجمة ☆ / ★)`; container.appendChild(hint);
+      let foundCount = 0;
       state.adhkar.forEach((item, idx) => {
-        if (q && !item.title.toLowerCase().includes(q) && !item.steps.some(s => s.text.toLowerCase().includes(q))) return;
+        const titleNorm = normalizeArabicForSearch(item.title);
+        const matchedStepIdx = q ? item.steps.findIndex(s => normalizeArabicForSearch(s.title).includes(q) || normalizeArabicForSearch(s.text).includes(q)) : -1;
+        if (q && !titleNorm.includes(q) && matchedStepIdx === -1) return;
+        foundCount++;
         const row = document.createElement('div');
         row.className = 'index-item' + (idx === state.activeIndex ? ' current' : '');
         row.onclick = () => {
@@ -1674,12 +1645,18 @@ function getFilteredAdhkarEntries() {
             const selList = state.lists.find(l => l.id === modalSelectedListId);
             state.activeListId = (selList && Array.isArray(selList.ids) && selList.ids.includes(item.id)) ? modalSelectedListId : 'all';
           }
-          selectDhikr(idx); closeModal('indexModal');
+          selectDhikr(idx);
+          if (matchedStepIdx >= 0) jumpToStep(matchedStepIdx);
+          closeModal('indexModal');
         };
         const isStarred = Array.isArray(targetList.ids) ? targetList.ids.includes(item.id) : false;
-        row.innerHTML = `<span class="index-item-title">${item.title}</span><span style="font-size:11.5px; color:var(--text-muted);">${item.steps.length} خطوة</span><button type="button" class="star-toggle-btn ${isStarred ? 'starred' : ''}" onclick="toggleDhikrInList('${item.id}', '${targetList.id}', event)">${isStarred ? '★' : '☆'}</button>`;
+        const stepBadge = (q && matchedStepIdx >= 0 && item.steps[matchedStepIdx].title) ? ` • ${item.steps[matchedStepIdx].title}` : '';
+        row.innerHTML = `<span class="index-item-title">${item.title}<span style="font-size:11.5px; color:var(--primary-color);">${stepBadge}</span></span><span style="font-size:11.5px; color:var(--text-muted);">${item.steps.length} خطوة</span><button type="button" class="star-toggle-btn ${isStarred ? 'starred' : ''}" onclick="toggleDhikrInList('${item.id}', '${targetList.id}', event)">${isStarred ? '★' : '☆'}</button>`;
         container.appendChild(row);
       });
+      if (q && foundCount === 0) {
+        container.innerHTML += '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13.5px;">لا توجد نتائج مطابقة لبحثك</div>';
+      }
     }
   
         function openStepsIndexModal() {
