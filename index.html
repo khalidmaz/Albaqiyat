@@ -123,6 +123,8 @@
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
 
     /* وضع القراءة بكامل الشاشة (مستقل عن تدوير الهاتف) */
+    .reading-font-btn { display: none; font-size: 12.5px; font-weight: 800; color: var(--primary-color); border-color: var(--primary-color); background: var(--primary-light); width: 32px; }
+    body.reading-mode .reading-font-btn { display: inline-flex; }
     body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
     body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
     body.reading-mode.reading-counter-right .counter-zone { flex-direction: row-reverse; }
@@ -275,6 +277,8 @@
         <div class="card-top">
           <div class="steps-pills" id="stepsPills"></div>
           <button type="button" class="step-count-btn" id="stepCounterBtn" onclick="openStepsIndexModal()">1 / 1 ▾</button>
+          <button type="button" class="fav-icon-btn reading-font-btn" onclick="adjustReadingFontSize(-2)" title="تصغير الخط">أ-</button>
+          <button type="button" class="fav-icon-btn reading-font-btn" onclick="adjustReadingFontSize(2)" title="تكبير الخط">أ+</button>
           <button type="button" class="fav-icon-btn" onclick="generateDhikrShareImage()" title="مشاركة الذكر كصورة">
             <svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           </button>
@@ -1774,7 +1778,7 @@ function getFilteredAdhkarEntries() {
       }
     }
   
-                function openStepsIndexModal() {
+        function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -1842,6 +1846,17 @@ function getFilteredAdhkarEntries() {
     function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
     function setTheme(themeName) { state.theme = themeName; applyAppearance(); saveState(true); }
     function setFontSize(val) { state.fontSize = parseInt(val, 10); applyAppearance(); saveState(true); }
+    function adjustReadingFontSize(delta) {
+      const nextSize = Math.min(48, Math.max(18, state.fontSize + delta));
+      if (nextSize === state.fontSize) {
+        showSaveToast(delta > 0 ? 'وصلت للحد الأقصى للخط' : 'وصلت للحد الأدنى للخط');
+        return;
+      }
+      state.fontSize = nextSize;
+      applyAppearance();
+      saveState(false);
+      showSaveToast(`حجم الخط: ${state.fontSize}`);
+    }
     function setDailyGoal(val) { const g = parseInt(val, 10); state.dailyGoal = isNaN(g) || g < 0 ? 0 : g; localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal); updateDailyGoalUI(); if (state.syncCode) pushToCloud(); showSaveToast('تم حفظ الهدف اليومي'); }
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
@@ -1856,4 +1871,3 @@ function getFilteredAdhkarEntries() {
   </script>
 </body>
 </html>
-
