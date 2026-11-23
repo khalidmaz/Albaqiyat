@@ -428,7 +428,7 @@
         </div>
       </div>
           
- <div class="form-group">
+  <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="38" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -831,7 +831,7 @@
       }
     }
 
-               let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
+                   let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
     function showSaveToast(msg = 'تم الحفظ', duration = 1600) {
       const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
       clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
@@ -935,95 +935,79 @@
       if (notify) showSaveToast(msg);
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
-    
-    let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
-    function showSaveToast(msg = 'تم الحفظ') {
-      const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
-      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
-    }
-    function pushToCloud() {
-      if (!state.syncCode || !navigator.onLine) return;
-      lastTapTime = Date.now();
-      clearTimeout(cloudPushTimer);
-      cloudPushTimer = setTimeout(() => {
-        const cleanCode = encodeURIComponent(state.syncCode.trim());
-        lastCloudStamp = Date.now();
-        const payload = {
-          adhkar: state.adhkar,
-          activeIndex: state.activeIndex,
-          activeListId: state.activeListId,
-          progressMap: state.progressMap,
-          lists: state.lists,
-          stats: state.stats,
-          dailyGoal: state.dailyGoal,
-          updatedAt: lastCloudStamp
-        };
-        fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
-      }, 350);
-    }
-    async function pullFromCloud(notify = false) {
-      if (!state.syncCode || !navigator.onLine || isPullingCloud) return;
-      if (!notify && (Date.now() - lastTapTime < 1200)) return;
-      isPullingCloud = true;
-      try {
-        const cleanCode = encodeURIComponent(state.syncCode.trim());
-        if (!notify) {
-          const stampRes = await fetch(`${FIREBASE_DB_URL}/users/${cleanCode}/updatedAt.json?t=${Date.now()}`, { cache: 'no-store' });
-          if (!stampRes.ok) return;
-          const remoteStamp = await stampRes.json();
-          if (!remoteStamp || remoteStamp <= lastCloudStamp) return;
-        }
-        const res = await fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json?t=${Date.now()}`, { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data && Array.isArray(data.adhkar) && data.adhkar.length > 0) {
-          if (!notify && data.updatedAt && data.updatedAt <= lastCloudStamp) return;
-          lastCloudStamp = data.updatedAt || Date.now();
-          const validCloudAdhkar = data.adhkar.filter(a => a && a.id && a.title && Array.isArray(a.steps) && a.steps.length > 0);
-          if (validCloudAdhkar.length > 0) state.adhkar = validCloudAdhkar;
-          state.progressMap = data.progressMap || {};
-          if (Array.isArray(data.lists) && data.lists.length > 0) state.lists = data.lists;
-          if (typeof data.activeListId === 'string') state.activeListId = data.activeListId;
-          if (typeof data.activeIndex === 'number' && data.activeIndex >= 0 && data.activeIndex < state.adhkar.length) state.activeIndex = data.activeIndex;
-          else if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
-          if (data.stats) { state.stats = data.stats; if (!state.stats.dailyDetails) state.stats.dailyDetails = {}; checkStatsDate(); }
-          if (typeof data.dailyGoal === 'number' && state.dailyGoal !== data.dailyGoal) {
-            state.dailyGoal = data.dailyGoal;
-            localStorage.setItem('tasbih_dailygoal_v63', state.dailyGoal);
-            const goalInp = document.getElementById('dailyGoalInput');
-            if (goalInp) goalInp.value = state.dailyGoal;
-          }
-          saveState(false, '', true); render(true);
-          if (notify) showSaveToast('تمت المزامنة السحابية');
-        } else if (notify) { pushToCloud(); showSaveToast('تم ربط الجهاز ورفع بياناتك'); }
-      } catch (e) {} finally { isPullingCloud = false; }
-    }
-    function saveSyncCode() {
-      const val = document.getElementById('syncCodeInput').value.trim();
-      state.syncCode = val; localStorage.setItem('tasbih_sync_code_v15', val); updateSyncUI();
-      if (val) pullFromCloud(true); else showSaveToast('تم إيقاف المزامنة السحابية');
-    }
-    function updateSyncUI() {
-      const inp = document.getElementById('syncCodeInput'), st = document.getElementById('syncStatusText');
-      if (inp) inp.value = state.syncCode;
-      if (st) { st.textContent = state.syncCode ? `الحالة: متصل بالمزامنة (${state.syncCode})` : 'الحالة: تخزين محلي على هذا الجهاز فقط'; st.style.color = state.syncCode ? 'var(--primary-color)' : 'var(--text-muted)'; }
-    }
-    function saveState(notify = false, msg = 'تم الحفظ', skipCloud = false) {
-      localStorage.setItem('tasbih_adhkar_v14', JSON.stringify(state.adhkar));
-      localStorage.setItem('tasbih_active_idx_v14', state.activeIndex);
-      localStorage.setItem('tasbih_progress_map_v14', JSON.stringify(state.progressMap));
-      localStorage.setItem('tasbih_lists_v24', JSON.stringify(state.lists));
-      localStorage.setItem('tasbih_active_list_v24', state.activeListId);
-      localStorage.setItem('tasbih_theme_v14', state.theme);
-      localStorage.setItem('tasbih_fontsize_v14', state.fontSize);
-      localStorage.setItem('tasbih_focus_v14', state.focusMode);
-      localStorage.setItem('tasbih_wakelock_v14', state.wakeLockEnabled);
-      localStorage.setItem('tasbih_stats_v14', JSON.stringify(state.stats));
-      if (!skipCloud && state.syncCode) pushToCloud();
-      if (notify) showSaveToast(msg);
-    }
-    setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
+    function getFilteredAdhkarEntries() {
+      if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
+      const list = state.lists.find(l => l.id === state.activeListId);
+      if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
+      const filtered = state.adhkar.map((item, idx) => ({ item, idx })).filter(e => list.ids.includes(e.item.id));
+      if (filtered.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
+      return filtered;
+    }
+    function getDhikrProgress(dhikr) {
+      if (!dhikr || !Array.isArray(dhikr.steps) || dhikr.steps.length === 0) {
+        return { stepIndex: 0, stepCounts: new Array() };
+      }
+      let prog = state.progressMap[dhikr.id];
+      if (!prog || !Array.isArray(prog.stepCounts) || prog.stepCounts.length !== dhikr.steps.length) {
+        prog = { stepIndex: 0, stepCounts: dhikr.steps.map(s => (s.target > 0 ? s.target : 0)) };
+        state.progressMap[dhikr.id] = prog;
+      }
+      if (typeof prog.stepIndex !== 'number' || prog.stepIndex < 0 || prog.stepIndex >= dhikr.steps.length) prog.stepIndex = 0;
+      return prog;
+    }
+    function isStepInProgress(dhikr, sIdx) { const prog = getDhikrProgress(dhikr), target = dhikr.steps[sIdx].target, cnt = prog.stepCounts[sIdx]; return (target > 0 && cnt < target) || (target === 0 && cnt > 0); }
+    function hasActiveProgress(dhikr) { if (!dhikr || !Array.isArray(dhikr.steps)) return false; for (let i = 0; i < dhikr.steps.length; i++) if (isStepInProgress(dhikr, i)) return true; return false; }
+    function fitDhikrTextToCard() {
+      const card = document.querySelector('.card');
+      const textEl = document.getElementById('dhikrText');
+      if (!card || !textEl) return;
+      let size = state.fontSize + 2;
+      textEl.style.fontSize = size + 'px';
+      textEl.style.lineHeight = size > 24 ? '1.85' : '1.75';
+      while (card.scrollHeight > card.clientHeight + 1 && size > 15) {
+        size -= 0.5;
+        textEl.style.fontSize = size + 'px';
+        if (size <= 23) textEl.style.lineHeight = '1.7';
+        if (size <= 20) textEl.style.lineHeight = '1.62';
+      }
+    }
+    window.addEventListener('resize', fitDhikrTextToCard);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitDhikrTextToCard); }
+    function applyTimeAutomations() {
+      const hr = new Date().getHours();
+      if (state.autoTimeList) {
+        let targetList = 'all';
+        if (hr >= 4 && hr < 12) targetList = 'morning_list';
+        else if (hr >= 15 && hr < 21) targetList = 'evening_list';
+        else if (hr >= 21 || hr < 4) targetList = 'sleep_list';
+        if (state.lists.some(l => l.id === targetList)) state.activeListId = targetList;
+      }
+    }
+    function init() { checkStatsDate(); applyTimeAutomations(); if (state.activeIndex >= state.adhkar.length || state.activeIndex < 0) state.activeIndex = 0; applyAppearance(); applyWakeLock(); updateSyncUI(); render(); if (state.syncCode) pullFromCloud(false); }
+    function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar.at(0); }
+    function applyAppearance() {
+      let activeTheme = state.theme;
+      if (state.autoDarkMode) {
+        const hr = new Date().getHours();
+        const isNight = (hr >= 18 || hr < 5);
+        const darkThemes = new Array('oled','black-gold','royal-navy-gold','twilight-marigold','raven-apricot','aubergine-cyan','outer-space-red','charcoal-orange','abyss-sand','carbon-silver','walnut-charcoal','espresso-terracotta');
+        if (isNight && !darkThemes.includes(activeTheme)) activeTheme = 'oled';
+        else if (!isNight && darkThemes.includes(activeTheme)) activeTheme = 'default';
+      }
+      if (activeTheme === 'default') document.documentElement.removeAttribute('data-theme');
+      else document.documentElement.setAttribute('data-theme', activeTheme);
+      document.documentElement.style.setProperty('--dhikr-font-size', state.fontSize + 'px');
+      document.getElementById('fontSlider').value = state.fontSize; document.getElementById('fontSizeVal').textContent = state.fontSize;
+      const goalInp = document.getElementById('dailyGoalInput'); if (goalInp) goalInp.value = state.dailyGoal || 0;
+      const atmTgl = document.getElementById('autoTimeListToggle'); if (atmTgl) atmTgl.checked = state.autoTimeList;
+      const adkTgl = document.getElementById('autoDarkToggle'); if (adkTgl) adkTgl.checked = state.autoDarkMode;
+      document.getElementById('focusToggle').checked = state.focusMode;
+      document.getElementById('wakeLockToggle').checked = state.wakeLockEnabled;
+      document.getElementById('counterZone').classList.toggle('focus-active', state.focusMode);
+      document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.t === state.theme));
+      fitDhikrTextToCard();
+    }
  
   function updateDailyGoalUI() {
       const track = document.getElementById('dailyGoalTrack');
@@ -1471,4 +1455,3 @@
   </script>
 </body>
 </html>
-
