@@ -1344,6 +1344,17 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
     let lastGeneratedBlob = null;
+    function wrapCanvasText(ctx, text, maxWidth) {
+      const words = (text || '').split(' ');
+      const lines = []; let curLine = '';
+      for (let w of words) {
+        const test = curLine ? curLine + ' ' + w : w;
+        if (ctx.measureText(test).width > maxWidth && curLine) { lines.push(curLine); curLine = w; }
+        else curLine = test;
+      }
+      if (curLine) lines.push(curLine);
+      return lines;
+    }
     function generateDhikrShareImage() {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
@@ -1363,40 +1374,52 @@ function getFilteredAdhkarEntries() {
 
       ctx.fillStyle = surfCol;
       ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(60, 60, 960, 960, 44); else ctx.fillRect(60, 60, 960, 960);
+      if (ctx.roundRect) ctx.roundRect(44, 44, 992, 992, 48); else ctx.fillRect(44, 44, 992, 992);
       ctx.fill();
-      ctx.strokeStyle = accCol; ctx.lineWidth = 4; ctx.stroke();
+      ctx.strokeStyle = accCol; ctx.lineWidth = 6; ctx.stroke();
 
+      ctx.strokeStyle = primCol; ctx.lineWidth = 2;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(66, 66, 948, 948, 36); else ctx.strokeRect(66, 66, 948, 948);
+      ctx.stroke();
+
+      const headerTitle = (step.title && step.title.trim() && step.title !== dhikr.title) ? `${dhikr.title} • ${step.title}` : dhikr.title;
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 38px Tajawal, sans-serif';
+      ctx.font = 'bold 42px Tajawal, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(dhikr.title, 540, 150);
+      ctx.fillText(headerTitle, 540, 148);
+
+      ctx.strokeStyle = accCol; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(320, 180); ctx.lineTo(760, 180); ctx.stroke();
 
       ctx.fillStyle = textCol;
       const rawText = step.text || '';
-      const fontSize = rawText.length > 260 ? 34 : (rawText.length > 140 ? 42 : 50);
+      let fontSize = rawText.length > 350 ? 42 : (rawText.length > 220 ? 52 : (rawText.length > 110 ? 64 : 76));
       ctx.font = `bold ${fontSize}px Amiri, serif`;
-      const words = rawText.split(' ');
-      const lines = []; let curLine = '';
-      for (let w of words) {
-        const test = curLine ? curLine + ' ' + w : w;
-        if (ctx.measureText(test).width > 820) { lines.push(curLine); curLine = w; }
-        else curLine = test;
+      let lines = wrapCanvasText(ctx, rawText, 830);
+      while (lines.length > 10 && fontSize > 34) {
+        fontSize -= 4;
+        ctx.font = `bold ${fontSize}px Amiri, serif`;
+        lines = wrapCanvasText(ctx, rawText, 830);
       }
-      if (curLine) lines.push(curLine);
-      const lineHeight = fontSize * 1.65;
-      const startY = 520 - ((lines.length - 1) * lineHeight) / 2;
-      lines.slice(0, 11).forEach((ln, i) => ctx.fillText(ln, 540, startY + i * lineHeight));
+      const lineHeight = fontSize * 1.58;
+      const centerAreaY = (dhikr.virtue && dhikr.virtue.trim()) ? 495 : 535;
+      const startY = centerAreaY - ((lines.length - 1) * lineHeight) / 2;
+      lines.forEach((ln, i) => ctx.fillText(ln, 540, startY + i * lineHeight));
 
       if (dhikr.virtue && dhikr.virtue.trim()) {
         ctx.fillStyle = mutedCol;
-        ctx.font = 'bold 24px Tajawal, sans-serif';
-        const vShort = dhikr.virtue.length > 95 ? dhikr.virtue.slice(0, 95) + '...' : dhikr.virtue;
-        ctx.fillText(vShort, 540, 895);
+        ctx.font = 'bold 25px Tajawal, sans-serif';
+        const vLines = wrapCanvasText(ctx, dhikr.virtue, 840).slice(0, 2);
+        vLines.forEach((vl, idx) => ctx.fillText(vl, 540, 845 + idx * 36));
       }
+
+      ctx.strokeStyle = accCol; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(380, 922); ctx.lineTo(700, 922); ctx.stroke();
+
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 26px Tajawal, sans-serif';
-      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 965);
+      ctx.font = 'bold 28px Tajawal, sans-serif';
+      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 968);
 
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('shareCardPreview').src = dataUrl;
@@ -1441,16 +1464,18 @@ function getFilteredAdhkarEntries() {
     (function setupCardSwipe() {
       let touchStartX = 0, touchStartY = 0;
       document.addEventListener('touchstart', (e) => {
-        if (!e.target.closest('#dhikrCard')) return;
-        touchStartX = e.changedTouches.screenX;
-        touchStartY = e.changedTouches.screenY;
+        if (!e.target.closest('.card') || e.target.closest('button')) return;
+        if (e.touches && e.touches.length === 1) {
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
+        }
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
-        if (!touchStartX) return;
-        const dx = e.changedTouches.screenX - touchStartX;
-        const dy = e.changedTouches.screenY - touchStartY;
+        if (!touchStartX || !e.changedTouches || e.changedTouches.length === 0) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
         touchStartX = 0;
-        if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
           const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
           if (dx > 0) {
             if (dhikr.steps.length > 1 && prog.stepIndex < dhikr.steps.length - 1) jumpToStep(prog.stepIndex + 1);
@@ -1611,7 +1636,18 @@ function getFilteredAdhkarEntries() {
       saveState(false);
     }
 
-   let modalSelectedListId = 'all';
+      let modalSelectedListId = 'all';
+    function normalizeArabicForSearch(str) {
+      return (str || '')
+        .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+        .replace(/[\uFEFB\uFEF7\uFEF9\uFEF5]/g, 'لا')
+        .replace(/[أإآٱ]/g, 'ا')
+        .replace(/ة/g, 'ه')
+        .replace(/ى/g, 'ي')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    }
     function openIndexModal() {
       modalSelectedListId = state.activeListId; document.getElementById('dhikrSearchInput').value = '';
       renderIndexModalList(); document.getElementById('indexModal').classList.add('open');
@@ -1666,15 +1702,21 @@ function getFilteredAdhkarEntries() {
         chip.innerHTML = `<span>${l.name} (${idsLen})</span>` + (l.id !== 'fav' ? `<span onclick="deleteCustomList('${l.id}', event)" style="opacity:0.75; margin-right:3px;">✕</span>` : '');
         chip.onclick = () => switchActiveList(l.id); listsRow.appendChild(chip);
       });
-      const q = document.getElementById('dhikrSearchInput').value.trim().toLowerCase(), container = document.getElementById('indexDhikrList'); container.innerHTML = '';
+      const rawQ = document.getElementById('dhikrSearchInput').value.trim();
+      const q = normalizeArabicForSearch(rawQ);
+      const container = document.getElementById('indexDhikrList'); container.innerHTML = '';
       const defaultFav = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
       const targetList = modalSelectedListId === 'all' ? defaultFav : (state.lists.find(l => l.id === modalSelectedListId) || defaultFav);
       if (!targetList) return;
       const hint = document.createElement('div');
       hint.style.cssText = 'font-size:12px; font-weight:700; color:var(--primary-color); margin-bottom:8px;';
       hint.textContent = `تضيف وتزيل من: ${targetList.name} (اضغط النجمة ☆ / ★)`; container.appendChild(hint);
+      let foundCount = 0;
       state.adhkar.forEach((item, idx) => {
-        if (q && !item.title.toLowerCase().includes(q) && !item.steps.some(s => s.text.toLowerCase().includes(q))) return;
+        const titleNorm = normalizeArabicForSearch(item.title);
+        const matchedStepIdx = q ? item.steps.findIndex(s => normalizeArabicForSearch(s.title).includes(q) || normalizeArabicForSearch(s.text).includes(q)) : -1;
+        if (q && !titleNorm.includes(q) && matchedStepIdx === -1) return;
+        foundCount++;
         const row = document.createElement('div');
         row.className = 'index-item' + (idx === state.activeIndex ? ' current' : '');
         row.onclick = () => {
@@ -1682,12 +1724,18 @@ function getFilteredAdhkarEntries() {
             const selList = state.lists.find(l => l.id === modalSelectedListId);
             state.activeListId = (selList && Array.isArray(selList.ids) && selList.ids.includes(item.id)) ? modalSelectedListId : 'all';
           }
-          selectDhikr(idx); closeModal('indexModal');
+          selectDhikr(idx);
+          if (matchedStepIdx >= 0) jumpToStep(matchedStepIdx);
+          closeModal('indexModal');
         };
         const isStarred = Array.isArray(targetList.ids) ? targetList.ids.includes(item.id) : false;
-        row.innerHTML = `<span class="index-item-title">${item.title}</span><span style="font-size:11.5px; color:var(--text-muted);">${item.steps.length} خطوة</span><button type="button" class="star-toggle-btn ${isStarred ? 'starred' : ''}" onclick="toggleDhikrInList('${item.id}', '${targetList.id}', event)">${isStarred ? '★' : '☆'}</button>`;
+        const stepBadge = (q && matchedStepIdx >= 0 && item.steps[matchedStepIdx].title) ? ` • ${item.steps[matchedStepIdx].title}` : '';
+        row.innerHTML = `<span class="index-item-title">${item.title}<span style="font-size:11.5px; color:var(--primary-color);">${stepBadge}</span></span><span style="font-size:11.5px; color:var(--text-muted);">${item.steps.length} خطوة</span><button type="button" class="star-toggle-btn ${isStarred ? 'starred' : ''}" onclick="toggleDhikrInList('${item.id}', '${targetList.id}', event)">${isStarred ? '★' : '☆'}</button>`;
         container.appendChild(row);
       });
+      if (q && foundCount === 0) {
+        container.innerHTML += '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13.5px;">لا توجد نتائج مطابقة لبحثك</div>';
+      }
     }
   
         function openStepsIndexModal() {
