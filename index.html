@@ -123,13 +123,15 @@
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
 
-    /* وضع السرد المتصل (صفحة واحدة) */
+    /* وضع السرد المتصل (صفحة واحدة مع إبقاء المؤقت والعد الآلي والتراجع) */
     .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
     body.continuous-mode .continuous-list { display: flex; }
-    body.continuous-mode #dhikrText, body.continuous-mode .counter-zone, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
+    body.continuous-mode #dhikrText, body.continuous-mode .ring-wrapper, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
+    body.continuous-mode .counter-zone { padding: 4px 8px; margin: 2px 0; border-radius: 14px; }
     body.continuous-mode .card-top { justify-content: space-between; width: 100%; }
     body.continuous-mode .card-top .fav-icon-btn { width: 34px; height: 28px; }
     .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; display: flex; flex-direction: column; }
+    .cont-step-card.active-cont-step { border-color: var(--primary-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
     .cont-step-card.done-step { opacity: 0.65; border-color: var(--primary-color); background: var(--primary-light); }
     .cont-step-header { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 6px; }
     .cont-step-title { font-size: 12.5px; font-weight: 800; color: var(--primary-color); }
@@ -562,6 +564,10 @@
         <label>الهدف اليومي للتسبيح (0 لإخفاء الشريط)</label>
         <input type="number" id="dailyGoalInput" min="0" step="50" placeholder="مثال: 1000" onchange="setDailyGoal(this.value)">
       </div>
+      <label class="switch-row">
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>عرض الأذكار كصفحة واحدة متصلة</span></span>
+        <input type="checkbox" id="continuousModeToggle" onchange="toggleContinuousMode(this.checked)" style="width:20px; height:20px; cursor:pointer;">
+      </label>
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg><span>وضع التركيز (لمس واسع)</span></span>
         <input type="checkbox" id="focusToggle" onchange="toggleFocusMode(this.checked)" style="width:20px; height:20px; cursor:pointer;">
@@ -1189,6 +1195,7 @@ function getFilteredAdhkarEntries() {
       const atmTgl = document.getElementById('autoTimeListToggle'); if (atmTgl) atmTgl.checked = state.autoTimeList;
       const adkTgl = document.getElementById('autoDarkToggle'); if (adkTgl) adkTgl.checked = state.autoDarkMode;
       const adrTgl = document.getElementById('autoDailyResetToggle'); if (adrTgl) adrTgl.checked = state.autoDailyReset;
+      const contTgl = document.getElementById('continuousModeToggle'); if (contTgl) contTgl.checked = document.body.classList.contains('continuous-mode');
       const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
       const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
@@ -1256,7 +1263,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('resumeBanner').classList.remove('show');
     }
 
-        function render(skipCloud = false) {
+    function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
       if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
       const activeListObj = state.lists.find(l => l.id === state.activeListId);
@@ -1329,7 +1336,7 @@ function getFilteredAdhkarEntries() {
       const entries = getFilteredAdhkarEntries(), pos = entries.findIndex(e => e.idx === state.activeIndex);
       state.activeIndex = entries[(pos + 1) % entries.length].idx; render();
     }
-    function handleZoneTap(e) { if (state.focusMode) performIncrement(false); }
+    function handleZoneTap(e) { if (state.focusMode && !document.body.classList.contains('continuous-mode')) performIncrement(false); }
     function handleRingTap(e) { if (!state.focusMode) { e.stopPropagation(); performIncrement(false); } }
     function performIncrement(fromAuto = false) {
       const dhikr = getCurrentDhikr(); if (!dhikr || !dhikr.steps || dhikr.steps.length === 0) return;
@@ -1343,11 +1350,12 @@ function getFilteredAdhkarEntries() {
           measuredIntervalMs = Math.max(300, Math.round((diff1 + diff2) / 2));
         }
       }
-      startDhikrTimer(dhikr.id); let completedDuration = 0;
+      startDhikrTimer(dhikr.id); let completedDuration = 0, stepFinished = false;
       if (step.target > 0) {
         if (prog.stepCounts[sIdx] > 1) { prog.stepCounts[sIdx] -= 1; recordTasbihStat(dhikr, sIdx, 0); }
         else {
           prog.stepCounts[sIdx] = step.target;
+          stepFinished = true;
           if (sIdx < dhikr.steps.length - 1) {
             prog.stepIndex = sIdx + 1; stopAutoTap(); tapTimestamps = new Array(); measuredIntervalMs = null; autoTapUsedInStep = false; recordTasbihStat(dhikr, sIdx, 0);
           } else {
@@ -1363,14 +1371,23 @@ function getFilteredAdhkarEntries() {
       if (!state.stats.history) state.stats.history = {};
       state.stats.history[getTodayStr()] = state.stats.todayCount;
       state.progressMap[dhikr.id] = prog; render();
+      if (stepFinished && document.body.classList.contains('continuous-mode') && sIdx + 1 < dhikr.steps.length) {
+        setTimeout(() => {
+          const nextCard = document.querySelector(`.cont-step-card[data-step-idx="${sIdx + 1}"]`);
+          if (nextCard) nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      }
     }
 
-    function toggleContinuousMode() {
-      const isActive = document.body.classList.toggle('continuous-mode');
+        function toggleContinuousMode(forceState) {
+      const isActive = (typeof forceState === 'boolean')
+        ? document.body.classList.toggle('continuous-mode', forceState)
+        : document.body.classList.toggle('continuous-mode');
       localStorage.setItem('tasbih_continuous_mode', isActive);
       const btn = document.getElementById('continuousModeBtn');
       if (btn) btn.classList.toggle('fav-active', isActive);
-      if (isActive) { pauseDhikrTimer(); stopAutoTap(); }
+      const tgl = document.getElementById('continuousModeToggle');
+      if (tgl) tgl.checked = isActive;
       render(true);
       showSaveToast(isActive ? 'عرض كصفحة واحدة متصلة' : 'العرض التفاعلي خطوة بخطوة');
     }
@@ -1382,8 +1399,9 @@ function getFilteredAdhkarEntries() {
       dhikr.steps.forEach((st, sIdx) => {
         const curVal = prog.stepCounts[sIdx];
         const isDone = st.target > 0 && curVal === st.target && prog.stepIndex > sIdx;
+        const isCurrent = sIdx === prog.stepIndex && !isDone;
         const card = document.createElement('div');
-        card.className = 'cont-step-card' + (isDone ? ' done-step' : '');
+        card.className = 'cont-step-card' + (isDone ? ' done-step' : (isCurrent ? ' active-cont-step' : ''));
         card.dataset.stepIdx = sIdx;
         const stTitle = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
         const badgeText = st.target > 0 ? (isDone ? 'تم ✓' : `${curVal} / ${st.target}`) : `${curVal}`;
@@ -1398,34 +1416,12 @@ function getFilteredAdhkarEntries() {
     function tapContinuousStep(sIdx) {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
-      const step = dhikr.steps[sIdx];
-      let stepCompleted = false;
-      if (step.target > 0) {
-        if (prog.stepCounts[sIdx] > 1) {
-          prog.stepCounts[sIdx] -= 1;
-          prog.stepIndex = sIdx;
-          recordTasbihStat(dhikr, sIdx, 0);
-        } else {
-          prog.stepCounts[sIdx] = step.target;
-          prog.stepIndex = Math.min(dhikr.steps.length - 1, sIdx + 1);
-          recordTasbihStat(dhikr, sIdx, 0);
-          stepCompleted = true;
-          showSaveToast(`تمت: ${step.title || ('خطوة ' + (sIdx + 1))}`);
-        }
-      } else {
-        prog.stepCounts[sIdx] += 1;
-        recordTasbihStat(dhikr, sIdx, 0);
+      if (prog.stepIndex !== sIdx) {
+        resetAutoTapCalibration();
+        prog.stepIndex = sIdx;
+        state.progressMap[dhikr.id] = prog;
       }
-      if (!state.stats.history) state.stats.history = {};
-      state.stats.history[getTodayStr()] = state.stats.todayCount;
-      state.progressMap[dhikr.id] = prog;
-      render();
-      if (stepCompleted && sIdx + 1 < dhikr.steps.length) {
-        setTimeout(() => {
-          const nextCard = document.querySelector(`.cont-step-card[data-step-idx="${sIdx + 1}"]`);
-          if (nextCard) nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 120);
-      }
+      performIncrement(false);
     }
     function openResetOptions() {
       const dhikr = getCurrentDhikr();
@@ -1886,7 +1882,7 @@ function getFilteredAdhkarEntries() {
       }
     }
   
-                function openStepsIndexModal() {
+                        function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -1951,7 +1947,11 @@ function getFilteredAdhkarEntries() {
       else if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(shareText).then(() => showSaveToast('تم نسخ الرابط والشرح')); }
       else { prompt('انسخ الرسالة:', shareText); }
     }
-    function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
+    function openSettingsModal() {
+      const contTgl = document.getElementById('continuousModeToggle');
+      if (contTgl) contTgl.checked = document.body.classList.contains('continuous-mode');
+      document.getElementById('settingsModal').classList.add('open');
+    }
     function setTheme(themeName) { state.theme = themeName; applyAppearance(); saveState(true); }
     function setFontSize(val) { state.fontSize = parseInt(val, 10); applyAppearance(); saveState(true); }
     function adjustReadingFontSize(delta) {
@@ -1970,7 +1970,6 @@ function getFilteredAdhkarEntries() {
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleAutoDailyReset(val) { state.autoDailyReset = val; localStorage.setItem('tasbih_autodaily_reset', val); if (val) checkStatsDate(); render(); showSaveToast('تم الحفظ'); }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
-    function toggleReadingCounterRight(val) { localStorage.setItem('tasbih_reading_right', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleLandscapeSwap(val) { localStorage.setItem('tasbih_landscape_swap', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleWakeLock(val) { state.wakeLockEnabled = val; applyWakeLock(); saveState(true); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
