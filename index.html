@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -121,14 +122,15 @@
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
 
-    /* وضع القراءة بكامل الشاشة */
+    /* وضع القراءة بكامل الشاشة (مستقل عن تدوير الهاتف) */
     body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
     body.reading-mode .counter-zone { flex-direction: row; justify-content: space-between; padding: 6px 12px; margin: 4px 0; border-radius: 14px; background: var(--surface-color); border: 1px solid var(--border-color); }
-    body.reading-mode .counter-top-bar { width: auto; justify-content: flex-start; }
-    body.reading-mode .ring-wrapper { width: 58px; height: 58px; }
+    body.reading-mode.reading-counter-right .counter-zone { flex-direction: row-reverse; }
+    body.reading-mode .counter-top-bar { width: auto; justify-content: flex-start; flex: 1; }
+    body.reading-mode.reading-counter-right .counter-top-bar { justify-content: flex-end; }
+    body.reading-mode .ring-wrapper { width: 62px; height: 62px; background: var(--primary-color); border-radius: 14px; flex-shrink: 0; }
     body.reading-mode .progress-svg { display: none; }
-    body.reading-mode .ring-wrapper { background: var(--primary-color); border-radius: 14px; }
-    body.reading-mode .count-number { font-size: 22px; color: #ffffff; }
+    body.reading-mode .count-number { font-size: 23px; color: #ffffff; }
     body.reading-mode .count-label { font-size: 9px; color: rgba(255,255,255,0.85); margin-top: 1px; }
 
     /* تقويم الالتزام الشهري */
@@ -516,7 +518,7 @@
         </div>
       </div>
           
-        <div class="form-group">
+                <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="48" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -527,6 +529,10 @@
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg><span>وضع التركيز (لمس واسع)</span></span>
         <input type="checkbox" id="focusToggle" onchange="toggleFocusMode(this.checked)" style="width:20px; height:20px; cursor:pointer;">
+      </label>
+      <label class="switch-row">
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg><span>وضع القراءة الكاملة: العداد يمين</span></span>
+        <input type="checkbox" id="readingCounterRightToggle" onchange="toggleReadingCounterRight(this.checked)" style="width:20px; height:20px; cursor:pointer;">
       </label>
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span>الوضع العرضي: العداد يمين والذكر يسار</span></span>
@@ -1089,7 +1095,8 @@ function getFilteredAdhkarEntries() {
       const textEl = document.getElementById('dhikrText');
       if (!card || !textEl) return;
       const isLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 550;
-      let size = state.fontSize + (isLandscape ? 16 : 2);
+      const isReading = document.body.classList.contains('reading-mode');
+      let size = state.fontSize + (isLandscape ? 16 : (isReading ? 4 : 2));
       textEl.style.fontSize = size + 'px';
       textEl.style.lineHeight = isLandscape ? '1.48' : (size > 24 ? '1.85' : '1.75');
       while (card.scrollHeight > card.clientHeight + 1 && size > 15) {
@@ -1134,6 +1141,9 @@ function getFilteredAdhkarEntries() {
       const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
       const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
+      const isReadingRight = localStorage.getItem('tasbih_reading_right') === 'true';
+      const readRightTgl = document.getElementById('readingCounterRightToggle'); if (readRightTgl) readRightTgl.checked = isReadingRight;
+      document.body.classList.toggle('reading-counter-right', isReadingRight);
       document.getElementById('focusToggle').checked = state.focusMode;
       document.getElementById('wakeLockToggle').checked = state.wakeLockEnabled;
       document.getElementById('counterZone').classList.toggle('focus-active', state.focusMode);
@@ -1306,7 +1316,7 @@ function getFilteredAdhkarEntries() {
       state.progressMap[dhikr.id] = prog; render();
     }
 
-    function openResetOptions() {
+        function openResetOptions() {
       const dhikr = getCurrentDhikr();
       if (dhikr && dhikr.steps.length > 1) {
         document.getElementById('resetChoiceModal').classList.add('open');
@@ -1345,7 +1355,7 @@ function getFilteredAdhkarEntries() {
     }
     let lastGeneratedBlob = null;
     function wrapCanvasText(ctx, text, maxWidth) {
-      const words = (text || '').split(' ');
+      const words = (text || '').split(/\s+/).filter(Boolean);
       const lines = []; let curLine = '';
       for (let w of words) {
         const test = curLine ? curLine + ' ' + w : w;
@@ -1387,39 +1397,53 @@ function getFilteredAdhkarEntries() {
       ctx.fillStyle = primCol;
       ctx.font = 'bold 42px Tajawal, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(headerTitle, 540, 148);
+      ctx.fillText(headerTitle, 540, 146);
 
       ctx.strokeStyle = accCol; ctx.lineWidth = 3;
-      ctx.beginPath(); ctx.moveTo(320, 180); ctx.lineTo(760, 180); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(300, 178); ctx.lineTo(780, 178); ctx.stroke();
+
+      const hasVirtue = Boolean(dhikr.virtue && dhikr.virtue.trim());
+      let vLines = [];
+      let virtueBlockHeight = 0;
+      if (hasVirtue) {
+        ctx.font = 'bold 26px Tajawal, sans-serif';
+        vLines = wrapCanvasText(ctx, dhikr.virtue.trim(), 820).slice(0, 3);
+        virtueBlockHeight = vLines.length * 38 + 24;
+      }
+
+      const topBound = 205;
+      const bottomBound = hasVirtue ? (900 - virtueBlockHeight) : 900;
+      const availableHeight = bottomBound - topBound;
 
       ctx.fillStyle = textCol;
       const rawText = step.text || '';
-      let fontSize = rawText.length > 350 ? 42 : (rawText.length > 220 ? 52 : (rawText.length > 110 ? 64 : 76));
+      let fontSize = rawText.length > 350 ? 48 : (rawText.length > 220 ? 58 : (rawText.length > 110 ? 72 : 84));
       ctx.font = `bold ${fontSize}px Amiri, serif`;
-      let lines = wrapCanvasText(ctx, rawText, 830);
-      while (lines.length > 10 && fontSize > 34) {
-        fontSize -= 4;
+      let lines = wrapCanvasText(ctx, rawText, 850);
+      while ((lines.length * fontSize * 1.56 > availableHeight) && fontSize > 34) {
+        fontSize -= 3;
         ctx.font = `bold ${fontSize}px Amiri, serif`;
-        lines = wrapCanvasText(ctx, rawText, 830);
+        lines = wrapCanvasText(ctx, rawText, 850);
       }
-      const lineHeight = fontSize * 1.58;
-      const centerAreaY = (dhikr.virtue && dhikr.virtue.trim()) ? 495 : 535;
-      const startY = centerAreaY - ((lines.length - 1) * lineHeight) / 2;
+      const lineHeight = fontSize * 1.56;
+      const totalTextHeight = lines.length * lineHeight;
+      const centerAreaY = topBound + (availableHeight / 2);
+      const startY = centerAreaY - (totalTextHeight / 2) + (fontSize * 0.72);
       lines.forEach((ln, i) => ctx.fillText(ln, 540, startY + i * lineHeight));
 
-      if (dhikr.virtue && dhikr.virtue.trim()) {
+      if (hasVirtue && vLines.length > 0) {
         ctx.fillStyle = mutedCol;
-        ctx.font = 'bold 25px Tajawal, sans-serif';
-        const vLines = wrapCanvasText(ctx, dhikr.virtue, 840).slice(0, 2);
-        vLines.forEach((vl, idx) => ctx.fillText(vl, 540, 845 + idx * 36));
+        ctx.font = 'bold 26px Tajawal, sans-serif';
+        const vStartY = 895 - ((vLines.length - 1) * 38);
+        vLines.forEach((vl, idx) => ctx.fillText(vl, 540, vStartY + idx * 38));
       }
 
       ctx.strokeStyle = accCol; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(380, 922); ctx.lineTo(700, 922); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(360, 926); ctx.lineTo(720, 926); ctx.stroke();
 
       ctx.fillStyle = primCol;
       ctx.font = 'bold 28px Tajawal, sans-serif';
-      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 968);
+      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 972);
 
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('shareCardPreview').src = dataUrl;
@@ -1462,21 +1486,32 @@ function getFilteredAdhkarEntries() {
       }
     }
     (function setupCardSwipe() {
-      let touchStartX = 0, touchStartY = 0;
+      let touchStartX = 0, touchStartY = 0, isSwipeTracking = false;
       document.addEventListener('touchstart', (e) => {
-        if (!e.target.closest('.card') || e.target.closest('button')) return;
+        if (!e.target.closest('.card') || e.target.closest('button') || e.target.closest('.steps-pills')) {
+          isSwipeTracking = false;
+          return;
+        }
         if (e.touches && e.touches.length === 1) {
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
+          isSwipeTracking = true;
         }
       }, { passive: true });
+      document.addEventListener('touchmove', (e) => {
+        if (!isSwipeTracking || !e.touches || e.touches.length !== 1) return;
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        if (dy > 18 && dy > dx) isSwipeTracking = false;
+      }, { passive: true });
       document.addEventListener('touchend', (e) => {
-        if (!touchStartX || !e.changedTouches || e.changedTouches.length === 0) return;
+        if (!isSwipeTracking || !e.changedTouches || e.changedTouches.length === 0) return;
+        isSwipeTracking = false;
         const dx = e.changedTouches[0].clientX - touchStartX;
         const dy = e.changedTouches[0].clientY - touchStartY;
-        touchStartX = 0;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
-          const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          const dhikr = getCurrentDhikr(); if (!dhikr) return;
+          const prog = getDhikrProgress(dhikr);
           if (dx > 0) {
             if (dhikr.steps.length > 1 && prog.stepIndex < dhikr.steps.length - 1) jumpToStep(prog.stepIndex + 1);
             else nextDhikr();
@@ -1488,7 +1523,7 @@ function getFilteredAdhkarEntries() {
       }, { passive: true });
     })();
 
-    function getRemainingToCompleteDhikr(dhikr) {
+        function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
       const prog = getDhikrProgress(dhikr); let totalRem = 0;
       dhikr.steps.forEach((st, idx) => {
@@ -1498,6 +1533,7 @@ function getFilteredAdhkarEntries() {
     }
     function openStatsModal() {
       checkStatsDate();
+      renderMonthlyCalendar();
       const todayCnt = state.stats.todayCount || 0;
       document.getElementById('statToday').textContent = todayCnt;
       document.getElementById('statTotal').textContent = state.stats.totalCount || 0;
@@ -1738,7 +1774,7 @@ function getFilteredAdhkarEntries() {
       }
     }
   
-        function openStepsIndexModal() {
+                function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -1810,6 +1846,7 @@ function getFilteredAdhkarEntries() {
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
+    function toggleReadingCounterRight(val) { localStorage.setItem('tasbih_reading_right', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleLandscapeSwap(val) { localStorage.setItem('tasbih_landscape_swap', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleWakeLock(val) { state.wakeLockEnabled = val; applyWakeLock(); saveState(true); }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
@@ -1819,3 +1856,4 @@ function getFilteredAdhkarEntries() {
   </script>
 </body>
 </html>
+
