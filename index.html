@@ -127,19 +127,21 @@
     .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
     body.continuous-mode .continuous-list { display: flex; }
     body.continuous-mode #dhikrText, body.continuous-mode .counter-zone, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
-    body.continuous-mode .card-top { justify-content: flex-end; }
-    .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; }
-    .cont-step-card.done-step { opacity: 0.62; border-color: var(--primary-color); background: var(--primary-light); }
-    .cont-step-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+    body.continuous-mode .card-top { justify-content: space-between; width: 100%; }
+    body.continuous-mode .card-top .fav-icon-btn { width: 34px; height: 28px; }
+    .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; display: flex; flex-direction: column; }
+    .cont-step-card.done-step { opacity: 0.65; border-color: var(--primary-color); background: var(--primary-light); }
+    .cont-step-header { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 6px; }
     .cont-step-title { font-size: 12.5px; font-weight: 800; color: var(--primary-color); }
-    .cont-step-tap { background: var(--primary-color); color: #ffffff; border: none; border-radius: 10px; padding: 4px 12px; font-size: 13px; font-weight: 800; cursor: pointer; min-width: 58px; text-align: center; }
+    .cont-step-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.8; color: var(--text-main); font-weight: 700; text-align: center; }
+    .cont-step-footer { display: flex; justify-content: center; margin-top: 10px; }
+    .cont-step-tap { background: var(--primary-color); color: #ffffff; border: none; border-radius: 12px; padding: 6px 22px; font-size: 13.5px; font-weight: 800; cursor: pointer; min-width: 84px; text-align: center; }
     .cont-step-tap:active { transform: scale(0.94); }
-    .cont-step-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.8; color: var(--text-main); font-weight: 700; text-align: right; }
 
     /* كبسولة التحكم بحجم الخط في وضع القراءة الكاملة */
-    .reading-font-pill { display: none; align-items: center; background: var(--primary-light); border: 1px solid var(--primary-color); border-radius: 10px; height: 26px; overflow: hidden; flex-shrink: 0; }
+    .reading-font-pill { display: none; align-items: center; background: var(--primary-light); border: 1px solid var(--primary-color); border-radius: 10px; height: 28px; overflow: hidden; flex-shrink: 0; }
     body.reading-mode .reading-font-pill, body.continuous-mode .reading-font-pill { display: inline-flex; }
-    .reading-font-pill button { background: transparent; border: none; color: var(--primary-color); width: 27px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+    .reading-font-pill button { background: transparent; border: none; color: var(--primary-color); width: 30px; height: 100%; display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
     .reading-font-pill button:active { background: var(--primary-color); color: #ffffff; }
     .reading-font-pill .pill-sep { width: 1px; height: 14px; background: var(--primary-color); opacity: 0.35; }
 
@@ -1158,7 +1160,17 @@ function getFilteredAdhkarEntries() {
         if (state.lists.some(l => l.id === targetList)) state.activeListId = targetList;
       }
     }
-    function init() { checkStatsDate(); applyTimeAutomations(); if (state.activeIndex >= state.adhkar.length || state.activeIndex < 0) state.activeIndex = 0; applyAppearance(); applyWakeLock(); updateSyncUI(); render(); if (state.syncCode) pullFromCloud(false); }
+    function init() {
+      checkStatsDate();
+      applyTimeAutomations();
+      if (state.activeIndex >= state.adhkar.length || state.activeIndex < 0) state.activeIndex = 0;
+      const savedCont = localStorage.getItem('tasbih_continuous_mode') === 'true';
+      document.body.classList.toggle('continuous-mode', savedCont);
+      const contBtn = document.getElementById('continuousModeBtn');
+      if (contBtn) contBtn.classList.toggle('fav-active', savedCont);
+      applyAppearance(); applyWakeLock(); updateSyncUI(); render();
+      if (state.syncCode) pullFromCloud(false);
+    }
     function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar.at(0); }
     function applyAppearance() {
       let activeTheme = state.theme;
@@ -1353,8 +1365,9 @@ function getFilteredAdhkarEntries() {
       state.progressMap[dhikr.id] = prog; render();
     }
 
-            function toggleContinuousMode() {
+    function toggleContinuousMode() {
       const isActive = document.body.classList.toggle('continuous-mode');
+      localStorage.setItem('tasbih_continuous_mode', isActive);
       const btn = document.getElementById('continuousModeBtn');
       if (btn) btn.classList.toggle('fav-active', isActive);
       if (isActive) { pauseDhikrTimer(); stopAutoTap(); }
@@ -1371,9 +1384,10 @@ function getFilteredAdhkarEntries() {
         const isDone = st.target > 0 && curVal === st.target && prog.stepIndex > sIdx;
         const card = document.createElement('div');
         card.className = 'cont-step-card' + (isDone ? ' done-step' : '');
+        card.dataset.stepIdx = sIdx;
         const stTitle = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
         const badgeText = st.target > 0 ? (isDone ? 'تم ✓' : `${curVal} / ${st.target}`) : `${curVal}`;
-        card.innerHTML = `<div class="cont-step-header"><span class="cont-step-title">${sIdx + 1}. ${stTitle}</span><button type="button" class="cont-step-tap">${badgeText}</button></div><div class="cont-step-text">${st.text}</div>`;
+        card.innerHTML = `<div class="cont-step-header"><span class="cont-step-title">${sIdx + 1}. ${stTitle}</span></div><div class="cont-step-text">${st.text}</div><div class="cont-step-footer"><button type="button" class="cont-step-tap">${badgeText}</button></div>`;
         card.querySelector('.cont-step-tap').onclick = (e) => {
           e.stopPropagation();
           tapContinuousStep(sIdx);
@@ -1385,6 +1399,7 @@ function getFilteredAdhkarEntries() {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
       const step = dhikr.steps[sIdx];
+      let stepCompleted = false;
       if (step.target > 0) {
         if (prog.stepCounts[sIdx] > 1) {
           prog.stepCounts[sIdx] -= 1;
@@ -1394,6 +1409,7 @@ function getFilteredAdhkarEntries() {
           prog.stepCounts[sIdx] = step.target;
           prog.stepIndex = Math.min(dhikr.steps.length - 1, sIdx + 1);
           recordTasbihStat(dhikr, sIdx, 0);
+          stepCompleted = true;
           showSaveToast(`تمت: ${step.title || ('خطوة ' + (sIdx + 1))}`);
         }
       } else {
@@ -1404,6 +1420,12 @@ function getFilteredAdhkarEntries() {
       state.stats.history[getTodayStr()] = state.stats.todayCount;
       state.progressMap[dhikr.id] = prog;
       render();
+      if (stepCompleted && sIdx + 1 < dhikr.steps.length) {
+        setTimeout(() => {
+          const nextCard = document.querySelector(`.cont-step-card[data-step-idx="${sIdx + 1}"]`);
+          if (nextCard) nextCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 120);
+      }
     }
     function openResetOptions() {
       const dhikr = getCurrentDhikr();
@@ -1442,7 +1464,6 @@ function getFilteredAdhkarEntries() {
       document.getElementById('indexModal').classList.add('open');
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
-
 
     let lastGeneratedBlob = null;
     function wrapCanvasText(ctx, text, maxWidth) {
