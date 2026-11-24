@@ -1881,12 +1881,11 @@
       document.getElementById('shareCardModal').classList.add('open');
     }
 
-            async function shareGeneratedImage() {
-      const dhikr = getCurrentDhikr();
+    async function shareGeneratedImage() {
       if (lastGeneratedBlob && navigator.canShare) {
         const file = new File([lastGeneratedBlob], 'al-baqiyat-story.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
-          try { await navigator.share({ files: [file], title: dhikr ? dhikr.title : 'الباقيات' }); return; } catch (e) {}
+          try { await navigator.share({ files: [file] }); return; } catch (e) {}
         }
       }
       const a = document.createElement('a');
