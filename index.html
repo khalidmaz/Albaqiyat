@@ -1629,50 +1629,130 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-                let lastGeneratedBlob = null;
+                    let lastGeneratedBlob = null;
     const APP_SHARE_URL = 'https://github.io';
-    const QR_STORAGE_KEY = 'tasbih_cached_qr_v1';
 
-    function loadAppQrImage() {
-      return new Promise((resolve) => {
-        const cachedDataUrl = localStorage.getItem(QR_STORAGE_KEY);
-        if (cachedDataUrl && cachedDataUrl.startsWith('data:image/')) {
-          const cachedImg = new Image();
-          cachedImg.onload = () => resolve(cachedImg);
-          cachedImg.onerror = () => {
-            localStorage.removeItem(QR_STORAGE_KEY);
-            resolve(null);
-          };
-          cachedImg.src = cachedDataUrl;
-          return;
+    const QR_CORE = (function() {
+      const EXP = new Array(256), LOG = new Array(256);
+      for (let i = 0; i < 8; i++) EXP[i] = 1 << i;
+      for (let i = 8; i < 256; i++) EXP[i] = EXP[i - 4] ^ EXP[i - 5] ^ EXP[i - 6] ^ EXP[i - 8];
+      for (let i = 0; i < 255; i++) LOG[EXP[i]] = i;
+      const gexp = n => { while (n < 0) n += 255; while (n >= 256) n -= 255; return EXP[n]; };
+      const glog = n => LOG[n];
+      function polyMul(p1, p2) {
+        const res = new Array(p1.length + p2.length - 1).fill(0);
+        for (let i = 0; i < p1.length; i++)
+          for (let j = 0; j < p2.length; j++)
+            res[i + j] ^= gexp(glog(p1[i]) + glog(p2[j]));
+        return res;
+      }
+      function polyMod(dividend, divisor) {
+        let res = dividend.slice();
+        while (res.length >= divisor.length) {
+          if (res[0] === 0) { res.shift(); continue; }
+          const factor = glog(res[0]);
+          for (let i = 0; i < divisor.length; i++) res[i] ^= gexp(glog(divisor[i]) + factor);
+          res.shift();
         }
-        const encoded = encodeURIComponent(APP_SHARE_URL);
-        const urls = [
-          `https://qrserver.com{encoded}`,
-          `https://quickchart.io{encoded}`
-        ];
-        let idx = 0;
-        function tryNext() {
-          if (idx >= urls.length) { resolve(null); return; }
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => {
-            try {
-              const c = document.createElement('canvas');
-              c.width = img.naturalWidth || 260;
-              c.height = img.naturalHeight || 260;
-              c.getContext('2d').drawImage(img, 0, 0);
-              localStorage.setItem(QR_STORAGE_KEY, c.toDataURL('image/png'));
-            } catch (e) {}
-            resolve(img);
-          };
-          img.onerror = () => { idx++; tryNext(); };
-          img.src = urls[idx];
+        return res;
+      }
+      function getRsPoly(ecLen) {
+        let p =;
+        for (let i = 0; i < ecLen; i++) p = polyMul(p, [1, gexp(i)]);
+        return p;
+      }
+      function buildMatrix(text) {
+        const bytes = Array.from(new TextEncoder().encode(text));
+        const totalData = 55, ecCount = 15, size = 29;
+        const bits = [];
+        const pushBits = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
+        pushBits(4, 4);
+        pushBits(bytes.length, 8);
+        bytes.forEach(b => pushBits(b, 8));
+        pushBits(0, Math.min(4, totalData * 8 - bits.length));
+        while (bits.length % 8 !== 0) bits.push(0);
+        const dataCw = [];
+        for (let i = 0; i < bits.length; i += 8) {
+          let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
+          dataCw.push(b);
         }
-        tryNext();
-      });
+        const pads = [0xec, 0x11];
+        for (let i = 0; dataCw.length < totalData; i++) dataCw.push(pads[i % 2]);
+        const rsPoly = getRsPoly(ecCount);
+        const ecCw = polyMod(dataCw.concat(new Array(ecCount).fill(0)), rsPoly);
+        const fullCw = dataCw.concat(ecCw);
+        const streamBits = [];
+        fullCw.forEach(cw => { for (let i = 7; i >= 0; i--) streamBits.push((cw >>> i) & 1); });
+
+        const m = Array.from({ length: size }, () => new Array(size).fill(null));
+        const res = Array.from({ length: size }, () => new Array(size).fill(false));
+        const setFunc = (r, c, v) => { if (r >= 0 && r < size && c >= 0 && c < size) { m[r][c] = v ? 1 : 0; res[r][c] = true; } };
+        const placeFinder = (r, c) => {
+          for (let dr = -1; dr <= 7; dr++)
+            for (let dc = -1; dc <= 7; dc++) {
+              const inBox = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+              const onBorder = dr === 0 || dr === 6 || dc === 0 || dc === 6;
+              const inCore = dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4;
+              setFunc(r + dr, c + dc, inBox && (onBorder || inCore));
+            }
+        };
+        placeFinder(0, 0); placeFinder(0, size - 7); placeFinder(size - 7, 0);
+        for (let dr = -2; dr <= 2; dr++)
+          for (let dc = -2; dc <= 2; dc++)
+            setFunc(22 + dr, 22 + dc, Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0));
+        for (let i = 8; i < size - 8; i++) {
+          setFunc(6, i, i % 2 === 0);
+          setFunc(i, 6, i % 2 === 0);
+        }
+        setFunc(size - 8, 8, true);
+        for (let i = 0; i < 9; i++) {
+          if (i !== 6) { res[8][i] = true; res[i][8] = true; }
+          if (i < 8) { res[8][size - 1 - i] = true; res[size - 1 - i][8] = true; }
+        }
+        let bitIdx = 0, up = true;
+        for (let col = size - 1; col > 0; col -= 2) {
+          if (col === 6) col--;
+          for (let i = 0; i < size; i++) {
+            const r = up ? size - 1 - i : i;
+            for (let dc = 0; dc < 2; dc++) {
+              const c = col - dc;
+              if (!res[r][c]) {
+                let bit = bitIdx < streamBits.length ? streamBits[bitIdx++] : 0;
+                if ((r + c) % 2 === 0) bit ^= 1;
+                m[r][c] = bit;
+              }
+            }
+          }
+          up = !up;
+        }
+        const fmt =;
+        const fCoords1 = [[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+        const fCoords2 = [[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],[8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+        for (let i = 0; i < 15; i++) {
+          m[fCoords1[i][0]][fCoords1[i][1]] = fmt[i];
+          m[fCoords2[i][0]][fCoords2[i][1]] = fmt[i];
+        }
+        return m;
+      }
+      return { buildMatrix };
+    })();
+
+    function drawAppQrOnCanvas(ctx, x, y, size, fgColor, bgColor) {
+      const matrix = QR_CORE.buildMatrix(APP_SHARE_URL);
+      const count = matrix.length;
+      const pad = 2;
+      const cell = size / (count + pad * 2);
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(x, y, size, size);
+      ctx.fillStyle = fgColor;
+      for (let r = 0; r < count; r++) {
+        for (let c = 0; c < count; c++) {
+          if (matrix[r][c] === 1) {
+            ctx.fillRect(x + (c + pad) * cell, y + (r + pad) * cell, Math.ceil(cell), Math.ceil(cell));
+          }
+        }
+      }
     }
-    setTimeout(() => { loadAppQrImage(); }, 1500);
 
     function wrapCanvasText(ctx, text, maxWidth) {
       const words = (text || '').split(/\s+/).filter(Boolean);
@@ -1686,7 +1766,7 @@ function getFilteredAdhkarEntries() {
       return lines;
     }
 
-    async function generateDhikrShareImage() {
+    function generateDhikrShareImage() {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
       const step = dhikr.steps[prog.stepIndex] || { text: '' };
@@ -1697,8 +1777,6 @@ function getFilteredAdhkarEntries() {
       const textCol = styles.getPropertyValue('--text-main').trim() || '#1b2a22';
       const mutedCol = styles.getPropertyValue('--text-muted').trim() || '#5c7065';
       const accCol = styles.getPropertyValue('--accent-color').trim() || '#d4af37';
-
-      const qrImg = await loadAppQrImage();
 
       const canvas = document.createElement('canvas');
       canvas.width = 1080; canvas.height = 1920;
@@ -1769,22 +1847,16 @@ function getFilteredAdhkarEntries() {
       ctx.font = 'bold 34px Tajawal, sans-serif';
       ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 1580);
 
-      if (qrImg) {
-        const qrSize = 186;
-        const qrX = (1080 - qrSize) / 2;
-        const qrY = 1605;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 20);
-        else ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
-        ctx.fill();
-        ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
-        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-      } else {
-        ctx.fillStyle = mutedCol;
-        ctx.font = 'bold 26px Tajawal, sans-serif';
-        ctx.fillText('khalidmaz.github.io/Albaqiyat', 540, 1650);
-      }
+      const qrSize = 186;
+      const qrX = (1080 - qrSize) / 2;
+      const qrY = 1605;
+      ctx.fillStyle = surfCol;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 20);
+      else ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+      ctx.fill();
+      ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
+      drawAppQrOnCanvas(ctx, qrX, qrY, qrSize, primCol, surfCol);
 
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('shareCardPreview').src = dataUrl;
