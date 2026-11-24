@@ -1629,87 +1629,23 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-            let lastGeneratedBlob = null;
-    function createQrMatrix(text) {
-      const data = Array.from(new TextEncoder().encode(text));
-      const totalCodewords = 44, dataCodewords = 34, ecCodewords = 10;
-      const bits = [];
-      const pushBits = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1); };
-      pushBits(4, 4); pushBits(data.length, 8);
-      data.forEach(b => pushBits(b, 8));
-      pushBits(0, Math.min(4, dataCodewords * 8 - bits.length));
-      while (bits.length % 8 !== 0) bits.push(0);
-      const bytes = [];
-      for (let i = 0; i < bits.length; i += 8) bytes.push(bits.slice(i, i + 8).reduce((a, b) => (a << 1) | b, 0));
-      const pads = [0xec, 0x11]; let pIdx = 0;
-      while (bytes.length < dataCodewords) { bytes.push(pads[pIdx % 2]); pIdx++; }
-      const gfExp = new Uint8Array(512), gfLog = new Uint8Array(256);
-      let x = 1;
-      for (let i = 0; i < 255; i++) { gfExp[i] = x; gfLog[x] = i; x <<= 1; if (x & 0x100) x ^= 0x11d; }
-      for (let i = 255; i < 512; i++) gfExp[i] = gfExp[i - 255];
-      const gfMul = (a, b) => (a === 0 || b === 0) ? 0 : gfExp[gfLog[a] + gfLog[b]];
-      const gen =;
-      const ec = new Uint8Array(ecCodewords);
-      for (let i = 0; i < dataCodewords; i++) {
-        const factor = bytes[i] ^ ec[0];
-        ec.copyWithin(0, 1); ec[ecCodewords - 1] = 0;
-        for (let j = 0; j < ecCodewords; j++) ec[j] ^= gfMul(gen[j + 1], factor);
-      }
-      const codewords = bytes.concat(Array.from(ec));
-      const size = 25;
-      const mod = Array.from({ length: size }, () => Array(size).fill(null));
-      const res = Array.from({ length: size }, () => Array(size).fill(false));
-      const setMod = (r, c, v, isRes = true) => { if (r >= 0 && r < size && c >= 0 && c < size) { mod[r][c] = v; if (isRes) res[r][c] = true; } };
-      const addFinder = (r, c) => {
-        for (let dr = -1; dr <= 7; dr++) for (let dc = -1; dc <= 7; dc++) {
-          const inBox = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
-          const v = inBox && (dr === 0 || dr === 6 || dc === 0 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
-          setMod(r + dr, c + dc, v);
+    let lastGeneratedBlob = null, cachedQrKey = '', cachedQrImg = null;
+    function getAppQrImage(fgHex, bgHex) {
+      const cleanFg = (fgHex || '#0f5132').replace('#', '');
+      const cleanBg = (bgHex || '#ffffff').replace('#', '');
+      const key = `${cleanFg}_${cleanBg}`;
+      return new Promise((resolve) => {
+        if (cachedQrKey === key && cachedQrImg && cachedQrImg.complete && cachedQrImg.naturalWidth > 0) {
+          resolve(cachedQrImg);
+          return;
         }
-      };
-      addFinder(0, 0); addFinder(0, size - 7); addFinder(size - 7, 0);
-      for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) setMod(18 + dr, 18 + dc, Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0));
-      for (let i = 8; i < size - 8; i++) { setMod(6, i, i % 2 === 0); setMod(i, 6, i % 2 === 0); }
-      setMod(size - 8, 8, true);
-      for (let i = 0; i < 9; i++) { if (i !== 6) { res[8][i] = true; res[i][8] = true; } if (i < 8) { res[8][size - 1 - i] = true; res[size - 1 - i][8] = true; } }
-      const allBits = [];
-      codewords.forEach(cw => { for (let b = 7; b >= 0; b--) allBits.push((cw >> b) & 1); });
-      let bIdx = 0, up = true;
-      for (let c = size - 1; c > 0; c -= 2) {
-        if (c === 6) c--;
-        for (let i = 0; i < size; i++) {
-          const r = up ? size - 1 - i : i;
-          for (let dc = 0; dc < 2; dc++) {
-            const cc = c - dc;
-            if (!res[r][cc]) {
-              const bit = bIdx < allBits.length ? allBits[bIdx++] : 0;
-              mod[r][cc] = ((r + cc) % 2 === 0) ? !bit : !!bit;
-            }
-          }
-        }
-        up = !up;
-      }
-      const fmt =;
-      for (let i = 0; i < 6; i++) { mod[8][i] = !!fmt[i]; mod[i][8] = !!fmt[14 - i]; }
-      mod[8][7] = !!fmt[6]; mod[8][8] = !!fmt[7]; mod[7][8] = !!fmt[8];
-      for (let i = 0; i < 7; i++) mod[size - 1 - i][8] = !!fmt[i];
-      for (let i = 0; i < 8; i++) mod[8][size - 8 + i] = !!fmt[7 + i];
-      return mod;
-    }
-    function drawLocalQrCode(ctx, text, x, y, size, fgCol, bgCol) {
-      const matrix = createQrMatrix(text);
-      const count = matrix.length, quiet = 2, total = count + quiet * 2;
-      const cell = size / total;
-      ctx.fillStyle = bgCol;
-      ctx.fillRect(x, y, size, size);
-      ctx.fillStyle = fgCol;
-      for (let r = 0; r < count; r++) {
-        for (let c = 0; c < count; c++) {
-          if (matrix[r][c]) {
-            ctx.fillRect(Math.floor(x + (c + quiet) * cell), Math.floor(y + (r + quiet) * cell), Math.ceil(cell), Math.ceil(cell));
-          }
-        }
-      }
+        const appUrl = encodeURIComponent('https://github.io');
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => { cachedQrKey = key; cachedQrImg = img; resolve(img); };
+        img.onerror = () => resolve(null);
+        img.src = `https://qrserver.com{cleanFg}&bgcolor=${cleanBg}&data=${appUrl}`;
+      });
     }
     function wrapCanvasText(ctx, text, maxWidth) {
       const words = (text || '').split(/\s+/).filter(Boolean);
@@ -1722,7 +1658,7 @@ function getFilteredAdhkarEntries() {
       if (curLine) lines.push(curLine);
       return lines;
     }
-    function generateDhikrShareImage() {
+    async function generateDhikrShareImage() {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
       const step = dhikr.steps[prog.stepIndex] || { text: '' };
@@ -1733,6 +1669,8 @@ function getFilteredAdhkarEntries() {
       const textCol = styles.getPropertyValue('--text-main').trim() || '#1b2a22';
       const mutedCol = styles.getPropertyValue('--text-muted').trim() || '#5c7065';
       const accCol = styles.getPropertyValue('--accent-color').trim() || '#d4af37';
+
+      const qrImg = await getAppQrImage(primCol, surfCol);
 
       const canvas = document.createElement('canvas');
       canvas.width = 1080; canvas.height = 1920;
@@ -1753,32 +1691,32 @@ function getFilteredAdhkarEntries() {
 
       const headerTitle = (step.title && step.title.trim() && step.title !== dhikr.title) ? `${dhikr.title} • ${step.title}` : dhikr.title;
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 52px Tajawal, sans-serif';
+      ctx.font = 'bold 50px Tajawal, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(headerTitle, 540, 195);
 
       ctx.strokeStyle = accCol; ctx.lineWidth = 3.5;
       ctx.beginPath(); ctx.moveTo(260, 238); ctx.lineTo(820, 238); ctx.stroke();
 
-            const hasVirtue = Boolean(dhikr.virtue && dhikr.virtue.trim());
+      const hasVirtue = Boolean(dhikr.virtue && dhikr.virtue.trim());
       let vLines = [];
       let virtueBlockHeight = 0;
       if (hasVirtue) {
-        ctx.font = 'bold 34px Tajawal, sans-serif';
+        ctx.font = 'bold 32px Tajawal, sans-serif';
         vLines = wrapCanvasText(ctx, dhikr.virtue.trim(), 840).slice(0, 4);
-        virtueBlockHeight = vLines.length * 48 + 36;
+        virtueBlockHeight = vLines.length * 46 + 34;
       }
 
       const topBound = 285;
-      const bottomBound = hasVirtue ? (1485 - virtueBlockHeight) : 1485;
+      const bottomBound = hasVirtue ? (1490 - virtueBlockHeight) : 1490;
       const availableHeight = bottomBound - topBound;
 
       ctx.fillStyle = textCol;
       const rawText = step.text || '';
-      let fontSize = rawText.length > 420 ? 60 : (rawText.length > 260 ? 74 : (rawText.length > 130 ? 90 : 108));
+      let fontSize = rawText.length > 420 ? 58 : (rawText.length > 260 ? 70 : (rawText.length > 130 ? 86 : 102));
       ctx.font = `bold ${fontSize}px Amiri, serif`;
       let lines = wrapCanvasText(ctx, rawText, 850);
-      while ((lines.length * fontSize * 1.6 > availableHeight) && fontSize > 42) {
+      while ((lines.length * fontSize * 1.6 > availableHeight) && fontSize > 40) {
         fontSize -= 3;
         ctx.font = `bold ${fontSize}px Amiri, serif`;
         lines = wrapCanvasText(ctx, rawText, 850);
@@ -1791,28 +1729,34 @@ function getFilteredAdhkarEntries() {
 
       if (hasVirtue && vLines.length > 0) {
         ctx.fillStyle = mutedCol;
-        ctx.font = 'bold 34px Tajawal, sans-serif';
-        const vStartY = 1475 - ((vLines.length - 1) * 48);
-        vLines.forEach((vl, idx) => ctx.fillText(vl, 540, vStartY + idx * 48));
+        ctx.font = 'bold 32px Tajawal, sans-serif';
+        const vStartY = 1480 - ((vLines.length - 1) * 46);
+        vLines.forEach((vl, idx) => ctx.fillText(vl, 540, vStartY + idx * 46));
       }
 
       ctx.strokeStyle = accCol; ctx.lineWidth = 2.5;
-      ctx.beginPath(); ctx.moveTo(300, 1522); ctx.lineTo(780, 1522); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(320, 1525); ctx.lineTo(760, 1525); ctx.stroke();
 
       ctx.fillStyle = primCol;
-      ctx.font = 'bold 36px Tajawal, sans-serif';
-      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 1578);
+      ctx.font = 'bold 34px Tajawal, sans-serif';
+      ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 1580);
 
-      const qrSize = 180;
-      const qrX = (1080 - qrSize) / 2;
-      const qrY = 1606;
-      ctx.fillStyle = surfCol;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 22);
-      else ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
-      ctx.fill();
-      ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
-      drawLocalQrCode(ctx, 'https://khalidmaz.github.io/Albaqiyat/', qrX, qrY, qrSize, primCol, surfCol);
+      if (qrImg) {
+        const qrSize = 176;
+        const qrX = (1080 - qrSize) / 2;
+        const qrY = 1608;
+        ctx.fillStyle = surfCol;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 20);
+        else ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+        ctx.fill();
+        ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+      } else {
+        ctx.fillStyle = mutedCol;
+        ctx.font = 'bold 26px Tajawal, sans-serif';
+        ctx.fillText('khalidmaz.github.io/Tasbeh', 540, 1650);
+      }
 
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('shareCardPreview').src = dataUrl;
@@ -2209,30 +2153,18 @@ function getFilteredAdhkarEntries() {
     }
     function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
 
-        async function shareAppWithGuide() {
-      const appUrl = 'https://khalidmaz.github.io/Albaqiyat/';
-      const shareText = '*الباقيات*\nتطبيق خفيف للأذكار والتسبيح، يعمل بدون إنترنت.\n\n*أبرز مميزات التطبيق:*\n• يعمل بدون إنترنت ويمكن تثبيته على الشاشة الرئيسية كتطبيق مستقل.\n• جميع الأذكار مأخوذة من كتاب حصن المسلم.\n• عدّاد آلي ذكي يقيس سرعتك من أول 3 ضغطات ويكمل عنك، مع زر تراجع سريع.\n• مؤقت زمني لكل ذكر مع إمكانية إيقافه واستئنافه في أي وقت.\n• إحصائيات يومية وإجمالية مع هدف يومي وحساب الأيام المتتالية.\n• إمكانية إضافة أذكار جديدة وتعديلها وترتيبها بالسحب والإفلات.\n• مزامنة سحابية اختيارية لربط أجهزتك المختلفة برمز خاص.\n• 22 لوناً وثيماً مريحاً للعين مع الوضع الليلي التلقائي والتحكم الذكي بحجم الخط ووضع التركيز.\n\n*طريقة تثبيته على الشاشة الرئيسية:*\n• *في الآيفون (Safari):* افتح الرابط ثم اضغط زر المشاركة بالأسفل واختر «إضافة إلى الصفحة الرئيسية».\n• *في الأندرويد (Chrome):* افتح الرابط ثم اضغط القائمة بالأعلى واختر «الإضافة إلى الشاشة الرئيسية».\n\n*طريقة المزامنة بين أجهزتك (اختياري ويحتاج إلى إنترنت):*\nافتح الإعدادات داخل التطبيق، اكتب رمزاً سرياً خاصاً بك (6 خانات على الأقل مكونة من أحرف وأرقام ورموز مثل: Kh#2026@ts لتجنب تشابه الرموز مع الآخرين) ثم اضغط «ربط»، واكتب نفس الرمز في أجهزتك الأخرى لتتحدث أذكارك وعدّاداتك تلقائياً.\n\n*رابط التطبيق:*\n' + appUrl + '\n\nتقبّل الله طاعتكم';
-
+    function shareAppWithGuide() {
+      const appUrl = 'https' + '://' + 'khalidmaz.github.' + 'io/Tasbeh/';
+      const shareText = '*الباقيات*\nتطبيق خفيف للأذكار والتسبيح، يعمل بدون إنترنت.\n\n*أبرز مميزات التطبيق:*\n• يعمل بدون إنترنت ويمكن تثبيته على الشاشة الرئيسية كتطبيق مستقل.\n• جميع الأذكار مأخوذة من كتاب حصن المسلم.\n• عدّاد آلي ذكي يقيس سرعتك من أول 3 ضغطات ويكمل عنك، مع زر تراجع سريع.\n• مؤقت زمني لكل ذكر مع إمكانية إيقافه واستئنافه في أي وقت.\n• إحصائيات يومية وإجمالية مع هدف يومي وحساب الأيام المتتالية.\n• إمكانية إضافة أذكار جديدة وتعديلها وترتيبها بالسحب والإفلات.\n• مزامنة سحابية اختيارية لربط أجهزتك المختلفة برمز خاص.\n• 22 لوناً وثيماً مريحاً للعين مع الوضع الليلي التلقائي والتحكم الذكي بحجم الخط ووضع التركيز.\n\n*رابط التطبيق:*\n' + appUrl + '\n\n*طريقة تثبيته على الشاشة الرئيسية:*\n• *في الآيفون (Safari):* افتح الرابط ثم اضغط زر المشاركة بالأسفل واختر «إضافة إلى الصفحة الرئيسية».\n• *في الأندرويد (Chrome):* افتح الرابط ثم اضغط القائمة بالأعلى واختر «الإضافة إلى الشاشة الرئيسية».\n\n*طريقة المزامنة بين أجهزتك (اختياري ويحتاج إلى إنترنت):*\nافتح الإعدادات داخل التطبيق، اكتب رمزاً سرياً خاصاً بك (6 خانات على الأقل مكونة من أحرف وأرقام ورموز مثل: Kh#2026@ts لتجنب تشابه الرموز مع الآخرين) ثم اضغط «ربط»، واكتب نفس الرمز في أجهزتك الأخرى لتتحدث أذكارك وعدّاداتك تلقائياً.\n\nتقبّل الله طاعتكم';
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        try { await navigator.clipboard.writeText(shareText); } catch (e) {}
+        navigator.clipboard.writeText(shareText).catch(() => {});
       }
-
       if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'تطبيق الباقيات للأذكار والتسبيح',
-            text: shareText
-          });
-          return;
-        } catch (err) {
-          if (err && err.name === 'AbortError') return;
-        }
-      }
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        showSaveToast('تم نسخ الشرح والرابط كاملاً للحافظة', 2600);
+        navigator.share({ text: shareText }).catch(() => {});
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        showSaveToast('تم نسخ الرابط والشرح كاملاً');
       } else {
-        prompt('انسخ الرسالة التالية:', shareText);
+        prompt('انسخ الرسالة:', shareText);
       }
     }
     function openSettingsModal() {
