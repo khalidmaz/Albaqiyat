@@ -43,7 +43,7 @@
     [data-theme="walnut-charcoal"] { --bg-color: #1d1916; --surface-color: #2a231e; --primary-color: #c89d74; --primary-light: #3b3028; --accent-color: #e0b892; --text-main: #f7f1eb; --text-muted: #b09e8e; --border-color: #45382e; }
     [data-theme="espresso-terracotta"] { --bg-color: #261e19; --surface-color: #362a23; --primary-color: #d9643a; --primary-light: #47362c; --accent-color: #f08a65; --text-main: #faf2ed; --text-muted: #b8a295; --border-color: #4f3d33; }
     [data-theme="olive-cream"] { --bg-color: #ead8c3; --surface-color: #f6ece0; --primary-color: #5c5e2b; --primary-light: #e2dec8; --accent-color: #7d803b; --text-main: #333616; --text-muted: #6b6d48; --border-color: #d6c3ad; }
-  
+
 #splashScreen { position: fixed; inset: 0; background-color: var(--bg-color); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 9999; transition: opacity 0.35s ease, visibility 0.35s ease; }
     #splashScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
     .splash-icon { width: 64px; height: 64px; border-radius: 20px; background: var(--primary-light); color: var(--primary-color); display: flex; align-items: center; justify-content: center; animation: splashPulse 1.3s ease-in-out infinite; }
@@ -64,7 +64,7 @@
     .icon-btn:active { transform: scale(0.92); }
     .ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .ico-sm { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
- 
+
       .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
     .list-filter-btn { flex: 0 0 auto; padding: 7px 12px; border-radius: 20px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .tabs-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; }
@@ -98,7 +98,7 @@
     .fav-icon-btn.fav-active { color: var(--accent-color); border-color: var(--accent-color); background: var(--primary-light); }
     .tool-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 9px; padding: 4px 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
     .tool-btn.delete { color: var(--danger-color); border-color: rgba(220, 53, 69, 0.35); }
-   
+
 .dhikr-text { font-family: 'Amiri', serif; font-size: var(--dhikr-font-size); line-height: 1.85; text-align: center; color: var(--text-main); margin: auto 0; padding: 2px 0; font-weight: 700; width: 100%; }
     .virtue-box { background: var(--bg-color); border-radius: 12px; padding: 7px 11px; font-size: 12.5px; line-height: 1.55; color: var(--text-muted); border-right: 3px solid var(--accent-color); margin-top: 6px; flex-shrink: 0; }
     .virtue-box.compact-virtue { padding: 5px 9px; font-size: 11.5px; line-height: 1.45; }
@@ -327,7 +327,7 @@
       </div>
       <div class="daily-goal-track" id="dailyGoalTrack"><div class="daily-goal-fill" id="dailyGoalFill"></div></div>
     </header>
-   
+
 <div class="tabs-wrapper">
       <button type="button" class="list-filter-btn" id="listFilterBtn" onclick="openIndexModal()">
         <span id="activeListLabel">الكل</span>
@@ -379,7 +379,7 @@
           <div class="virtue-box" id="virtueBox"></div>
         </div>
       </div>
- 
+
         <div class="counter-zone" id="counterZone" onclick="handleZoneTap(event)">
         <div class="quick-targets-bar" id="quickTargetsBar" onclick="event.stopPropagation()">
           <button type="button" class="qt-btn" data-qt="33" onclick="setQuickTarget(33)">33</button>
@@ -420,7 +420,7 @@
           </div>
         </div>
       </div>
-   
+
         <div class="bottom-controls">
         <button class="ctrl-btn" onclick="prevDhikr()">
           <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -498,7 +498,7 @@
         </div>
         <div class="cal-grid" id="monthlyCalGrid"></div>
       </div>
- 
+
     <div class="stats-section-title">
         <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
         <span>الأذكار المقروءة اليوم</span>
@@ -632,7 +632,7 @@
           <div class="theme-option" data-t="olive-cream" onclick="setTheme('olive-cream')">زيتوني وبيج كريمي</div>
         </div>
       </div>
-          
+
         <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="48" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
@@ -685,7 +685,7 @@
         </div>
         <div class="sync-status" id="syncStatusText">الحالة: تخزين محلي على هذا الجهاز فقط</div>
       </div>
-  
+
       <div class="sync-box" style="margin-top: 10px;">
         <label style="display:flex; align-items:center; gap:6px; font-size:14px; font-weight:800; color:var(--primary-color); margin-bottom:6px;">
           <svg class="ico-sm" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -720,7 +720,7 @@
           ctx.arc(x, y, ringR, 0, Math.PI * 2);
           ctx.stroke();
         }
-  
+
         const dataUrl = canvas.toDataURL('image/png');
         document.getElementById('appleIcon').href = dataUrl;
         const fav = document.getElementById('favIcon');
@@ -788,7 +788,7 @@
           { title: 'الصلاة على النبي ﷺ', text: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', target: 10 }
         ]
       },
-    
+
   {
         id: 'sleep_adhkar',
         title: 'أذكار النوم',
@@ -819,7 +819,7 @@
           { title: 'الحمد لله الذي عافاني', text: 'الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لِي بِذِكْرِهِ', target: 1 }
         ]
       },
-   
+
    {
         id: 'ruqyah_shariah',
         title: 'الرقية الشرعية',
@@ -860,7 +860,7 @@
           { title: 'بعد السلام من الفجر', text: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا', target: 1 }
         ]
       },
-     
+
  {
         id: 'daily_occasions_adhkar',
         title: 'أذكار المنزل والسفر',
@@ -894,7 +894,7 @@
       { id: 'd7', title: 'كلمتان خفيفتان', virtue: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن.', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', target: 0 }] },
       { id: 'd8', title: 'الحوقلة', virtue: 'كنزٌ من كنوز الجنّة.', steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }] }
     ];
- 
+
       function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function formatDuration(ms) { const totalSec = Math.floor(ms / 1000); const mins = Math.floor(totalSec / 60); const secs = totalSec % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; }
@@ -1037,7 +1037,7 @@
       revertTasbihStat(dhikr, sIdx, actualReverted); state.progressMap[dhikr.id] = prog; render();
       showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
     }
-  
+
     let wakeLockSentinel = null;
     async function applyWakeLock() {
       try {
@@ -1289,7 +1289,7 @@ function getFilteredAdhkarEntries() {
       document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.t === state.theme));
       fitDhikrTextToCard();
     }
- 
+
     function updateDailyGoalUI() {
       const track = document.getElementById('dailyGoalTrack');
       const fill = document.getElementById('dailyGoalFill');
@@ -1629,7 +1629,7 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-                    let lastGeneratedBlob = null;
+        let lastGeneratedBlob = null;
     const APP_SHARE_URL = 'https://github.io';
 
     const QR_CORE = (function() {
@@ -1649,39 +1649,39 @@ function getFilteredAdhkarEntries() {
       function polyMod(dividend, divisor) {
         let res = dividend.slice();
         while (res.length >= divisor.length) {
-          if (res[0] === 0) { res.shift(); continue; }
-          const factor = glog(res[0]);
+          if (res.at(0) === 0) { res.shift(); continue; }
+          const factor = glog(res.at(0));
           for (let i = 0; i < divisor.length; i++) res[i] ^= gexp(glog(divisor[i]) + factor);
           res.shift();
         }
         return res;
       }
       function getRsPoly(ecLen) {
-        let p =;
-        for (let i = 0; i < ecLen; i++) p = polyMul(p, [1, gexp(i)]);
+        let p = new Array(1).fill(1);
+        for (let i = 0; i < ecLen; i++) p = polyMul(p, new Array(1, gexp(i)));
         return p;
       }
       function buildMatrix(text) {
         const bytes = Array.from(new TextEncoder().encode(text));
         const totalData = 55, ecCount = 15, size = 29;
-        const bits = [];
+        const bits = new Array();
         const pushBits = (val, len) => { for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1); };
         pushBits(4, 4);
         pushBits(bytes.length, 8);
         bytes.forEach(b => pushBits(b, 8));
         pushBits(0, Math.min(4, totalData * 8 - bits.length));
         while (bits.length % 8 !== 0) bits.push(0);
-        const dataCw = [];
+        const dataCw = new Array();
         for (let i = 0; i < bits.length; i += 8) {
           let b = 0; for (let j = 0; j < 8; j++) b = (b << 1) | bits[i + j];
           dataCw.push(b);
         }
-        const pads = [0xec, 0x11];
+        const pads = new Array(0xec, 0x11);
         for (let i = 0; dataCw.length < totalData; i++) dataCw.push(pads[i % 2]);
         const rsPoly = getRsPoly(ecCount);
         const ecCw = polyMod(dataCw.concat(new Array(ecCount).fill(0)), rsPoly);
         const fullCw = dataCw.concat(ecCw);
-        const streamBits = [];
+        const streamBits = new Array();
         fullCw.forEach(cw => { for (let i = 7; i >= 0; i--) streamBits.push((cw >>> i) & 1); });
 
         const m = Array.from({ length: size }, () => new Array(size).fill(null));
@@ -1725,12 +1725,14 @@ function getFilteredAdhkarEntries() {
           }
           up = !up;
         }
-        const fmt =;
-        const fCoords1 = [[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
-        const fCoords2 = [[size-1,8],[size-2,8],[size-3,8],[size-4,8],[size-5,8],[size-6,8],[size-7,8],[8,size-8],[8,size-7],[8,size-6],[8,size-5],[8,size-4],[8,size-3],[8,size-2],[8,size-1]];
+        const fmt = new Array(1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0);
+        const fR1 = new Array(8, 8, 8, 8, 8, 8, 8, 8, 7, 5, 4, 3, 2, 1, 0);
+        const fC1 = new Array(0, 1, 2, 3, 4, 5, 7, 8, 8, 8, 8, 8, 8, 8, 8);
+        const fR2 = new Array(size-1, size-2, size-3, size-4, size-5, size-6, size-7, 8, 8, 8, 8, 8, 8, 8, 8);
+        const fC2 = new Array(8, 8, 8, 8, 8, 8, 8, size-8, size-7, size-6, size-5, size-4, size-3, size-2, size-1);
         for (let i = 0; i < 15; i++) {
-          m[fCoords1[i][0]][fCoords1[i][1]] = fmt[i];
-          m[fCoords2[i][0]][fCoords2[i][1]] = fmt[i];
+          m[fR1[i]][fC1[i]] = fmt[i];
+          m[fR2[i]][fC2[i]] = fmt[i];
         }
         return m;
       }
@@ -2194,7 +2196,7 @@ function getFilteredAdhkarEntries() {
         container.innerHTML += '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13.5px;">لا توجد نتائج مطابقة لبحثك</div>';
       }
     }
-  
+
                 function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
@@ -2254,7 +2256,7 @@ function getFilteredAdhkarEntries() {
     }
     function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
 
-            function shareAppWithGuide() {
+                function shareAppWithGuide() {
       const appUrl = 'https://github.io';
       const shareText = '*الباقيات*\nتطبيق خفيف للأذكار والتسبيح، يعمل بدون إنترنت.\n\n*أبرز مميزات التطبيق:*\n• يعمل بدون إنترنت ويمكن تثبيته على الشاشة الرئيسية كتطبيق مستقل.\n• جميع الأذكار مأخوذة من كتاب حصن المسلم.\n• عدّاد آلي ذكي يقيس سرعتك من أول 3 ضغطات ويكمل عنك، مع زر تراجع سريع.\n• مؤقت زمني لكل ذكر مع إمكانية إيقافه واستئنافه في أي وقت.\n• إحصائيات يومية وإجمالية مع هدف يومي وحساب الأيام المتتالية.\n• إمكانية إضافة أذكار جديدة وتعديلها وترتيبها بالسحب والإفلات.\n• مزامنة سحابية اختيارية لربط أجهزتك المختلفة برمز خاص.\n• 22 لوناً وثيماً مريحاً للعين مع الوضع الليلي التلقائي والتحكم الذكي بحجم الخط ووضع التركيز.\n\n*رابط التطبيق:*\n' + appUrl + '\n\n*طريقة تثبيته على الشاشة الرئيسية:*\n• *في الآيفون (Safari):* افتح الرابط ثم اضغط زر المشاركة بالأسفل واختر «إضافة إلى الصفحة الرئيسية».\n• *في الأندرويد (Chrome):* افتح الرابط ثم اضغط القائمة بالأعلى واختر «الإضافة إلى الشاشة الرئيسية».\n\n*طريقة المزامنة بين أجهزتك (اختياري ويحتاج إلى إنترنت):*\nافتح الإعدادات داخل التطبيق، اكتب رمزاً سرياً خاصاً بك (6 خانات على الأقل مكونة من أحرف وأرقام ورموز مثل: Kh#2026@ts لتجنب تشابه الرموز مع الآخرين) ثم اضغط «ربط»، واكتب نفس الرمز في أجهزتك الأخرى لتتحدث أذكارك وعدّاداتك تلقائياً.\n\nتقبّل الله طاعتكم';
       if (navigator.clipboard && navigator.clipboard.writeText) {
