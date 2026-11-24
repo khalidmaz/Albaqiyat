@@ -65,7 +65,7 @@
     .ico { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
     .ico-sm { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
  
-    .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
+      .tabs-wrapper { display: flex; align-items: center; gap: 7px; padding: 8px 16px; background: var(--bg-color); flex-shrink: 0; }
     .list-filter-btn { flex: 0 0 auto; padding: 7px 12px; border-radius: 20px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 13px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .tabs-bar { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; }
     .tabs-bar::-webkit-scrollbar { display: none; }
@@ -83,8 +83,10 @@
     .resume-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 16px 6px; padding: 6px 12px; border-radius: 12px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
     .resume-banner.show { display: flex; }
     main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 16px 8px; overflow: hidden; }
-    .card { background: var(--surface-color); border-radius: 20px; padding: 10px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
-    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .card { background: var(--surface-color); border-radius: 20px; padding: 10px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; position: relative; }
+    .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; position: relative; }
+    .card-progress-track { position: absolute; bottom: -1px; left: 0; right: 0; height: 2.5px; background: transparent; overflow: hidden; }
+    .card-progress-fill { height: 100%; width: 0%; background: var(--accent-color); transition: width 0.25s ease; }
     .card-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; touch-action: pan-y; padding-top: 2px; }
     .steps-pills { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 2px; }
     .steps-pills::-webkit-scrollbar { display: none; }
@@ -326,6 +328,9 @@
       <button type="button" class="fav-icon-btn" onclick="openQuickSearchModal()" title="بحث سريع في الأذكار" style="width:32px; height:32px; border-radius:16px;">
         <svg class="ico-sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
+      <button type="button" class="fav-icon-btn" id="randomDhikrBtn" onclick="pickRandomDhikr()" title="اختيار ذكر عشوائي" style="display:none; width:32px; height:32px; border-radius:16px;">
+        <svg class="ico-sm" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+      </button>
       <div class="tabs-bar" id="tabsBar"></div>
     </div>
     <div class="resume-banner" id="resumeBanner" onclick="jumpToResumeDhikr()">
@@ -358,6 +363,7 @@
           <button type="button" class="fav-icon-btn" id="favToggleBtn" onclick="toggleCurrentDhikrInActiveList()" title="إضافة للمفضلة أو القائمة الحالية">
             <svg class="ico-sm" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           </button>
+          <div class="card-progress-track"><div class="card-progress-fill" id="cardProgressFill"></div></div>
         </div>
         <div class="card-body">
           <div class="dhikr-text" id="dhikrText"></div>
@@ -624,6 +630,10 @@
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><span>عرض الأذكار كصفحة واحدة متصلة</span></span>
         <input type="checkbox" id="continuousModeToggle" onchange="toggleContinuousMode(this.checked)" style="width:20px; height:20px; cursor:pointer;">
+      </label>
+      <label class="switch-row">
+        <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg><span>إظهار زر «ذكر عشوائي» بجانب البحث</span></span>
+        <input type="checkbox" id="randomBtnToggle" onchange="toggleRandomBtnSetting(this.checked)" style="width:20px; height:20px; cursor:pointer;">
       </label>
       <label class="switch-row">
         <span class="switch-lbl"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg><span>وضع التركيز (لمس واسع)</span></span>
@@ -1253,6 +1263,9 @@ function getFilteredAdhkarEntries() {
       const adkTgl = document.getElementById('autoDarkToggle'); if (adkTgl) adkTgl.checked = state.autoDarkMode;
       const adrTgl = document.getElementById('autoDailyResetToggle'); if (adrTgl) adrTgl.checked = state.autoDailyReset;
       const contTgl = document.getElementById('continuousModeToggle'); if (contTgl) contTgl.checked = document.body.classList.contains('continuous-mode');
+      const showRandom = localStorage.getItem('tasbih_show_random_btn') === 'true';
+      const randTgl = document.getElementById('randomBtnToggle'); if (randTgl) randTgl.checked = showRandom;
+      const randBtn = document.getElementById('randomDhikrBtn'); if (randBtn) randBtn.style.display = showRandom ? 'inline-flex' : 'none';
       const isSwapped = localStorage.getItem('tasbih_landscape_swap') === 'true';
       const swapTgl = document.getElementById('landscapeSwapToggle'); if (swapTgl) swapTgl.checked = isSwapped;
       const mainEl = document.querySelector('main'); if (mainEl) mainEl.classList.toggle('landscape-swap', isSwapped);
@@ -1320,7 +1333,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('resumeBanner').classList.remove('show');
     }
 
-    function render(skipCloud = false) {
+        function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
       if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
       const activeListObj = state.lists.find(l => l.id === state.activeListId);
@@ -1335,6 +1348,12 @@ function getFilteredAdhkarEntries() {
       if (activeChipEl) activeChipEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr), step = dhikr.steps[prog.stepIndex] || { text: '', target: 0 }, currentVal = prog.stepCounts[prog.stepIndex] || 0;
+      const cardProgFill = document.getElementById('cardProgressFill');
+      if (cardProgFill) {
+        const totalSteps = dhikr.steps.length;
+        const pct = totalSteps > 1 ? Math.round((prog.stepIndex / totalSteps) * 100) : (step.target > 0 ? Math.round(((step.target - currentVal) / step.target) * 100) : 0);
+        cardProgFill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+      }
       const defaultFavList = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
       const targetList = state.activeListId === 'all' ? defaultFavList : activeListObj;
       const favBtn = document.getElementById('favToggleBtn');
@@ -2000,7 +2019,7 @@ function getFilteredAdhkarEntries() {
       }
     }
   
-        function openStepsIndexModal() {
+                function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -2058,6 +2077,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('deleteModal').classList.add('open');
     }
     function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
+
     function shareAppWithGuide() {
       const appUrl = 'https' + '://' + 'khalidmaz.github.' + 'io/Tasbeh/';
       const shareText = '*الباقيات*\nتطبيق خفيف للأذكار والتسبيح، يعمل بدون إنترنت.\n\n*أبرز مميزات التطبيق:*\n• يعمل بدون إنترنت ويمكن تثبيته على الشاشة الرئيسية كتطبيق مستقل.\n• جميع الأذكار مأخوذة من كتاب حصن المسلم.\n• عدّاد آلي ذكي يقيس سرعتك من أول 3 ضغطات ويكمل عنك، مع زر تراجع سريع.\n• مؤقت زمني لكل ذكر مع إمكانية إيقافه واستئنافه في أي وقت.\n• إحصائيات يومية وإجمالية مع هدف يومي وحساب الأيام المتتالية.\n• إمكانية إضافة أذكار جديدة وتعديلها وترتيبها بالسحب والإفلات.\n• مزامنة سحابية اختيارية لربط أجهزتك المختلفة برمز خاص.\n• 22 لوناً وثيماً مريحاً للعين مع الوضع الليلي التلقائي والتحكم الذكي بحجم الخط ووضع التركيز.\n\n*رابط التطبيق:*\n' + appUrl + '\n\n*طريقة تثبيته على الشاشة الرئيسية:*\n• *في الآيفون (Safari):* افتح الرابط ثم اضغط زر المشاركة بالأسفل واختر «إضافة إلى الصفحة الرئيسية».\n• *في الأندرويد (Chrome):* افتح الرابط ثم اضغط القائمة بالأعلى واختر «الإضافة إلى الشاشة الرئيسية».\n\n*طريقة المزامنة بين أجهزتك (اختياري ويحتاج إلى إنترنت):*\nافتح الإعدادات داخل التطبيق، اكتب رمزاً سرياً خاصاً بك (6 خانات على الأقل مكونة من أحرف وأرقام ورموز مثل: Kh#2026@ts لتجنب تشابه الرموز مع الآخرين) ثم اضغط «ربط»، واكتب نفس الرمز في أجهزتك الأخرى لتتحدث أذكارك وعدّاداتك تلقائياً.\n\nتقبّل الله طاعتكم';
@@ -2087,6 +2107,23 @@ function getFilteredAdhkarEntries() {
     function toggleAutoTimeList(val) { state.autoTimeList = val; localStorage.setItem('tasbih_autotime_v63', val); if (val) applyTimeAutomations(); else state.activeListId = 'all'; render(); showSaveToast('تم الحفظ'); }
     function toggleAutoDark(val) { state.autoDarkMode = val; localStorage.setItem('tasbih_autodark_v63', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function toggleAutoDailyReset(val) { state.autoDailyReset = val; localStorage.setItem('tasbih_autodaily_reset', val); if (val) checkStatsDate(); render(); showSaveToast('تم الحفظ'); }
+    function toggleRandomBtnSetting(val) { localStorage.setItem('tasbih_show_random_btn', val); applyAppearance(); showSaveToast('تم الحفظ'); }
+    function pickRandomDhikr() {
+      const entries = getFilteredAdhkarEntries();
+      if (entries.length === 0) return;
+      const pool = entries.length > 1 ? entries.filter(e => e.idx !== state.activeIndex) : entries;
+      const chosen = pool[Math.floor(Math.random() * pool.length)];
+      selectDhikr(chosen.idx);
+      const dhikr = getCurrentDhikr();
+      if (dhikr && dhikr.steps.length > 1) {
+        const randStep = Math.floor(Math.random() * dhikr.steps.length);
+        jumpToStep(randStep);
+        const stTitle = dhikr.steps[randStep].title || dhikr.title;
+        showSaveToast(`ذكر عشوائي: ${stTitle}`);
+      } else {
+        showSaveToast(`ذكر عشوائي: ${dhikr.title}`);
+      }
+    }
     function toggleFocusMode(val) { state.focusMode = val; applyAppearance(); saveState(true); }
     function toggleLandscapeSwap(val) { localStorage.setItem('tasbih_landscape_swap', val); applyAppearance(); showSaveToast('تم الحفظ'); }
     function quickToggleLandscapeSwap(e) {
