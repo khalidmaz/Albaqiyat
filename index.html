@@ -123,7 +123,7 @@
     .ctrl-btn { padding: 10px 6px; border-radius: 13px; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--text-main); font-size: 13.5px; font-weight: 700; cursor: pointer; white-space: nowrap; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
     .ctrl-btn.primary { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
 
-    /* وضع السرد المتصل (صفحة واحدة مع إبقاء المؤقت والعد الآلي والتراجع) */
+    /* وضع السرد المتصل (صفحة واحدة) */
     .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
     body.continuous-mode .continuous-list { display: flex; }
     body.continuous-mode #dhikrText, body.continuous-mode .ring-wrapper, body.continuous-mode .steps-pills, body.continuous-mode #stepCounterBtn { display: none !important; }
@@ -147,7 +147,7 @@
     .reading-font-pill button:active { background: var(--primary-color); color: #ffffff; }
     .reading-font-pill .pill-sep { width: 1px; height: 14px; background: var(--primary-color); opacity: 0.35; }
 
-    /* وضع القراءة بكامل الشاشة (العداد بالنص تحت) */
+    /* وضع القراءة بكامل الشاشة (العداد بالنص تحت في الوضع العمودي) */
     body.reading-mode header, body.reading-mode .tabs-wrapper, body.reading-mode .resume-banner { display: none !important; }
     body.reading-mode .counter-zone { flex-direction: column; align-items: center; justify-content: center; padding: 6px 12px; margin: 4px 0; border-radius: 16px; background: var(--surface-color); border: 1px solid var(--border-color); gap: 5px; }
     body.reading-mode .counter-top-bar { width: 100%; justify-content: center; }
@@ -168,9 +168,9 @@
       .tabs-wrapper { padding: 3px 12px; }
       main {
         display: grid;
-        grid-template-columns: 1fr 165px;
+        grid-template-columns: 1fr 175px;
         grid-template-rows: 1fr auto;
-        column-gap: 8px;
+        column-gap: 10px;
         row-gap: 4px;
         padding: 2px 12px 5px;
       }
@@ -178,18 +178,33 @@
       .card-top { margin-bottom: 2px; padding-bottom: 4px; }
       .bottom-controls { grid-column: 1; grid-row: 2; gap: 6px; }
       .ctrl-btn { padding: 5px 6px; font-size: 12px; }
-      .counter-zone { grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 2px; justify-content: center; gap: 4px; }
-      .counter-top-bar { gap: 4px; }
-      .timer-pill, .auto-tap-btn, .undo-tap-btn { padding: 2px 7px; font-size: 10.5px; }
-      .ring-wrapper { width: 124px; height: 124px; }
-      .count-number { font-size: 32px; }
-      .count-label { font-size: 10.5px; margin-top: 2px; }
+
+      /* توحيد شكل العداد وأزراره في الوضع العرضي ليكون دائماً دائرياً ومتباعداً */
+      .counter-zone, body.reading-mode .counter-zone, body.continuous-mode .counter-zone {
+        grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 6px 6px;
+        display: flex; flex-direction: column; align-items: center; justify-content: space-evenly;
+        gap: 6px; background: transparent; border: none;
+      }
+      .counter-top-bar, body.reading-mode .counter-top-bar {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; width: 100%;
+      }
+      .timer-pill, .auto-tap-btn, .undo-tap-btn {
+        padding: 3px 9px; font-size: 10.5px; width: 92%; justify-content: center;
+      }
+      .ring-wrapper, body.reading-mode .ring-wrapper {
+        display: flex !important; width: 118px; height: 118px;
+        background: transparent; border-radius: 50%; margin: 2px auto 0;
+      }
+      .progress-svg, body.reading-mode .progress-svg { display: block !important; }
+      .count-number, body.reading-mode .count-number { font-size: 30px; color: var(--primary-color); }
+      .count-label, body.reading-mode .count-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
       .virtue-box { display: none !important; }
 
-      main.landscape-swap { grid-template-columns: 165px 1fr; }
+      main.landscape-swap { grid-template-columns: 175px 1fr; }
       main.landscape-swap .card { grid-column: 2; }
       main.landscape-swap .bottom-controls { grid-column: 2; }
-      main.landscape-swap .counter-zone { grid-column: 1; }
+      main.landscape-swap .counter-zone, body.reading-mode main.landscape-swap .counter-zone { grid-column: 1; }
     }
 
       .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
@@ -453,7 +468,7 @@
     </div>
   </div>
 
- <div class="modal-backdrop" id="indexModal">
+  <div class="modal-backdrop" id="indexModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 class="modal-title" style="margin:0;">القوائم وفهرس الأذكار</h3>
@@ -464,8 +479,9 @@
         <input type="text" id="newListNameInput" placeholder="اسم قائمة جديدة (مثل: أذكار المساء)..." style="padding:7px 10px; font-size:13.5px;">
         <button type="button" class="ctrl-btn primary" style="padding:7px 12px; font-size:13px;" onclick="createCustomList()">+ قائمة</button>
       </div>
-      <div class="form-group" style="margin-bottom:10px;">
-        <input type="text" id="dhikrSearchInput" placeholder="ابحث عن ذكر للانتقال الفوري..." oninput="renderIndexModalList()" style="padding:8px 11px; font-size:14px;">
+      <div class="form-group" style="margin-bottom:10px; position:relative;">
+        <input type="text" id="dhikrSearchInput" placeholder="ابحث عن ذكر للانتقال الفوري..." oninput="renderIndexModalList()" style="padding:8px 11px 8px 34px; font-size:14px;">
+        <button type="button" id="clearSearchBtn" onclick="clearDhikrSearch()" style="display:none; position:absolute; left:8px; top:50%; transform:translateY(-50%); background:var(--border-color); color:var(--text-main); border:none; border-radius:50%; width:22px; height:22px; font-size:12px; font-weight:800; cursor:pointer; align-items:center; justify-content:center;">✕</button>
       </div>
       <div id="indexDhikrList"></div>
       <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('indexModal')">إغلاق</button></div>
@@ -1263,7 +1279,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('resumeBanner').classList.remove('show');
     }
 
-        function render(skipCloud = false) {
+            function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
       if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
       const activeListObj = state.lists.find(l => l.id === state.activeListId);
@@ -1338,6 +1354,14 @@ function getFilteredAdhkarEntries() {
     }
     function handleZoneTap(e) { if (state.focusMode && !document.body.classList.contains('continuous-mode')) performIncrement(false); }
     function handleRingTap(e) { if (!state.focusMode) { e.stopPropagation(); performIncrement(false); } }
+    function showCompletionCelebration(title, durationMs) {
+      const msgEl = document.getElementById('completionModalMsg');
+      const modalEl = document.getElementById('completionModal');
+      if (!msgEl || !modalEl) return;
+      const durPart = durationMs > 0 ? `<br><span style="font-size:12.5px; color:var(--text-muted); font-weight:600;">المدة المستغرقة: ${formatDuration(durationMs)}</span>` : '';
+      msgEl.innerHTML = `أتممت بفضل الله قراءة<br><span style="color:var(--primary-color); font-size:17px;">«${title}»</span>${durPart}`;
+      modalEl.classList.add('open');
+    }
     function performIncrement(fromAuto = false) {
       const dhikr = getCurrentDhikr(); if (!dhikr || !dhikr.steps || dhikr.steps.length === 0) return;
       const prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
@@ -1359,8 +1383,15 @@ function getFilteredAdhkarEntries() {
           if (sIdx < dhikr.steps.length - 1) {
             prog.stepIndex = sIdx + 1; stopAutoTap(); tapTimestamps = new Array(); measuredIntervalMs = null; autoTapUsedInStep = false; recordTasbihStat(dhikr, sIdx, 0);
           } else {
+            const finishedTitle = dhikr.title;
+            const isMultiStep = dhikr.steps.length > 1;
             prog.stepIndex = 0; pauseDhikrTimer(); completedDuration = dhikrElapsedMs[dhikr.id] || 0; dhikrElapsedMs[dhikr.id] = 0;
-            resetAutoTapCalibration(); recordTasbihStat(dhikr, sIdx, completedDuration); showSaveToast(`أتممت الذكر في ${formatDuration(completedDuration)}`);
+            resetAutoTapCalibration(); recordTasbihStat(dhikr, sIdx, completedDuration);
+            if (isMultiStep) {
+              showCompletionCelebration(finishedTitle, completedDuration);
+            } else {
+              showSaveToast(`أتممت الذكر في ${formatDuration(completedDuration)}`);
+            }
             if (state.activeListId !== 'all') {
               const entries = getFilteredAdhkarEntries();
               if (entries.length > 1) { const pos = entries.findIndex(e => e.idx === state.activeIndex); state.activeIndex = entries[(pos + 1) % entries.length].idx; }
@@ -1379,7 +1410,7 @@ function getFilteredAdhkarEntries() {
       }
     }
 
-    function toggleContinuousMode(forceState) {
+        function toggleContinuousMode(forceState) {
       const isActive = (typeof forceState === 'boolean')
         ? document.body.classList.toggle('continuous-mode', forceState)
         : document.body.classList.toggle('continuous-mode');
@@ -1790,7 +1821,7 @@ function getFilteredAdhkarEntries() {
       saveState(false);
     }
 
-      let modalSelectedListId = 'all';
+            let modalSelectedListId = 'all';
     function normalizeArabicForSearch(str) {
       return (str || '')
         .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
@@ -1801,6 +1832,11 @@ function getFilteredAdhkarEntries() {
         .replace(/\s+/g, ' ')
         .trim()
         .toLowerCase();
+    }
+    function clearDhikrSearch() {
+      const inp = document.getElementById('dhikrSearchInput');
+      if (inp) { inp.value = ''; inp.focus(); }
+      renderIndexModalList();
     }
     function openIndexModal() {
       modalSelectedListId = state.activeListId; document.getElementById('dhikrSearchInput').value = '';
@@ -1857,6 +1893,8 @@ function getFilteredAdhkarEntries() {
         chip.onclick = () => switchActiveList(l.id); listsRow.appendChild(chip);
       });
       const rawQ = document.getElementById('dhikrSearchInput').value.trim();
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (clearBtn) clearBtn.style.display = rawQ.length > 0 ? 'flex' : 'none';
       const q = normalizeArabicForSearch(rawQ);
       const container = document.getElementById('indexDhikrList'); container.innerHTML = '';
       const defaultFav = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
