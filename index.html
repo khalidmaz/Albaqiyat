@@ -1100,7 +1100,7 @@
       }
     }
 
-                           let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
+                       let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
     function showSaveToast(msg = 'تم الحفظ', duration = 1600) {
       const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
       clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
@@ -1123,11 +1123,11 @@
           updatedAt: lastCloudStamp
         };
         fetch(`${FIREBASE_DB_URL}/users/${cleanCode}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), keepalive: true }).catch(() => {});
-      }, 450);
+      }, 350);
     }
     async function pullFromCloud(notify = false) {
       if (!state.syncCode || !navigator.onLine || isPullingCloud) return;
-      if (!notify && (Date.now() - lastTapTime < 2500)) return;
+      if (!notify && (Date.now() - lastTapTime < 1200)) return;
       isPullingCloud = true;
       try {
         const cleanCode = encodeURIComponent(state.syncCode.trim());
@@ -1209,9 +1209,9 @@
       if (!skipCloud && state.syncCode) pushToCloud();
       if (notify) showSaveToast(msg);
     }
-    setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 4000);
+    setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-            function getFilteredAdhkarEntries() {
+        function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1278,7 +1278,7 @@
       applyAppearance(); applyWakeLock(); updateSyncUI(); render();
       if (state.syncCode) pullFromCloud(false);
     }
-    function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar[0]; }
+    function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar.at(0); }
     function applyAppearance() {
       let activeTheme = state.theme;
       if (state.autoDarkMode) {
@@ -1368,7 +1368,7 @@
       document.getElementById('resumeBanner').classList.remove('show');
     }
 
-                function setQuickTarget(newTarget) {
+            function setQuickTarget(newTarget) {
       const dhikr = getCurrentDhikr();
       if (!dhikr || dhikr.steps.length !== 1) return;
       pauseDhikrTimer(); resetAutoTapCalibration();
@@ -1380,7 +1380,7 @@
     }
     function render(skipCloud = false) {
       let entries = getFilteredAdhkarEntries();
-      if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries[0].idx;
+      if (!entries.some(e => e.idx === state.activeIndex) && entries.length > 0) state.activeIndex = entries.at(0).idx;
       const activeListObj = state.lists.find(l => l.id === state.activeListId);
       document.getElementById('activeListLabel').textContent = state.activeListId === 'all' ? 'الكل' : (activeListObj ? activeListObj.name : 'الكل');
       const tabsBar = document.getElementById('tabsBar'); tabsBar.innerHTML = ''; let activeChipEl = null;
@@ -1407,7 +1407,7 @@
         const pct = totalSteps > 1 ? Math.round((prog.stepIndex / totalSteps) * 100) : (step.target > 0 ? Math.round(((step.target - currentVal) / step.target) * 100) : 0);
         cardProgFill.style.width = Math.max(0, Math.min(100, pct)) + '%';
       }
-      const defaultFavList = state.lists.find(l => l.id === 'fav') || state.lists[0];
+      const defaultFavList = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
       const targetList = state.activeListId === 'all' ? defaultFavList : activeListObj;
       const favBtn = document.getElementById('favToggleBtn');
       if (favBtn && targetList) {
@@ -1447,7 +1447,7 @@
       updateProgressRing(currentVal, step.target); updateDailyGoalUI(); updateTimerUI(); updateAutoTapButtonUI(); updateResumeBanner(); saveState(false, '', skipCloud);
     }
 
-            function scrollContinuousToStep(sIdx, pos = 'center') {
+        function scrollContinuousToStep(sIdx, pos = 'center') {
       if (!document.body.classList.contains('continuous-mode')) return;
       setTimeout(() => {
         const targetCard = document.querySelector(`.cont-step-card[data-step-idx="${sIdx}"]`);
@@ -1512,11 +1512,10 @@
       const prog = getDhikrProgress(dhikr), sIdx = prog.stepIndex, step = dhikr.steps[sIdx];
       if (!fromAuto && (step.target === 0 || step.target > 5)) {
         const now = Date.now();
-        if (tapTimestamps.length > 0 && (now - tapTimestamps[tapTimestamps.length - 1]) > 8000) tapTimestamps = new Array();
+        if (tapTimestamps.length > 0 && (now - tapTimestamps.at(-1)) > 8000) tapTimestamps = new Array();
         tapTimestamps.push(now);
         if (tapTimestamps.length >= 3) {
-          const lenT = tapTimestamps.length;
-          const diff1 = tapTimestamps[lenT - 2] - tapTimestamps[lenT - 3], diff2 = tapTimestamps[lenT - 1] - tapTimestamps[lenT - 2];
+          const diff1 = tapTimestamps.at(-2) - tapTimestamps.at(-3), diff2 = tapTimestamps.at(-1) - tapTimestamps.at(-2);
           measuredIntervalMs = Math.max(300, Math.round((diff1 + diff2) / 2));
         }
       }
@@ -1651,7 +1650,7 @@
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-                let lastGeneratedBlob = null;
+            let lastGeneratedBlob = null;
     const APP_SHARE_URL = 'https://' + 'khalidmaz.github.' + 'io/Albaqiyat/';
 
     const QR_CORE = (function() {
@@ -1671,8 +1670,8 @@
       function polyMod(dividend, divisor) {
         let res = dividend.slice();
         while (res.length >= divisor.length) {
-          if (res[0] === 0) { res.shift(); continue; }
-          const factor = glog(res[0]);
+          if (res.at(0) === 0) { res.shift(); continue; }
+          const factor = glog(res.at(0));
           for (let i = 0; i < divisor.length; i++) res[i] ^= gexp(glog(divisor[i]) + factor);
           res.shift();
         }
@@ -1888,7 +1887,7 @@
       document.getElementById('shareCardModal').classList.add('open');
     }
 
-        async function shareGeneratedImage() {
+    async function shareGeneratedImage() {
       if (lastGeneratedBlob && navigator.canShare) {
         const file = new File([lastGeneratedBlob], 'al-baqiyat-story.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
@@ -1917,7 +1916,7 @@
       const summaryEl = document.getElementById('weekSummaryBar');
       if (!grid) return;
       grid.innerHTML = '';
-      const daysAr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الخمعة', 'السبت'];
+      const daysAr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
       const hist = state.stats.history || {};
       const todayStr = getTodayStr();
       const goal = state.dailyGoal || 1000;
@@ -1954,22 +1953,22 @@
           return;
         }
         if (e.touches && e.touches.length === 1) {
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
+          touchStartX = e.touches.at(0).clientX;
+          touchStartY = e.touches.at(0).clientY;
           isSwipeTracking = true;
         }
       }, { passive: true });
       document.addEventListener('touchmove', (e) => {
         if (!isSwipeTracking || !e.touches || e.touches.length !== 1) return;
-        const dx = Math.abs(e.touches[0].clientX - touchStartX);
-        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        const dx = Math.abs(e.touches.at(0).clientX - touchStartX);
+        const dy = Math.abs(e.touches.at(0).clientY - touchStartY);
         if (dy > 18 && dy > dx) isSwipeTracking = false;
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
         if (!isSwipeTracking || !e.changedTouches || e.changedTouches.length === 0) return;
         isSwipeTracking = false;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dx = e.changedTouches.at(0).clientX - touchStartX;
+        const dy = e.changedTouches.at(0).clientY - touchStartY;
         if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
           const dhikr = getCurrentDhikr(); if (!dhikr) return;
           const prog = getDhikrProgress(dhikr);
@@ -1984,7 +1983,7 @@
       }, { passive: true });
     })();
 
-    function getRemainingToCompleteDhikr(dhikr) {
+        function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
       const prog = getDhikrProgress(dhikr); let totalRem = 0;
       dhikr.steps.forEach((st, idx) => {
@@ -2062,7 +2061,7 @@
             const totalSteps = dhikr.steps.length;
             const doneStepsCount = totalSteps - unreadSteps.length;
             const pct = Math.round((doneStepsCount / totalSteps) * 100);
-            const resumeStepIdx = unreadSteps[0];
+            const resumeStepIdx = unreadSteps.at(0);
             const resumeStepObj = dhikr.steps[resumeStepIdx];
             const resumeStepName = (resumeStepObj && resumeStepObj.title && resumeStepObj.title.trim()) ? resumeStepObj.title.trim() : `خطوة ${resumeStepIdx + 1}`;
             uCard.onclick = () => jumpToDhikrFromStats(dIdx, resumeStepIdx);
@@ -2076,7 +2075,7 @@
       document.getElementById('statsModal').classList.add('open');
     }
 
-       function openAddModal() {
+   function openAddModal() {
       state.editingIndex = -1; document.getElementById('formModalTitle').textContent = 'إضافة ذكر جديد';
       document.getElementById('inputTitle').value = ''; document.getElementById('inputVirtue').value = '';
       const container = document.getElementById('stepsContainer'); container.innerHTML = '';
@@ -2130,12 +2129,7 @@
       document.getElementById('manageModal').classList.add('open');
     }
     function startRowDrag(e, row, idx) {
-      e.preventDefault();
-      const handle = e.currentTarget;
-      if (handle && handle.setPointerCapture) {
-        try { handle.setPointerCapture(e.pointerId); } catch (err) {}
-      }
-      dragSrcIndex = idx; row.classList.add('dragging');
+      e.preventDefault(); dragSrcIndex = idx; row.classList.add('dragging');
       const list = document.getElementById('manageList');
       function onPointerMove(moveEvent) {
         const items = Array.from(list.querySelectorAll('.manage-item')), clientY = moveEvent.clientY;
@@ -2146,19 +2140,12 @@
           else if (clientY > midY && i > dragSrcIndex) { list.insertBefore(row, targetRow.nextSibling); reorderAdhkarArray(dragSrcIndex, i); dragSrcIndex = i; break; }
         }
       }
-      function onPointerUp(upEvent) {
-        if (handle && handle.releasePointerCapture) {
-          try { handle.releasePointerCapture(upEvent.pointerId); } catch (err) {}
-        }
+      function onPointerUp() {
         row.classList.remove('dragging');
-        handle.removeEventListener('pointermove', onPointerMove);
-        handle.removeEventListener('pointerup', onPointerUp);
-        handle.removeEventListener('pointercancel', onPointerUp);
+        document.removeEventListener('pointermove', onPointerMove); document.removeEventListener('pointerup', onPointerUp);
         openManageModal(); render(); showSaveToast('تم تحديث الترتيب');
       }
-      handle.addEventListener('pointermove', onPointerMove);
-      handle.addEventListener('pointerup', onPointerUp);
-      handle.addEventListener('pointercancel', onPointerUp);
+      document.addEventListener('pointermove', onPointerMove); document.addEventListener('pointerup', onPointerUp);
     }
     function reorderAdhkarArray(fromIdx, toIdx) {
       const activeId = state.adhkar[state.activeIndex]?.id;
@@ -2276,7 +2263,7 @@
       }
     }
 
-                    function openStepsIndexModal() {
+                function openStepsIndexModal() {
       const dhikr = getCurrentDhikr(), prog = getDhikrProgress(dhikr);
       document.getElementById('stepsIndexTitle').textContent = `${dhikr.title} (${dhikr.steps.length} خطوة)`;
       const list = document.getElementById('stepsIndexList'); list.innerHTML = '';
@@ -2303,7 +2290,6 @@
       else prompt('انسخ الكود التالي:', code);
     }
     function openImportModal() { closeModal('manageModal'); document.getElementById('importCodeInput').value = ''; document.getElementById('importModal').classList.add('open'); }
-
     function importAdhkarCode() {
       try {
         const raw = document.getElementById('importCodeInput').value.trim(), parsed = JSON.parse(raw);
@@ -2312,7 +2298,7 @@
           state.adhkar.push(newItem); state.activeIndex = state.adhkar.length - 1; closeModal('importModal'); render(); showSaveToast(`تمت إضافة "${newItem.title}"`); return;
         }
         const list = Array.isArray(parsed) ? parsed : parsed.list;
-        if (Array.isArray(list) && list.length > 0 && list.title && Array.isArray(list.steps) && list.steps.length > 0) {
+        if (Array.isArray(list) && list.length > 0 && list.at(0).title && Array.isArray(list.at(0).steps) && list.at(0).steps.length > 0) {
           state.adhkar = list; state.progressMap = {}; state.activeIndex = 0; closeModal('importModal'); render(); showSaveToast('تم استيراد القائمة بنجاح');
         } else showSaveToast('صيغة الكود غير صحيحة');
       } catch (e) { showSaveToast('الكود غير صالح'); }
@@ -2331,15 +2317,7 @@
     function openResetDefaultsConfirm() {
       closeModal('manageModal');
       document.getElementById('deleteMsg').textContent = 'هل تريد استعادة جميع الأذكار الافتراضية وحذف التعديلات؟';
-      state.pendingConfirmAction = () => {
-        state.adhkar = JSON.parse(JSON.stringify(defaultAdhkar));
-        state.progressMap = {};
-        state.activeIndex = 0;
-        const validIds = state.adhkar.map(a => a.id);
-        state.lists.forEach(l => { if (Array.isArray(l.ids)) l.ids = l.ids.filter(id => validIds.includes(id)); });
-        render();
-        showSaveToast('تمت الاستعادة');
-      };
+      state.pendingConfirmAction = () => { state.adhkar = JSON.parse(JSON.stringify(defaultAdhkar)); state.progressMap = {}; state.activeIndex = 0; render(); showSaveToast('تمت الاستعادة'); };
       document.getElementById('deleteModal').classList.add('open');
     }
     function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
