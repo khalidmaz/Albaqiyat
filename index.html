@@ -1629,7 +1629,7 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-    let lastGeneratedBlob = null, cachedQrKey = '', cachedQrImg = null;
+        let lastGeneratedBlob = null, cachedQrKey = '', cachedQrImg = null;
     function getAppQrImage(fgHex, bgHex) {
       const cleanFg = (fgHex || '#0f5132').replace('#', '');
       const cleanBg = (bgHex || '#ffffff').replace('#', '');
@@ -1755,7 +1755,7 @@ function getFilteredAdhkarEntries() {
       } else {
         ctx.fillStyle = mutedCol;
         ctx.font = 'bold 26px Tajawal, sans-serif';
-        ctx.fillText('khalidmaz.github.io/Tasbeh', 540, 1650);
+        ctx.fillText('khalidmaz.github.io/Albaqiyat', 540, 1650);
       }
 
       const dataUrl = canvas.toDataURL('image/png');
@@ -1806,22 +1806,22 @@ function getFilteredAdhkarEntries() {
           return;
         }
         if (e.touches && e.touches.length === 1) {
-          touchStartX = e.touches.clientX;
-          touchStartY = e.touches.clientY;
+          touchStartX = e.touches[0].clientX;
+          touchStartY = e.touches[0].clientY;
           isSwipeTracking = true;
         }
       }, { passive: true });
       document.addEventListener('touchmove', (e) => {
         if (!isSwipeTracking || !e.touches || e.touches.length !== 1) return;
-        const dx = Math.abs(e.touches.clientX - touchStartX);
-        const dy = Math.abs(e.touches.clientY - touchStartY);
+        const dx = Math.abs(e.touches[0].clientX - touchStartX);
+        const dy = Math.abs(e.touches[0].clientY - touchStartY);
         if (dy > 18 && dy > dx) isSwipeTracking = false;
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
         if (!isSwipeTracking || !e.changedTouches || e.changedTouches.length === 0) return;
         isSwipeTracking = false;
-        const dx = e.changedTouches.clientX - touchStartX;
-        const dy = e.changedTouches.clientY - touchStartY;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
         if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
           const dhikr = getCurrentDhikr(); if (!dhikr) return;
           const prog = getDhikrProgress(dhikr);
@@ -2153,8 +2153,8 @@ function getFilteredAdhkarEntries() {
     }
     function executeConfirmAction() { if (state.pendingConfirmAction) { state.pendingConfirmAction(); state.pendingConfirmAction = null; } closeModal('deleteModal'); }
 
-    function shareAppWithGuide() {
-      const appUrl = 'https' + '://' + 'khalidmaz.github.' + 'io/Tasbeh/';
+        function shareAppWithGuide() {
+      const appUrl = 'https' + '://' + 'khalidmaz.github.' + 'io/Albaqiyat/';
       const shareText = '*الباقيات*\nتطبيق خفيف للأذكار والتسبيح، يعمل بدون إنترنت.\n\n*أبرز مميزات التطبيق:*\n• يعمل بدون إنترنت ويمكن تثبيته على الشاشة الرئيسية كتطبيق مستقل.\n• جميع الأذكار مأخوذة من كتاب حصن المسلم.\n• عدّاد آلي ذكي يقيس سرعتك من أول 3 ضغطات ويكمل عنك، مع زر تراجع سريع.\n• مؤقت زمني لكل ذكر مع إمكانية إيقافه واستئنافه في أي وقت.\n• إحصائيات يومية وإجمالية مع هدف يومي وحساب الأيام المتتالية.\n• إمكانية إضافة أذكار جديدة وتعديلها وترتيبها بالسحب والإفلات.\n• مزامنة سحابية اختيارية لربط أجهزتك المختلفة برمز خاص.\n• 22 لوناً وثيماً مريحاً للعين مع الوضع الليلي التلقائي والتحكم الذكي بحجم الخط ووضع التركيز.\n\n*رابط التطبيق:*\n' + appUrl + '\n\n*طريقة تثبيته على الشاشة الرئيسية:*\n• *في الآيفون (Safari):* افتح الرابط ثم اضغط زر المشاركة بالأسفل واختر «إضافة إلى الصفحة الرئيسية».\n• *في الأندرويد (Chrome):* افتح الرابط ثم اضغط القائمة بالأعلى واختر «الإضافة إلى الشاشة الرئيسية».\n\n*طريقة المزامنة بين أجهزتك (اختياري ويحتاج إلى إنترنت):*\nافتح الإعدادات داخل التطبيق، اكتب رمزاً سرياً خاصاً بك (6 خانات على الأقل مكونة من أحرف وأرقام ورموز مثل: Kh#2026@ts لتجنب تشابه الرموز مع الآخرين) ثم اضغط «ربط»، واكتب نفس الرمز في أجهزتك الأخرى لتتحدث أذكارك وعدّاداتك تلقائياً.\n\nتقبّل الله طاعتكم';
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(shareText).catch(() => {});
