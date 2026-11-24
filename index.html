@@ -1100,7 +1100,7 @@
       }
     }
 
-                   let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
+                       let toastTimer = null, cloudPushTimer = null, lastCloudStamp = 0, isPullingCloud = false, lastTapTime = 0;
     function showSaveToast(msg = 'تم الحفظ', duration = 1600) {
       const toast = document.getElementById('saveToast'); toast.textContent = msg; toast.classList.add('show');
       clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
@@ -1146,8 +1146,14 @@
           const validCloudAdhkar = data.adhkar.filter(a => a && a.id && a.title && Array.isArray(a.steps) && a.steps.length > 0);
           if (validCloudAdhkar.length > 0) state.adhkar = validCloudAdhkar;
           state.progressMap = data.progressMap || {};
-          if (Array.isArray(data.lists) && data.lists.length > 0) state.lists = data.lists;
-          if (typeof data.activeListId === 'string') state.activeListId = data.activeListId;
+          if (Array.isArray(data.lists) && data.lists.length > 0) {
+            const cleanedCloudLists = data.lists.filter(l => !OLD_BUILTIN_IDS.includes(l.id));
+            if (!cleanedCloudLists.some(l => l.id === 'fav')) cleanedCloudLists.unshift({ id: 'fav', name: '★ المفضلة', ids: new Array() });
+            state.lists = cleanedCloudLists;
+          }
+          if (typeof data.activeListId === 'string') {
+            state.activeListId = OLD_BUILTIN_IDS.includes(data.activeListId) ? 'all' : data.activeListId;
+          }
           if (typeof data.activeIndex === 'number' && data.activeIndex >= 0 && data.activeIndex < state.adhkar.length) state.activeIndex = data.activeIndex;
           else if (state.activeIndex >= state.adhkar.length) state.activeIndex = 0;
           if (data.stats) { state.stats = data.stats; if (!state.stats.dailyDetails) state.stats.dailyDetails = {}; checkStatsDate(); }
@@ -1977,7 +1983,7 @@
       }, { passive: true });
     })();
 
-                        function getRemainingToCompleteDhikr(dhikr) {
+        function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
       const prog = getDhikrProgress(dhikr); let totalRem = 0;
       dhikr.steps.forEach((st, idx) => {
@@ -2033,7 +2039,7 @@
               else if (hasActiveProgress(dhikr) && sIdx > prog.stepIndex) stepRemTag = ` <span style="color:var(--text-muted); font-size:11px;">(متبقي ${st.target})</span>`;
             }
             const stName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
-            stepsHtml += `<div class="stat-step-row" onclick="event.stopPropagation(); jumpToDhikrFromStats(${dIdx}, ${sIdx});" style="padding:3px 0; cursor:pointer;"><span class="stat-step-name" style="color:var(--text-main);">${stName}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag} ←</span></div>`;
+            stepsHtml += `<div class="stat-step-row" onclick="event.stopPropagation(); jumpToDhikrFromStats(${dIdx}, ${sIdx});" style="padding:3px 0; cursor:pointer;"><span class="stat-step-name" style="color:var(--text-main);">${stName}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag} <span style="color:var(--primary-color);">←</span></span></div>`;
           });
           card.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">${totalDone} مرة${durText} ←</span></div>${remStatusHtml}<div class="stat-steps-list">${stepsHtml}</div>`;
           readListEl.appendChild(card);
@@ -2041,24 +2047,25 @@
         const unreadSteps = new Array();
         dhikr.steps.forEach((st, sIdx) => {
           const stCount = (entry && entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
-          const uStName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
-          if (stCount === 0) {
-            unreadSteps.push({
-              sIdx: sIdx,
-              label: `${uStName}: ${st.text.length > 26 ? st.text.slice(0, 26) + '...' : st.text}`
-            });
-          }
+          if (stCount === 0) unreadSteps.push(sIdx);
         });
         if (totalDone === 0 || unreadSteps.length > 0) {
-          hasUnreadAny = true; const uCard = document.createElement('div'); uCard.className = 'stat-detail-card'; uCard.style.cursor = 'pointer';
+          hasUnreadAny = true;
+          const uCard = document.createElement('div');
+          uCard.className = 'stat-detail-card';
+          uCard.style.cursor = 'pointer';
           if (totalDone === 0) {
             uCard.onclick = () => jumpToDhikrFromStats(dIdx, 0);
             uCard.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">ابدأ القراءة ←</span></div>`;
           } else {
-            const firstUnreadIdx = unreadSteps.at(0).sIdx;
-            uCard.onclick = () => jumpToDhikrFromStats(dIdx, firstUnreadIdx);
-            const stepsLinksHtml = unreadSteps.map(s => `<div onclick="event.stopPropagation(); jumpToDhikrFromStats(${dIdx}, ${s.sIdx});" style="padding:3px 0; cursor:pointer; color:var(--primary-color); font-weight:700;">• ${s.label} ←</div>`).join('');
-            uCard.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">خطوات متبقية ←</span></div><div class="stat-steps-list">${stepsLinksHtml}</div>`;
+            const totalSteps = dhikr.steps.length;
+            const doneStepsCount = totalSteps - unreadSteps.length;
+            const pct = Math.round((doneStepsCount / totalSteps) * 100);
+            const resumeStepIdx = unreadSteps.at(0);
+            const resumeStepObj = dhikr.steps[resumeStepIdx];
+            const resumeStepName = (resumeStepObj && resumeStepObj.title && resumeStepObj.title.trim()) ? resumeStepObj.title.trim() : `خطوة ${resumeStepIdx + 1}`;
+            uCard.onclick = () => jumpToDhikrFromStats(dIdx, resumeStepIdx);
+            uCard.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">استكمل (${pct}%) ←</span></div><div style="font-size:11.5px; color:var(--text-muted); margin-top:4px; font-weight:700;">توقفت عند: ${resumeStepName} (${resumeStepIdx + 1} من ${totalSteps})</div><div style="width:100%; height:4px; background:var(--border-color); border-radius:6px; overflow:hidden; margin-top:6px;"><div style="height:100%; width:${pct}%; background:var(--primary-color);"></div></div>`;
           }
           unreadListEl.appendChild(uCard);
         }
