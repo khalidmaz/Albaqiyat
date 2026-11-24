@@ -1,51 +1,20 @@
-const CACHE_NAME = 'tasbih-app-v113';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json'
-];
-
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
-  );
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
-    }).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  if (event.request.url.includes('firebaseio.com')) return;
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
-    })
-  );
-});
+{
+  "name": "الباقيات",
+  "short_name": "الباقيات",
+  "description": "تطبيق خفيف للأذكار والتسبيح من حصن المسلم، يعمل بدون إنترنت.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7f5",
+  "theme_color": "#0f5132",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23F7C616'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='28'%3E%3Ccircle cx='256' cy='116' r='36'/%3E%3Ccircle cx='365.5' cy='168.7' r='36'/%3E%3Ccircle cx='392.5' cy='287.1' r='36'/%3E%3Ccircle cx='316.7' cy='382.1' r='36'/%3E%3Ccircle cx='195.3' cy='382.1' r='36'/%3E%3Ccircle cx='119.5' cy='287.1' r='36'/%3E%3Ccircle cx='146.5' cy='168.7' r='36'/%3E%3C/g%3E%3C/svg%3E",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
