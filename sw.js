@@ -1,10 +1,9 @@
-const CACHE_NAME = 'tasbih-app-v131';
+const CACHE_NAME = 'tasbih-app-v114';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json'
 ];
-
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -13,7 +12,6 @@ self.addEventListener('install', (event) => {
     })
   );
 });
-
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -23,11 +21,9 @@ self.addEventListener('activate', (event) => {
     }).then(() => self.clients.claim())
   );
 });
-
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (event.request.url.includes('firebaseio.com')) return;
-
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
