@@ -83,11 +83,11 @@
     .resume-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; margin: 0 16px 6px; padding: 6px 12px; border-radius: 12px; background: var(--primary-light); border: 1px solid var(--primary-color); color: var(--primary-color); font-size: 12.5px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
     .resume-banner.show { display: flex; }
     main { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 4px 16px 8px; overflow: hidden; }
-    .card { background: var(--surface-color); border-radius: 20px; padding: 10px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; position: relative; }
+    .card { background: var(--surface-color); border-radius: 20px; padding: 10px 14px; border: 1px solid var(--border-color); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04); display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; position: relative; touch-action: manipulation; }
     .card-top { display: flex; justify-content: space-between; align-items: center; gap: 5px; padding-bottom: 8px; margin-bottom: 4px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; position: relative; }
     .card-progress-track { position: absolute; bottom: -1px; left: 0; right: 0; height: 2.5px; background: transparent; overflow: hidden; }
     .card-progress-fill { height: 100%; width: 0%; background: var(--accent-color); transition: width 0.25s ease; }
-    .card-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; touch-action: pan-y; padding-top: 2px; }
+    .card-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; touch-action: pan-x pan-y; padding-top: 2px; }
     .steps-pills { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; flex: 1; padding-bottom: 2px; }
     .steps-pills::-webkit-scrollbar { display: none; }
     .step-pill-btn { flex: 0 0 auto; background: var(--bg-color); color: var(--text-muted); border: 1px solid var(--border-color); font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 10px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
@@ -1887,7 +1887,7 @@
       document.getElementById('shareCardModal').classList.add('open');
     }
 
-    async function shareGeneratedImage() {
+        async function shareGeneratedImage() {
       if (lastGeneratedBlob && navigator.canShare) {
         const file = new File([lastGeneratedBlob], 'al-baqiyat-story.png', { type: 'image/png' });
         if (navigator.canShare({ files: [file] })) {
@@ -1952,24 +1952,29 @@
           isSwipeTracking = false;
           return;
         }
-        if (e.touches && e.touches.length === 1) {
-          touchStartX = e.touches.at(0).clientX;
-          touchStartY = e.touches.at(0).clientY;
+        const t = e.touches && e.touches.item(0);
+        if (t && e.touches.length === 1) {
+          touchStartX = t.clientX;
+          touchStartY = t.clientY;
           isSwipeTracking = true;
         }
       }, { passive: true });
       document.addEventListener('touchmove', (e) => {
         if (!isSwipeTracking || !e.touches || e.touches.length !== 1) return;
-        const dx = Math.abs(e.touches.at(0).clientX - touchStartX);
-        const dy = Math.abs(e.touches.at(0).clientY - touchStartY);
-        if (dy > 18 && dy > dx) isSwipeTracking = false;
+        const t = e.touches.item(0);
+        if (!t) return;
+        const dx = Math.abs(t.clientX - touchStartX);
+        const dy = Math.abs(t.clientY - touchStartY);
+        if (dy > 28 && dy > dx * 1.2) isSwipeTracking = false;
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
         if (!isSwipeTracking || !e.changedTouches || e.changedTouches.length === 0) return;
         isSwipeTracking = false;
-        const dx = e.changedTouches.at(0).clientX - touchStartX;
-        const dy = e.changedTouches.at(0).clientY - touchStartY;
-        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+        const t = e.changedTouches.item(0);
+        if (!t) return;
+        const dx = t.clientX - touchStartX;
+        const dy = t.clientY - touchStartY;
+        if (Math.abs(dx) > 36 && Math.abs(dx) > Math.abs(dy) * 1.2) {
           const dhikr = getCurrentDhikr(); if (!dhikr) return;
           const prog = getDhikrProgress(dhikr);
           if (dx > 0) {
