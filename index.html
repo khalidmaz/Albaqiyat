@@ -167,12 +167,15 @@
     body.reading-mode .count-number { font-size: 24px; color: #ffffff; }
     body.reading-mode .count-label { font-size: 9.5px; color: rgba(255,255,255,0.85); margin-top: 1px; }
 
-    /* تقويم الالتزام الشهري */
-    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
-    .cal-day { aspect-ratio: 1; border-radius: 8px; background: var(--bg-color); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
-    .cal-day.active-day { background: var(--primary-light); color: var(--primary-color); border-color: var(--primary-color); }
-    .cal-day.goal-day { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
-    .cal-day.today-ring { box-shadow: 0 0 0 2px var(--accent-color); }
+    /* بطاقة الالتزام الأسبوعي (آخر 7 أيام) */
+    .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 8px; }
+    .week-day-box { border-radius: 10px; background: var(--surface-color); border: 1px solid var(--border-color); padding: 6px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+    .week-day-box.active-day { background: var(--primary-light); color: var(--primary-color); border-color: var(--primary-color); }
+    .week-day-box.goal-day { background: var(--primary-color); color: #ffffff; border-color: var(--primary-color); }
+    .week-day-box.today-ring { box-shadow: 0 0 0 2px var(--accent-color); }
+    .week-day-name { font-size: 10.5px; font-weight: 800; opacity: 0.9; }
+    .week-day-cnt { font-size: 11px; font-weight: 800; }
+    .week-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--border-color); font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
 
     @media (orientation: landscape) and (max-height: 550px) {
       header { padding: 3px 12px; }
@@ -473,10 +476,13 @@
   </div>
   <div class="modal-backdrop" id="statsModal">
     <div class="modal-box">
-      <h3 class="modal-title">
-        <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>إحصائيات التسبيح</span>
-      </h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 class="modal-title" style="margin:0;">
+          <svg class="ico" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>إحصائيات التسبيح</span>
+        </h3>
+        <button type="button" onclick="closeModal('statsModal')" style="background:var(--primary-light); color:var(--primary-color); border:1px solid var(--primary-color); border-radius:10px; padding:5px 11px; font-size:13px; font-weight:800; cursor:pointer;">✕</button>
+      </div>
       <div class="stats-grid">
         <div class="stat-card"><div class="stat-val" id="statToday">0</div><div class="stat-lbl">تسبيحات اليوم</div></div>
         <div class="stat-card"><div class="stat-val" id="statTotal">0</div><div class="stat-lbl">الإجمالي الكلي</div></div>
@@ -493,10 +499,11 @@
       </div>
       <div style="background:var(--bg-color); border:1px solid var(--border-color); border-radius:12px; padding:10px 12px; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:12.5px; font-weight:800; color:var(--primary-color);">
-          <span id="calMonthTitle">تقويم الالتزام الشهري</span>
-          <span style="font-size:11px; color:var(--text-muted);">داكن: أتم الهدف • فاتح: سبّح</span>
+          <span id="calMonthTitle">الالتزام الأسبوعي (آخر 7 أيام)</span>
+          <span style="font-size:11px; color:var(--text-muted);">داكن: أتم الهدف</span>
         </div>
-        <div class="cal-grid" id="monthlyCalGrid"></div>
+        <div class="week-grid" id="monthlyCalGrid"></div>
+        <div class="week-summary-bar" id="weekSummaryBar"></div>
       </div>
 
     <div class="stats-section-title">
@@ -589,7 +596,7 @@
     </div>
   </div>
 
- <div class="modal-backdrop" id="deleteModal">
+<div class="modal-backdrop" id="deleteModal">
     <div class="modal-box">
       <h3 class="modal-title" style="color: var(--danger-color);">تأكيد الإجراء</h3>
       <p id="deleteMsg" style="font-size: 15px; line-height: 1.6; margin-bottom: 18px;"></p>
@@ -601,9 +608,9 @@
   </div>
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
         <h3 class="modal-title" style="margin:0;">المظهر والإعدادات</h3>
-        <button type="button" onclick="closeModal('settingsModal')" style="background:var(--primary-light); color:var(--primary-color); border:1px solid var(--primary-color); border-radius:12px; padding:7px 14px; font-size:14.5px; font-weight:800; cursor:pointer;">✕ إغلاق</button>
+        <button type="button" onclick="closeModal('settingsModal')" style="background:var(--primary-light); color:var(--primary-color); border:1px solid var(--primary-color); border-radius:10px; padding:5px 11px; font-size:13px; font-weight:800; cursor:pointer;">✕</button>
       </div>
       <div class="form-group">
         <label>اختر لون الواجهة</label>
@@ -861,7 +868,7 @@
         ]
       },
 
-   {
+      {
         id: 'daily_occasions_adhkar',
         title: 'أذكار الخروج والدخول والركوب والسفر',
         virtue: 'أذكار الخروج من المنزل ودخوله، ودعاء الركوب والسفر ودخول السوق من كتاب حصن المسلم.',
@@ -1198,7 +1205,7 @@
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-function getFilteredAdhkarEntries() {
+        function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1297,7 +1304,7 @@ function getFilteredAdhkarEntries() {
       fitDhikrTextToCard();
     }
 
-    function updateDailyGoalUI() {
+        function updateDailyGoalUI() {
       const track = document.getElementById('dailyGoalTrack');
       const fill = document.getElementById('dailyGoalFill');
       const pill = document.getElementById('goalCountdownPill');
@@ -1318,6 +1325,7 @@ function getFilteredAdhkarEntries() {
         pill.classList.toggle('running', rem === 0);
         txt.textContent = rem > 0 ? `متبقي ${rem}` : 'تم الهدف اليومي';
       }
+      if (rem === 0 && typeof checkDailyGoalCelebration === 'function') checkDailyGoalCelebration();
     }
     function updateProgressRing(current, target) {
       const circle = document.getElementById('progressCircle'), circumference = 578.05;
@@ -1873,7 +1881,7 @@ function getFilteredAdhkarEntries() {
       document.getElementById('shareCardModal').classList.add('open');
     }
 
-    async function shareGeneratedImage() {
+            async function shareGeneratedImage() {
       const dhikr = getCurrentDhikr();
       if (lastGeneratedBlob && navigator.canShare) {
         const file = new File([lastGeneratedBlob], 'al-baqiyat-story.png', { type: 'image/png' });
@@ -1887,25 +1895,49 @@ function getFilteredAdhkarEntries() {
       a.click();
       showSaveToast('تم حفظ صورة الستوري');
     }
+    function checkDailyGoalCelebration() {
+      const goal = state.dailyGoal || 0;
+      const todayCnt = state.stats.todayCount || 0;
+      if (goal <= 0 || todayCnt < goal) return;
+      const todayStr = getTodayStr();
+      const celebratedKey = 'tasbih_goal_celebrated_day';
+      if (localStorage.getItem(celebratedKey) !== todayStr) {
+        localStorage.setItem(celebratedKey, todayStr);
+        showSaveToast(`ما شاء الله! أتممت هدفك اليومي (${goal} تسبيحة)`, 3600);
+      }
+    }
     function renderMonthlyCalendar() {
       const grid = document.getElementById('monthlyCalGrid');
-      const titleEl = document.getElementById('calMonthTitle');
+      const summaryEl = document.getElementById('weekSummaryBar');
       if (!grid) return;
       grid.innerHTML = '';
-      const now = new Date(), year = now.getFullYear(), month = now.getMonth();
-      const monthsAr = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-      if (titleEl) titleEl.textContent = `تقويم الالتزام • ${monthsAr[month]} ${year}`;
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysAr = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
       const hist = state.stats.history || {};
       const todayStr = getTodayStr();
       const goal = state.dailyGoal || 1000;
-      for (let d = 1; d <= daysInMonth; d++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-        const cnt = dateStr === todayStr ? (state.stats.todayCount || 0) : (hist[dateStr] || 0);
-        const cell = document.createElement('div');
-        cell.className = 'cal-day' + (cnt >= goal && goal > 0 ? ' goal-day' : (cnt > 0 ? ' active-day' : '')) + (dateStr === todayStr ? ' today-ring' : '');
-        cell.textContent = d;
-        grid.appendChild(cell);
+      let weekTotal = 0, bestDayName = '', bestDayCnt = 0;
+
+      for (let offset = 6; offset >= 0; offset--) {
+        const dObj = new Date();
+        dObj.setDate(dObj.getDate() - offset);
+        const dateStr = `${dObj.getFullYear()}-${String(dObj.getMonth() + 1).padStart(2, '0')}-${String(dObj.getDate()).padStart(2, '0')}`;
+        const isToday = dateStr === todayStr;
+        const cnt = isToday ? (state.stats.todayCount || 0) : (hist[dateStr] || 0);
+        const dayName = isToday ? 'اليوم' : daysAr[dObj.getDay()];
+
+        weekTotal += cnt;
+        if (cnt > bestDayCnt) { bestDayCnt = cnt; bestDayName = dayName; }
+
+        const box = document.createElement('div');
+        const reachedGoal = goal > 0 && cnt >= goal;
+        box.className = 'week-day-box' + (reachedGoal ? ' goal-day' : (cnt > 0 ? ' active-day' : '')) + (isToday ? ' today-ring' : '');
+        const shortCnt = cnt >= 1000 ? (cnt / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : cnt;
+        box.innerHTML = `<span class="week-day-name">${dayName}</span><span class="week-day-cnt">${shortCnt}</span>`;
+        grid.appendChild(box);
+      }
+      if (summaryEl) {
+        summaryEl.innerHTML = `<span>مجموع الأسبوع: <strong style="color:var(--primary-color);">${weekTotal}</strong></span>` +
+          (bestDayCnt > 0 ? `<span>الأكثر: <strong style="color:var(--primary-color);">${bestDayName} (${bestDayCnt})</strong></span>` : '<span>ابدأ وردك اليوم</span>');
       }
     }
     (function setupCardSwipe() {
@@ -1916,22 +1948,22 @@ function getFilteredAdhkarEntries() {
           return;
         }
         if (e.touches && e.touches.length === 1) {
-          touchStartX = e.touches[0].clientX;
-          touchStartY = e.touches[0].clientY;
+          touchStartX = e.touches.at(0).clientX;
+          touchStartY = e.touches.at(0).clientY;
           isSwipeTracking = true;
         }
       }, { passive: true });
       document.addEventListener('touchmove', (e) => {
         if (!isSwipeTracking || !e.touches || e.touches.length !== 1) return;
-        const dx = Math.abs(e.touches[0].clientX - touchStartX);
-        const dy = Math.abs(e.touches[0].clientY - touchStartY);
+        const dx = Math.abs(e.touches.at(0).clientX - touchStartX);
+        const dy = Math.abs(e.touches.at(0).clientY - touchStartY);
         if (dy > 18 && dy > dx) isSwipeTracking = false;
       }, { passive: true });
       document.addEventListener('touchend', (e) => {
         if (!isSwipeTracking || !e.changedTouches || e.changedTouches.length === 0) return;
         isSwipeTracking = false;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        const dy = e.changedTouches[0].clientY - touchStartY;
+        const dx = e.changedTouches.at(0).clientX - touchStartX;
+        const dy = e.changedTouches.at(0).clientY - touchStartY;
         if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy) * 1.4) {
           const dhikr = getCurrentDhikr(); if (!dhikr) return;
           const prog = getDhikrProgress(dhikr);
@@ -1946,13 +1978,21 @@ function getFilteredAdhkarEntries() {
       }, { passive: true });
     })();
 
-        function getRemainingToCompleteDhikr(dhikr) {
+                        function getRemainingToCompleteDhikr(dhikr) {
       if (!dhikr.steps.some(s => s.target > 0)) return null;
       const prog = getDhikrProgress(dhikr); let totalRem = 0;
       dhikr.steps.forEach((st, idx) => {
         if (st.target > 0) totalRem += (idx < prog.stepIndex) ? 0 : (idx === prog.stepIndex ? prog.stepCounts[idx] : st.target);
       });
       return totalRem;
+    }
+    function jumpToDhikrFromStats(dhikrIdx, stepIdx = -1) {
+      closeModal('statsModal');
+      state.activeListId = 'all';
+      selectDhikr(dhikrIdx);
+      if (typeof stepIdx === 'number' && stepIdx >= 0) {
+        jumpToStep(stepIdx);
+      }
     }
     function openStatsModal() {
       checkStatsDate();
@@ -1971,10 +2011,11 @@ function getFilteredAdhkarEntries() {
       const readListEl = document.getElementById('statsReadList'), unreadListEl = document.getElementById('statsUnreadList');
       readListEl.innerHTML = ''; unreadListEl.innerHTML = '';
       const details = state.stats.dailyDetails || {}; let hasReadAny = false, hasUnreadAny = false;
-      state.adhkar.forEach((dhikr) => {
+      state.adhkar.forEach((dhikr, dIdx) => {
         const entry = details[dhikr.id], totalDone = entry ? (entry.total || 0) : 0, prog = getDhikrProgress(dhikr);
         if (totalDone > 0) {
-          hasReadAny = true; const card = document.createElement('div'); card.className = 'stat-detail-card';
+          hasReadAny = true; const card = document.createElement('div'); card.className = 'stat-detail-card'; card.style.cursor = 'pointer';
+          card.onclick = () => jumpToDhikrFromStats(dIdx, -1);
           const durText = (entry.durationMs && entry.durationMs > 0) ? ` • ${formatDuration(entry.durationMs)}` : '';
           const totalRem = getRemainingToCompleteDhikr(dhikr); let remStatusHtml = '';
           if (totalRem !== null) {
@@ -1993,21 +2034,33 @@ function getFilteredAdhkarEntries() {
               else if (hasActiveProgress(dhikr) && sIdx > prog.stepIndex) stepRemTag = ` <span style="color:var(--text-muted); font-size:11px;">(متبقي ${st.target})</span>`;
             }
             const stName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
-            stepsHtml += `<div class="stat-step-row"><span class="stat-step-name">${stName}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag}</span></div>`;
+            stepsHtml += `<div class="stat-step-row" onclick="event.stopPropagation(); jumpToDhikrFromStats(${dIdx}, ${sIdx});" style="padding:3px 0; cursor:pointer;"><span class="stat-step-name" style="color:var(--text-main);">${stName}: ${shortTxt}</span><span style="font-weight:700; color:${stCount > 0 ? 'var(--primary-color)' : 'var(--text-muted)'};">${stCount} مرة${stepRemTag} ←</span></div>`;
           });
-          card.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge">${totalDone} مرة${durText}</span></div>${remStatusHtml}<div class="stat-steps-list">${stepsHtml}</div>`;
+          card.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">${totalDone} مرة${durText} ←</span></div>${remStatusHtml}<div class="stat-steps-list">${stepsHtml}</div>`;
           readListEl.appendChild(card);
         }
         const unreadSteps = new Array();
         dhikr.steps.forEach((st, sIdx) => {
           const stCount = (entry && entry.steps && entry.steps[sIdx]) ? entry.steps[sIdx] : 0;
           const uStName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${sIdx + 1}`;
-          if (stCount === 0) unreadSteps.push(`${uStName}: ${st.text.length > 26 ? st.text.slice(0, 26) + '...' : st.text}`);
+          if (stCount === 0) {
+            unreadSteps.push({
+              sIdx: sIdx,
+              label: `${uStName}: ${st.text.length > 26 ? st.text.slice(0, 26) + '...' : st.text}`
+            });
+          }
         });
         if (totalDone === 0 || unreadSteps.length > 0) {
-          hasUnreadAny = true; const uCard = document.createElement('div'); uCard.className = 'stat-detail-card'; uCard.style.opacity = '0.85';
-          if (totalDone === 0) uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">لم يُقرأ بعد</span></div>`;
-          else uCard.innerHTML = `<div class="stat-detail-header"><span>${dhikr.title}</span><span class="stat-badge" style="background:var(--surface-color); color:var(--text-muted); border:1px solid var(--border-color);">خطوات متبقية</span></div><div class="stat-steps-list">${unreadSteps.map(s => `<div>• ${s}</div>`).join('')}</div>`;
+          hasUnreadAny = true; const uCard = document.createElement('div'); uCard.className = 'stat-detail-card'; uCard.style.cursor = 'pointer';
+          if (totalDone === 0) {
+            uCard.onclick = () => jumpToDhikrFromStats(dIdx, 0);
+            uCard.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">ابدأ القراءة ←</span></div>`;
+          } else {
+            const firstUnreadIdx = unreadSteps.at(0).sIdx;
+            uCard.onclick = () => jumpToDhikrFromStats(dIdx, firstUnreadIdx);
+            const stepsLinksHtml = unreadSteps.map(s => `<div onclick="event.stopPropagation(); jumpToDhikrFromStats(${dIdx}, ${s.sIdx});" style="padding:3px 0; cursor:pointer; color:var(--primary-color); font-weight:700;">• ${s.label} ←</div>`).join('');
+            uCard.innerHTML = `<div class="stat-detail-header"><span style="color:var(--primary-color);">${dhikr.title}</span><span class="stat-badge">خطوات متبقية ←</span></div><div class="stat-steps-list">${stepsLinksHtml}</div>`;
+          }
           unreadListEl.appendChild(uCard);
         }
       });
@@ -2333,3 +2386,4 @@ function getFilteredAdhkarEntries() {
   </script>
 </body>
 </html>
+
