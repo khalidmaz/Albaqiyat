@@ -1629,52 +1629,51 @@ function getFilteredAdhkarEntries() {
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
 
-            let lastGeneratedBlob = null;
-    const APP_QR_MATRIX = [
-      "11111110110011001010101111111",
-      "10000010110111100101001000001",
-      "10111010111001000011001011101",
-      "10111010000110011101101011101",
-      "10111010000100100111101011101",
-      "10000010110111011101001000001",
-      "11111110101010101010101111111",
-      "00000000000001010000000000000",
-      "11101110111001000000111010110",
-      "01110101000011110110100000001",
-      "00100110101111010110010101111",
-      "01011001001110110111100000011",
-      "11011010101100100100011011010",
-      "01110000100110110011111011101",
-      "11110011111010001111111110101",
-      "00000100100010100010000111100",
-      "00110110111111001010010011111",
-      "10010100111010111001010011001",
-      "10001110101111101000110010100",
-      "00110001001100111000011011111",
-      "00101111111101110110111110111",
-      "00000000111011011101100011111",
-      "11111110100000000001101010010",
-      "10000010111100100000100010100",
-      "10111010110111110100111110011",
-      "10111010011010111010111100010",
-      "10111010011000011110001111011",
-      "10000010111000000101010110010",
-      "11111110110101011001110100110"
-    ];
-    function drawEmbeddedAppQr(ctx, x, y, size, fgColor, bgColor) {
-      const count = APP_QR_MATRIX.length;
-      const cell = size / count;
-      ctx.fillStyle = bgColor;
-      ctx.fillRect(x, y, size, size);
-      ctx.fillStyle = fgColor;
-      for (let r = 0; r < count; r++) {
-        for (let c = 0; c < count; c++) {
-          if (APP_QR_MATRIX[r][c] === '1') {
-            ctx.fillRect(x + c * cell, y + r * cell, Math.ceil(cell), Math.ceil(cell));
-          }
+                let lastGeneratedBlob = null;
+    const APP_SHARE_URL = 'https://github.io';
+    const QR_STORAGE_KEY = 'tasbih_cached_qr_v1';
+
+    function loadAppQrImage() {
+      return new Promise((resolve) => {
+        const cachedDataUrl = localStorage.getItem(QR_STORAGE_KEY);
+        if (cachedDataUrl && cachedDataUrl.startsWith('data:image/')) {
+          const cachedImg = new Image();
+          cachedImg.onload = () => resolve(cachedImg);
+          cachedImg.onerror = () => {
+            localStorage.removeItem(QR_STORAGE_KEY);
+            resolve(null);
+          };
+          cachedImg.src = cachedDataUrl;
+          return;
         }
-      }
+        const encoded = encodeURIComponent(APP_SHARE_URL);
+        const urls = [
+          `https://qrserver.com{encoded}`,
+          `https://quickchart.io{encoded}`
+        ];
+        let idx = 0;
+        function tryNext() {
+          if (idx >= urls.length) { resolve(null); return; }
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            try {
+              const c = document.createElement('canvas');
+              c.width = img.naturalWidth || 260;
+              c.height = img.naturalHeight || 260;
+              c.getContext('2d').drawImage(img, 0, 0);
+              localStorage.setItem(QR_STORAGE_KEY, c.toDataURL('image/png'));
+            } catch (e) {}
+            resolve(img);
+          };
+          img.onerror = () => { idx++; tryNext(); };
+          img.src = urls[idx];
+        }
+        tryNext();
+      });
     }
+    setTimeout(() => { loadAppQrImage(); }, 1500);
+
     function wrapCanvasText(ctx, text, maxWidth) {
       const words = (text || '').split(/\s+/).filter(Boolean);
       const lines = []; let curLine = '';
@@ -1686,7 +1685,8 @@ function getFilteredAdhkarEntries() {
       if (curLine) lines.push(curLine);
       return lines;
     }
-    function generateDhikrShareImage() {
+
+    async function generateDhikrShareImage() {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
       const step = dhikr.steps[prog.stepIndex] || { text: '' };
@@ -1697,6 +1697,8 @@ function getFilteredAdhkarEntries() {
       const textCol = styles.getPropertyValue('--text-main').trim() || '#1b2a22';
       const mutedCol = styles.getPropertyValue('--text-muted').trim() || '#5c7065';
       const accCol = styles.getPropertyValue('--accent-color').trim() || '#d4af37';
+
+      const qrImg = await loadAppQrImage();
 
       const canvas = document.createElement('canvas');
       canvas.width = 1080; canvas.height = 1920;
@@ -1767,16 +1769,22 @@ function getFilteredAdhkarEntries() {
       ctx.font = 'bold 34px Tajawal, sans-serif';
       ctx.fillText('تطبيق الباقيات • للأذكار والتسبيح', 540, 1580);
 
-      const qrSize = 176;
-      const qrX = (1080 - qrSize) / 2;
-      const qrY = 1608;
-      ctx.fillStyle = surfCol;
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24, 20);
-      else ctx.fillRect(qrX - 12, qrY - 12, qrSize + 24, qrSize + 24);
-      ctx.fill();
-      ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
-      drawEmbeddedAppQr(ctx, qrX, qrY, qrSize, primCol, surfCol);
+      if (qrImg) {
+        const qrSize = 186;
+        const qrX = (1080 - qrSize) / 2;
+        const qrY = 1605;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 20);
+        else ctx.fillRect(qrX - 10, qrY - 10, qrSize + 20, qrSize + 20);
+        ctx.fill();
+        ctx.strokeStyle = accCol; ctx.lineWidth = 3; ctx.stroke();
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+      } else {
+        ctx.fillStyle = mutedCol;
+        ctx.font = 'bold 26px Tajawal, sans-serif';
+        ctx.fillText('khalidmaz.github.io/Albaqiyat', 540, 1650);
+      }
 
       const dataUrl = canvas.toDataURL('image/png');
       document.getElementById('shareCardPreview').src = dataUrl;
