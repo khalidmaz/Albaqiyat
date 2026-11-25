@@ -129,7 +129,8 @@
     .continuous-list { display: none; flex-direction: column; gap: 10px; width: 100%; padding: 4px 0; }
     body.continuous-mode .continuous-list { display: flex; }
     body.continuous-mode #dhikrText, body.continuous-mode .ring-wrapper, body.continuous-mode .steps-pills { display: none !important; }
-    body.continuous-mode .counter-zone { padding: 4px 8px; margin: 2px 0; border-radius: 14px; background: var(--primary-light); border: 2px dashed var(--primary-color); }
+    body.continuous-mode .counter-zone,
+    body.reading-mode.continuous-mode .counter-zone { padding: 6px 10px; margin: 4px 0; border-radius: 16px; background: var(--primary-light); border: 2px dashed var(--primary-color); }
     body.continuous-mode .card-top { justify-content: space-between; width: 100%; }
     body.continuous-mode .card-top .fav-icon-btn { width: 34px; height: 28px; }
     .cont-step-card { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 11px 12px; transition: border-color 0.2s, opacity 0.2s; display: flex; flex-direction: column; }
@@ -177,52 +178,48 @@
     .week-day-cnt { font-size: 11px; font-weight: 800; }
     .week-summary-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 7px; border-top: 1px dashed var(--border-color); font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
 
-    @media (orientation: landscape) and (max-height: 550px) {
-      header { padding: 3px 12px; }
-      .tabs-wrapper { padding: 3px 12px; }
+    @media (orientation: landscape) and (min-width: 560px) {
       main {
         display: grid;
-        grid-template-columns: 1fr 175px;
+        grid-template-columns: 1fr 195px;
         grid-template-rows: 1fr auto;
-        column-gap: 10px;
-        row-gap: 4px;
-        padding: 2px 12px 5px;
+        column-gap: 12px;
+        row-gap: 6px;
+        padding: 4px 14px 8px;
       }
-      .card { grid-column: 1; grid-row: 1; padding: 5px 10px; }
-      .card-top { margin-bottom: 2px; padding-bottom: 4px; }
-      .bottom-controls { grid-column: 1; grid-row: 2; gap: 6px; }
-      .ctrl-btn { padding: 5px 6px; font-size: 12px; }
+      .card { grid-column: 1; grid-row: 1; }
+      .bottom-controls { grid-column: 1; grid-row: 2; }
       .landscape-swap-btn { display: inline-flex; }
 
       /* إخفاء الزر الداخلي في وضع السرد أثناء الوضع العرضي والاكتفاء بالعداد الدائري */
       body.continuous-mode .cont-step-footer { display: none !important; }
       body.continuous-mode .cont-step-card { cursor: pointer; }
 
-      /* توحيد شكل العداد الدائري الكبير وأزراره في كل الأوضاع العرضية */
+      /* توحيد شكل العداد الدائري الكبير وأزراره في كل الأوضاع العرضية (آيفون وآيباد) */
       .counter-zone,
       body.reading-mode .counter-zone,
       body.continuous-mode .counter-zone,
       body.reading-mode.continuous-mode .counter-zone {
-        grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 6px 4px;
+        grid-column: 2; grid-row: 1 / 3; margin: 0; padding: 8px 6px;
         display: flex !important; flex-direction: column; align-items: center; justify-content: space-evenly;
-        gap: 5px; background: var(--primary-light); border: 2px dashed var(--primary-color); border-radius: 22px;
+        gap: 6px; background: var(--primary-light); border: 2px dashed var(--primary-color); border-radius: 22px;
       }
       .counter-top-bar,
       body.reading-mode .counter-top-bar,
       body.continuous-mode .counter-top-bar {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 5px; width: 100%;
+        gap: 6px; width: 100%;
       }
       .timer-pill, .auto-tap-btn, .undo-tap-btn {
-        padding: 3px 8px; font-size: 10.5px; width: 94%; justify-content: center;
+        padding: 4px 8px; font-size: 11px; width: 92%; justify-content: center;
       }
-      .quick-targets-bar { gap: 3px; }
-      .qt-btn { padding: 2px 6px; font-size: 10px; }
+      .quick-targets-bar { gap: 4px; }
+      .qt-btn { padding: 3px 7px; font-size: 10.5px; }
       .ring-wrapper,
       body.reading-mode .ring-wrapper,
       body.continuous-mode .ring-wrapper,
       body.reading-mode.continuous-mode .ring-wrapper {
-        display: flex !important; width: 148px; height: 148px;
+        display: flex !important; width: 156px; height: 156px;
         background: transparent; border-radius: 50%; margin: 2px auto 0;
       }
       .progress-svg,
@@ -230,18 +227,32 @@
       body.continuous-mode .progress-svg { display: block !important; }
       .count-number,
       body.reading-mode .count-number,
-      body.continuous-mode .count-number { font-size: 38px; color: var(--primary-color); }
+      body.continuous-mode .count-number { font-size: 40px; color: var(--primary-color); }
       .count-label,
       body.reading-mode .count-label,
-      body.continuous-mode .count-label { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
-      .virtue-box { display: none !important; }
+      body.continuous-mode .count-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-      main.landscape-swap { grid-template-columns: 175px 1fr; }
+      main.landscape-swap { grid-template-columns: 195px 1fr; }
       main.landscape-swap .card { grid-column: 2; }
       main.landscape-swap .bottom-controls { grid-column: 2; }
       main.landscape-swap .counter-zone,
       body.reading-mode main.landscape-swap .counter-zone,
       body.continuous-mode main.landscape-swap .counter-zone { grid-column: 1; }
+    }
+
+    @media (orientation: landscape) and (max-height: 550px) {
+      header { padding: 3px 12px; }
+      .tabs-wrapper { padding: 3px 12px; }
+      main { padding: 2px 12px 5px; row-gap: 4px; }
+      .card { padding: 5px 10px; }
+      .card-top { margin-bottom: 2px; padding-bottom: 4px; }
+      .bottom-controls { gap: 6px; }
+      .ctrl-btn { padding: 5px 6px; font-size: 12px; }
+      .ring-wrapper,
+      body.reading-mode .ring-wrapper,
+      body.continuous-mode .ring-wrapper,
+      body.reading-mode.continuous-mode .ring-wrapper { width: 146px; height: 146px; }
+      .virtue-box { display: none !important; }
     }
 
       .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
@@ -1214,7 +1225,7 @@
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-        function getFilteredAdhkarEntries() {
+    function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1240,15 +1251,16 @@
       const cardBody = document.querySelector('.card-body');
       const textEl = document.getElementById('dhikrText');
       if (!cardBody || !textEl || document.body.classList.contains('continuous-mode')) return;
-      const isLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 550;
+      const isPhoneLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 550;
+      const isTabletLandscape = window.innerWidth > window.innerHeight && window.innerHeight > 550;
       const isReading = document.body.classList.contains('reading-mode');
-      let size = state.fontSize + (isLandscape ? 16 : (isReading ? 4 : 2));
+      let size = state.fontSize + (isPhoneLandscape ? 16 : (isTabletLandscape ? 6 : (isReading ? 4 : 2)));
       textEl.style.fontSize = size + 'px';
-      textEl.style.lineHeight = isLandscape ? '1.48' : (size > 24 ? '1.85' : '1.75');
+      textEl.style.lineHeight = isPhoneLandscape ? '1.48' : (size > 24 ? '1.85' : '1.75');
       while (cardBody.scrollHeight > cardBody.clientHeight + 1 && size > 15) {
         size -= 0.5;
         textEl.style.fontSize = size + 'px';
-        if (!isLandscape) {
+        if (!isPhoneLandscape) {
           if (size <= 23) textEl.style.lineHeight = '1.7';
           if (size <= 20) textEl.style.lineHeight = '1.62';
         }
@@ -1556,7 +1568,7 @@
       }
     }
 
-            function toggleContinuousMode(forceState) {
+                function toggleContinuousMode(forceState) {
       const isActive = (typeof forceState === 'boolean')
         ? document.body.classList.toggle('continuous-mode', forceState)
         : document.body.classList.toggle('continuous-mode');
@@ -1598,7 +1610,7 @@
           tapContinuousStep(sIdx);
         };
         card.onclick = () => {
-          if (window.innerWidth > window.innerHeight && window.innerHeight <= 550 && prog.stepIndex !== sIdx) {
+          if (window.innerWidth > window.innerHeight && window.innerWidth >= 560 && prog.stepIndex !== sIdx) {
             jumpToStep(sIdx);
           }
         };
