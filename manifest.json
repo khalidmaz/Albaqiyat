@@ -11,7 +11,7 @@
   "lang": "ar",
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://w3.org' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23F7C616'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='28'%3E%3Ccircle cx='256' cy='116' r='36'/%3E%3Ccircle cx='365.5' cy='168.7' r='36'/%3E%3Ccircle cx='392.5' cy='287.1' r='36'/%3E%3Ccircle cx='316.7' cy='382.1' r='36'/%3E%3Ccircle cx='195.3' cy='382.1' r='36'/%3E%3Ccircle cx='119.5' cy='287.1' r='36'/%3E%3Ccircle cx='146.5' cy='168.7' r='36'/%3E%3C/g%3E%3C/svg%3E",
+      "src": "./icon.svg",
       "sizes": "192x192 512x512 any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
