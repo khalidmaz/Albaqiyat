@@ -15,7 +15,7 @@
   <script>var l=document.createElement('link');l.rel='stylesheet';l.href='https'+':/'+'/fonts.googleapis.'+'com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap';document.head.appendChild(l);</script>
   <style>
 
-   :root {
+         :root {
       --bg-color: #f4f7f5; --surface-color: #ffffff; --primary-color: #0f5132;
       --primary-light: #e6f2ec; --accent-color: #d4af37; --text-main: #1b2a22;
       --text-muted: #5c7065; --border-color: #dce6e0; --danger-color: #dc3545;
@@ -29,12 +29,12 @@
     [data-theme="pink-light"] { --bg-color: #fdf2f8; --surface-color: #ffffff; --primary-color: #be185d; --primary-light: #fce7f3; --accent-color: #d97706; --text-main: #4a152e; --text-muted: #83385b; --border-color: #fbcfe8; }
     [data-theme="twilight-marigold"] { --bg-color: #282a3a; --surface-color: #36384c; --primary-color: #ffb81c; --primary-light: #474a63; --accent-color: #ffd166; --text-main: #f8f9fc; --text-muted: #b8b7cc; --border-color: #4f526e; }
     [data-theme="raven-apricot"] { --bg-color: #1b2826; --surface-color: #253633; --primary-color: #ff8a1f; --primary-light: #314743; --accent-color: #8d9e99; --text-main: #f2f7f5; --text-muted: #9eb0ab; --border-color: #3b5450; }
-    [data-theme="ricotta-prussian"] { --bg-color: #e8e3d5; --surface-color: #f7f4ec; --primary-color: #1e3552; --primary-light: #dcd6c6; --accent-color: #f03a2a; --text-main: #182a42; --text-muted: #52637a; --border-color: #cfc8b6; }
+    [data-theme="ricotta-prussian"] { --bg-color: #ebe6d8; --surface-color: #f9f6ee; --primary-color: #16304c; --primary-light: #e0dad0; --accent-color: #f03a2a; --text-main: #12263d; --text-muted: #4b617a; --border-color: #d3ccbe; }
     [data-theme="aubergine-cyan"] { --bg-color: #2e232e; --surface-color: #3d2f3d; --primary-color: #00d4e3; --primary-light: #4d3b4d; --accent-color: #dfd3c3; --text-main: #f7f3ee; --text-muted: #cbbba8; --border-color: #574357; }
     [data-theme="outer-space-red"] { --bg-color: #131b3a; --surface-color: #1c2752; --primary-color: #ff4e45; --primary-light: #28366e; --accent-color: #ffffff; --text-main: #f8fafc; --text-muted: #9eb0d6; --border-color: #2f4080; }
     [data-theme="plum-milk"] { --bg-color: #fff3e6; --surface-color: #ffffff; --primary-color: #381932; --primary-light: #f5e1d3; --accent-color: #8c3b68; --text-main: #2b1226; --text-muted: #6e4a63; --border-color: #ebd5c5; }
     [data-theme="charcoal-orange"] { --bg-color: #262626; --surface-color: #323232; --primary-color: #fc6f20; --primary-light: #42352e; --accent-color: #fee8d0; --text-main: #fee8d0; --text-muted: #c7b4a1; --border-color: #474747; }
-    [data-theme="meringue-clementine"] { --bg-color: #e6e2d6; --surface-color: #f5f2ea; --primary-color: #1d3557; --primary-light: #dce0e6; --accent-color: #ff6a1f; --text-main: #162842; --text-muted: #52647d; --border-color: #cfc9ba; }
+    [data-theme="meringue-clementine"] { --bg-color: #14243b; --surface-color: #1b314f; --primary-color: #ff6a1f; --primary-light: #243f63; --accent-color: #eae5d8; --text-main: #eae5d8; --text-muted: #b8c4d4; --border-color: #2d4c75; }
     [data-theme="bone-oxblood"] { --bg-color: #eae6df; --surface-color: #f7f5f0; --primary-color: #4a1a1f; --primary-light: #e6d8d9; --accent-color: #8f323b; --text-main: #2e1013; --text-muted: #6e4e51; --border-color: #d6cfc5; }
     [data-theme="abyss-sand"] { --bg-color: #142d2d; --surface-color: #1c3d3d; --primary-color: #d8c3a2; --primary-light: #274f4f; --accent-color: #e8d7bc; --text-main: #f5efe6; --text-muted: #a6bdb8; --border-color: #2c5959; }
     [data-theme="carbon-silver"] { --bg-color: #141414; --surface-color: #222222; --primary-color: #d3d5d9; --primary-light: #333436; --accent-color: #ffffff; --text-main: #f4f5f7; --text-muted: #9ea1a8; --border-color: #38393d; }
@@ -569,7 +569,24 @@
     </div>
   </div>
 
-    <div class="modal-backdrop" id="virtueLibraryModal">
+        <div class="modal-backdrop" id="quickListsModal" onclick="closeModal('quickListsModal')">
+    <div class="modal-box" style="max-width:350px;" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 class="modal-title" style="margin:0; font-size:16.5px;">حفظ الذكر في القوائم</h3>
+        <button type="button" onclick="closeModal('quickListsModal')" style="background:var(--primary-light); color:var(--primary-color); border:1px solid var(--primary-color); border-radius:10px; padding:4px 10px; font-size:13px; font-weight:800; cursor:pointer;">✕</button>
+      </div>
+      <p id="quickListsDhikrName" style="font-size:12.5px; color:var(--text-muted); font-weight:700; margin:0 0 10px;"></p>
+      <div id="quickListsCheckboxes" style="display:flex; flex-direction:column; gap:7px; margin-bottom:12px;"></div>
+      <div style="display:flex; gap:6px; margin-bottom:10px;">
+        <input type="text" id="quickNewListInput" placeholder="اسم مفضلة / قائمة جديدة..." style="padding:7px 10px; font-size:13.5px;">
+        <button type="button" class="ctrl-btn primary" style="padding:7px 12px; font-size:13px;" onclick="createQuickListFromStar()">+ إنشاء</button>
+      </div>
+      <div class="modal-actions" style="margin-top:8px;">
+        <button type="button" class="ctrl-btn primary" style="flex:1;" onclick="closeModal('quickListsModal')">تم</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="virtueLibraryModal">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
         <h3 class="modal-title" style="margin:0;">
@@ -647,7 +664,7 @@
     </div>
   </div>
 
-<div class="modal-backdrop" id="deleteModal">
+<div class="modal-backdrop" id="deleteModal" style="z-index: 120;">
     <div class="modal-box">
       <h3 class="modal-title" style="color: var(--danger-color);">تأكيد الإجراء</h3>
       <p id="deleteMsg" style="font-size: 15px; line-height: 1.6; margin-bottom: 18px;"></p>
@@ -674,12 +691,12 @@
           <div class="theme-option" data-t="pink-light" onclick="setTheme('pink-light')">وردي ناعم</div>
           <div class="theme-option" data-t="twilight-marigold" onclick="setTheme('twilight-marigold')">نيلي الغسق</div>
           <div class="theme-option" data-t="raven-apricot" onclick="setTheme('raven-apricot')">تركواز مشمشي</div>
-          <div class="theme-option" data-t="ricotta-prussian" onclick="setTheme('ricotta-prussian')">كريمي وأزرق</div>
+          <div class="theme-option" data-t="ricotta-prussian" onclick="setTheme('ricotta-prussian')">كريمي وأزرق وأحمر</div>
           <div class="theme-option" data-t="aubergine-cyan" onclick="setTheme('aubergine-cyan')">برقوقي وتركواز</div>
           <div class="theme-option" data-t="outer-space-red" onclick="setTheme('outer-space-red')">أزرق فضائي وأحمر</div>
           <div class="theme-option" data-t="plum-milk" onclick="setTheme('plum-milk')">خوخي وحليبي</div>
           <div class="theme-option" data-t="charcoal-orange" onclick="setTheme('charcoal-orange')">فحمي وبرتقالي</div>
-          <div class="theme-option" data-t="meringue-clementine" onclick="setTheme('meringue-clementine')">كريمي وكحلي بحري</div>
+          <div class="theme-option" data-t="meringue-clementine" onclick="setTheme('meringue-clementine')">كريمي وكحلي وبرتقالي</div>
           <div class="theme-option" data-t="bone-oxblood" onclick="setTheme('bone-oxblood')">كتاني وعنابي</div>
           <div class="theme-option" data-t="abyss-sand" onclick="setTheme('abyss-sand')">تركواز عميق ورملي</div>
           <div class="theme-option" data-t="carbon-silver" onclick="setTheme('carbon-silver')">كربوني وفضي لؤلؤي</div>
@@ -1433,7 +1450,7 @@
       showSaveToast(newTarget > 0 ? `الهدف: ${newTarget}` : 'العداد المفتوح');
     }
 
-            let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
+                        let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
     function render(skipCloud = false) {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
@@ -1515,10 +1532,9 @@
         }
       }
 
-      const favList = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
-      const isFav = favList && Array.isArray(favList.ids) && favList.ids.includes(dhikr.id);
+      const isInAnyList = state.lists.some(l => Array.isArray(l.ids) && l.ids.includes(dhikr.id));
       const favBtn = document.getElementById('favToggleBtn');
-      if (favBtn) favBtn.classList.toggle('fav-active', isFav);
+      if (favBtn) favBtn.classList.toggle('fav-active', isInAnyList);
 
       const textEl = document.getElementById('dhikrText');
       if (textEl && textEl.textContent !== step.text) textEl.textContent = step.text;
@@ -2256,7 +2272,7 @@
       saveState(false);
     }
 
-                            let modalSelectedListId = 'all';
+    let modalSelectedListId = 'all';
     function normalizeArabicForSearch(str) {
       return (str || '')
         .replace(/[\u064B-\u065F\u0670\u0640]/g, '')
@@ -2446,10 +2462,18 @@
     function deleteCustomList(listId, e) {
       if (e) e.stopPropagation();
       if (listId === 'fav') return;
-      state.lists = state.lists.filter(l => l.id !== listId);
-      if (state.activeListId === listId) state.activeListId = 'all';
-      if (modalSelectedListId === listId) modalSelectedListId = state.activeListId;
-      saveState(true, 'تم حذف القائمة'); renderIndexModalList(); render();
+      const targetList = state.lists.find(l => l.id === listId);
+      if (!targetList) return;
+      document.getElementById('deleteMsg').textContent = `هل أنت متأكد من حذف قائمة "${targetList.name}"؟ (ستبقى الأذكار محفوظة في «الكل»)`;
+      state.pendingConfirmAction = () => {
+        state.lists = state.lists.filter(l => l.id !== listId);
+        if (state.activeListId === listId) state.activeListId = 'all';
+        if (modalSelectedListId === listId) modalSelectedListId = state.activeListId;
+        saveState(true, 'تم حذف القائمة');
+        if (document.getElementById('indexModal')?.classList.contains('open')) renderIndexModalList();
+        render();
+      };
+      document.getElementById('deleteModal').classList.add('open');
     }
     function toggleDhikrInList(dhikrId, listId, e) {
       if (e) e.stopPropagation();
@@ -2457,14 +2481,48 @@
       if (!Array.isArray(list.ids)) list.ids = new Array();
       const idx = list.ids.indexOf(dhikrId);
       if (idx >= 0) { list.ids.splice(idx, 1); showSaveToast(`أُزيل من ${list.name}`); }
-      else { list.ids.push(dhikrId); if (modalSelectedListId !== 'all') state.activeListId = modalSelectedListId; showSaveToast(`أُضيف إلى ${list.name}`); }
-      renderIndexModalList(); render();
+      else { list.ids.push(dhikrId); showSaveToast(`أُضيف إلى ${list.name}`); }
+      if (document.getElementById('quickListsModal')?.classList.contains('open')) renderQuickListsCheckboxes();
+      if (document.getElementById('indexModal')?.classList.contains('open')) renderIndexModalList();
+      render();
+    }
+    function renderQuickListsCheckboxes() {
+      const dhikr = getCurrentDhikr(); if (!dhikr) return;
+      const nameEl = document.getElementById('quickListsDhikrName');
+      if (nameEl) nameEl.textContent = `الذكر الحالي: ${dhikr.title}`;
+      const box = document.getElementById('quickListsCheckboxes');
+      if (!box) return;
+      box.innerHTML = '';
+      state.lists.forEach(l => {
+        const isChecked = Array.isArray(l.ids) && l.ids.includes(dhikr.id);
+        const row = document.createElement('label');
+        row.className = 'switch-row';
+        row.style.cssText = 'margin-bottom:0; padding:9px 12px;' + (isChecked ? 'border-color:var(--primary-color); background:var(--primary-light);' : '');
+        row.innerHTML = `<span style="font-size:13.5px; color:var(--text-main);">${l.name} <span style="font-size:11.5px; color:var(--text-muted);">(${Array.isArray(l.ids) ? l.ids.length : 0})</span></span><input type="checkbox" ${isChecked ? 'checked' : ''} style="width:19px; height:19px; accent-color:var(--primary-color); cursor:pointer;">`;
+        row.querySelector('input').onchange = (ev) => toggleDhikrInList(dhikr.id, l.id, ev);
+        box.appendChild(row);
+      });
+    }
+    function createQuickListFromStar() {
+      const inp = document.getElementById('quickNewListInput');
+      const dhikr = getCurrentDhikr();
+      if (!inp || !dhikr) return;
+      const name = inp.value.trim();
+      if (!name) return;
+      const newList = { id: 'list_' + Date.now(), name, ids: new Array(dhikr.id) };
+      state.lists.push(newList);
+      inp.value = '';
+      renderQuickListsCheckboxes();
+      render();
+      showSaveToast(`تم إنشاء "${name}" وإضافة الذكر إليها`);
     }
     function toggleCurrentDhikrInActiveList() {
-      const dhikr = getCurrentDhikr(), defaultFav = state.lists.find(l => l.id === 'fav') || state.lists.at(0);
-      if (!dhikr || !defaultFav) return;
-      const targetId = state.activeListId === 'all' ? defaultFav.id : state.activeListId;
-      toggleDhikrInList(dhikr.id, targetId);
+      const dhikr = getCurrentDhikr();
+      if (!dhikr) return;
+      const inp = document.getElementById('quickNewListInput');
+      if (inp) inp.value = '';
+      renderQuickListsCheckboxes();
+      document.getElementById('quickListsModal').classList.add('open');
     }
     function renderIndexModalList() {
       const listsRow = document.getElementById('listsRow'); listsRow.innerHTML = '';
