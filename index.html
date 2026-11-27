@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -1116,7 +1115,15 @@
       showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
     }
 
-    let wakeLockSentinel = null;
+        let wakeLockSentinel = null, lastAutoTimeSlot = '';
+    function getCurrentTimeSlotKey() {
+      const d = new Date(), hr = d.getHours();
+      const dayStr = getTodayStr();
+      if (hr >= 4 && hr < 12) return dayStr + '_morning';
+      if (hr >= 15 && hr < 21) return dayStr + '_evening';
+      if (hr >= 21 || hr < 4) return dayStr + '_sleep';
+      return dayStr + '_day';
+    }
     async function applyWakeLock() {
       try {
         if (state.wakeLockEnabled && 'wakeLock' in navigator) { if (!wakeLockSentinel) wakeLockSentinel = await navigator.wakeLock.request('screen'); }
@@ -1126,6 +1133,14 @@
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
         if (state.wakeLockEnabled) { wakeLockSentinel = null; applyWakeLock(); }
+        checkStatsDate();
+        const curSlot = getCurrentTimeSlotKey();
+        if (state.autoTimeList && curSlot !== lastAutoTimeSlot) {
+          lastAutoTimeSlot = curSlot;
+          applyTimeAutomations();
+        }
+        applyAppearance();
+        render(true);
         if (state.syncCode) pullFromCloud(false);
       }
     });
@@ -1279,7 +1294,7 @@
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-        function getFilteredAdhkarEntries() {
+    function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1339,6 +1354,7 @@
     function init() {
       checkStatsDate();
       applyTimeAutomations();
+      lastAutoTimeSlot = getCurrentTimeSlotKey();
       if (state.activeIndex >= state.adhkar.length || state.activeIndex < 0) state.activeIndex = 0;
       const savedCont = localStorage.getItem('tasbih_continuous_mode') === 'true';
       document.body.classList.toggle('continuous-mode', savedCont);
@@ -1353,7 +1369,7 @@
       if (state.autoDarkMode) {
         const hr = new Date().getHours();
         const isNight = (hr >= 18 || hr < 5);
-        const darkThemes = new Array('oled','black-gold','royal-navy-gold','twilight-marigold','raven-apricot','aubergine-cyan','outer-space-red','charcoal-orange','abyss-sand','carbon-silver','walnut-charcoal','espresso-terracotta');
+        const darkThemes = new Array('oled','black-gold','royal-navy-gold','twilight-marigold','raven-apricot','aubergine-cyan','outer-space-red','charcoal-orange','meringue-clementine','abyss-sand','carbon-silver','walnut-charcoal','espresso-terracotta');
         if (isNight && !darkThemes.includes(activeTheme)) activeTheme = 'oled';
         else if (!isNight && darkThemes.includes(activeTheme)) activeTheme = 'default';
       }
@@ -1378,8 +1394,7 @@
       document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.t === state.theme));
       fitDhikrTextToCard();
     }
-
-                    function updateDailyGoalUI() {
+function updateDailyGoalUI() {
       const track = document.getElementById('dailyGoalTrack');
       const fill = document.getElementById('dailyGoalFill');
       const pill = document.getElementById('goalCountdownPill');
@@ -2717,4 +2732,3 @@
   </script>
 </body>
 </html>
-
