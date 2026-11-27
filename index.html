@@ -376,6 +376,10 @@
       </button>
       <div class="tabs-bar" id="tabsBar"></div>
     </div>
+    <div class="resume-banner" id="timeSuggestBanner" onclick="acceptTimeSuggestion()">
+      <span id="timeSuggestText">حان وقت أذكار الصباح • افتح الآن ←</span>
+      <span style="font-size:12px; padding:0 4px; opacity:0.85;" onclick="dismissTimeSuggestion(event)">✕</span>
+    </div>
     <div class="resume-banner" id="resumeBanner" onclick="jumpToResumeDhikr()">
       <span id="resumeBannerText">استكمال الورد...</span>
       <span style="font-size:11px; opacity:0.85;" onclick="dismissResumeBanner(event)">✕</span>
@@ -1114,8 +1118,7 @@
       revertTasbihStat(dhikr, sIdx, actualReverted); state.progressMap[dhikr.id] = prog; render();
       showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
     }
-
-        let wakeLockSentinel = null, lastAutoTimeSlot = '';
+let wakeLockSentinel = null, lastAutoTimeSlot = '';
     function getCurrentTimeSlotKey() {
       const d = new Date(), hr = d.getHours();
       const dayStr = getTodayStr();
@@ -1294,7 +1297,7 @@
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-    function getFilteredAdhkarEntries() {
+        function getFilteredAdhkarEntries() {
       if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
       const list = state.lists.find(l => l.id === state.activeListId);
       if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
@@ -1337,30 +1340,69 @@
     }
     window.addEventListener('resize', fitDhikrTextToCard);
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fitDhikrTextToCard); }
-    function applyTimeAutomations() {
-      const hr = new Date().getHours();
-      if (state.autoTimeList) {
-        let targetDhikrId = '';
-        if (hr >= 4 && hr < 12) targetDhikrId = 'morning_adhkar';
-        else if (hr >= 15 && hr < 21) targetDhikrId = 'evening_adhkar';
-        else if (hr >= 21 || hr < 4) targetDhikrId = 'sleep_adhkar';
-        const foundIdx = state.adhkar.findIndex(d => d.id === targetDhikrId);
-        if (foundIdx >= 0) {
-          state.activeListId = 'all';
-          state.activeIndex = foundIdx;
-        }
+    let pendingTimeSuggestIdx = -1, pendingTimeSuggestSlot = '';
+    function hideTimeSuggestionBanner() {
+      const b = document.getElementById('timeSuggestBanner');
+      if (b) b.classList.remove('show');
+      pendingTimeSuggestIdx = -1;
+      fitDhikrTextToCard();
+    }
+    function acceptTimeSuggestion() {
+      if (pendingTimeSuggestSlot) localStorage.setItem('tasbih_seen_timeslot', pendingTimeSuggestSlot);
+      const targetIdx = pendingTimeSuggestIdx;
+      hideTimeSuggestionBanner();
+      if (targetIdx >= 0 && targetIdx < state.adhkar.length) {
+        state.activeListId = 'all';
+        selectDhikr(targetIdx);
       }
+    }
+    function dismissTimeSuggestion(e) {
+      if (e) e.stopPropagation();
+      if (pendingTimeSuggestSlot) localStorage.setItem('tasbih_seen_timeslot', pendingTimeSuggestSlot);
+      hideTimeSuggestionBanner();
+    }
+    function applyTimeAutomations() {
+      const banner = document.getElementById('timeSuggestBanner');
+      const txtEl = document.getElementById('timeSuggestText');
+      if (!state.autoTimeList) {
+        hideTimeSuggestionBanner();
+        return;
+      }
+      const hr = new Date().getHours();
+      let targetDhikrId = '', label = '';
+      if (hr >= 4 && hr < 12) { targetDhikrId = 'morning_adhkar'; label = 'أذكار الصباح'; }
+      else if (hr >= 15 && hr < 21) { targetDhikrId = 'evening_adhkar'; label = 'أذكار المساء'; }
+      else if (hr >= 21 || hr < 4) { targetDhikrId = 'sleep_adhkar'; label = 'أذكار النوم'; }
+      if (!targetDhikrId) { hideTimeSuggestionBanner(); return; }
+
+      const slotKey = getCurrentTimeSlotKey();
+      const seenSlot = localStorage.getItem('tasbih_seen_timeslot') || '';
+      const foundIdx = state.adhkar.findIndex(d => d.id === targetDhikrId);
+      if (foundIdx < 0 || seenSlot === slotKey) { hideTimeSuggestionBanner(); return; }
+
+      if (state.activeIndex === foundIdx) {
+        localStorage.setItem('tasbih_seen_timeslot', slotKey);
+        hideTimeSuggestionBanner();
+        return;
+      }
+
+      pendingTimeSuggestIdx = foundIdx;
+      pendingTimeSuggestSlot = slotKey;
+      localStorage.setItem('tasbih_seen_timeslot', slotKey);
+      if (txtEl) txtEl.textContent = `حان وقت ${label} • افتح الآن ←`;
+      if (banner) banner.classList.add('show');
+      fitDhikrTextToCard();
     }
     function init() {
       checkStatsDate();
-      applyTimeAutomations();
-      lastAutoTimeSlot = getCurrentTimeSlotKey();
       if (state.activeIndex >= state.adhkar.length || state.activeIndex < 0) state.activeIndex = 0;
       const savedCont = localStorage.getItem('tasbih_continuous_mode') === 'true';
       document.body.classList.toggle('continuous-mode', savedCont);
       const contBtn = document.getElementById('continuousModeBtn');
       if (contBtn) contBtn.classList.toggle('fav-active', savedCont);
       applyAppearance(); applyWakeLock(); updateSyncUI(); render();
+      applyTimeAutomations();
+      lastAutoTimeSlot = getCurrentTimeSlotKey();
       if (state.syncCode) pullFromCloud(false);
     }
     function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar.at(0); }
@@ -1394,7 +1436,8 @@
       document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.t === state.theme));
       fitDhikrTextToCard();
     }
-function updateDailyGoalUI() {
+
+    function updateDailyGoalUI() {
       const track = document.getElementById('dailyGoalTrack');
       const fill = document.getElementById('dailyGoalFill');
       const pill = document.getElementById('goalCountdownPill');
@@ -1428,7 +1471,12 @@ function updateDailyGoalUI() {
     function updateResumeBanner() {
       const banner = document.getElementById('resumeBanner');
       const txt = document.getElementById('resumeBannerText');
+      const timeBanner = document.getElementById('timeSuggestBanner');
       if (!banner || !txt) return;
+      if (timeBanner && timeBanner.classList.contains('show')) {
+        banner.classList.remove('show');
+        return;
+      }
       const currentDhikr = getCurrentDhikr();
       const inProgIdx = state.adhkar.findIndex((d, idx) => idx !== state.activeIndex && d.id !== resumeDismissedId && d.steps.length > 1 && hasActiveProgress(d));
       if (inProgIdx >= 0 && currentDhikr) {
