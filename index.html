@@ -572,13 +572,17 @@
     </div>
   </div>
 
-        <div class="modal-backdrop" id="quickListsModal" onclick="closeModal('quickListsModal')">
-    <div class="modal-box" style="max-width:350px;" onclick="event.stopPropagation()">
+            <div class="modal-backdrop" id="quickListsModal" onclick="closeModal('quickListsModal')">
+    <div class="modal-box" style="max-width:360px;" onclick="event.stopPropagation()">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <h3 class="modal-title" style="margin:0; font-size:16.5px;">حفظ الذكر في القوائم</h3>
         <button type="button" onclick="closeModal('quickListsModal')" style="background:var(--primary-light); color:var(--primary-color); border:1px solid var(--primary-color); border-radius:10px; padding:4px 10px; font-size:13px; font-weight:800; cursor:pointer;">✕</button>
       </div>
-      <p id="quickListsDhikrName" style="font-size:12.5px; color:var(--text-muted); font-weight:700; margin:0 0 10px;"></p>
+      <p id="quickListsDhikrName" style="font-size:12.5px; color:var(--text-muted); font-weight:700; margin:0 0 8px;"></p>
+      <div id="quickScopeRow" style="display:none; gap:6px; margin-bottom:10px;">
+        <button type="button" id="quickScopePackBtn" class="list-chip active" style="flex:1; justify-content:center;" onclick="setQuickStarScope('pack')">الحزمة كاملة</button>
+        <button type="button" id="quickScopeStepBtn" class="list-chip" style="flex:1; justify-content:center;" onclick="setQuickStarScope('step')">هذه الخطوة فقط</button>
+      </div>
       <div id="quickListsCheckboxes" style="display:flex; flex-direction:column; gap:7px; margin-bottom:12px;"></div>
       <div style="display:flex; gap:6px; margin-bottom:10px;">
         <input type="text" id="quickNewListInput" placeholder="اسم مفضلة / قائمة جديدة..." style="padding:7px 10px; font-size:13.5px;">
@@ -710,7 +714,8 @@
           <div class="theme-option" data-t="olive-cream" onclick="setTheme('olive-cream')">زيتوني وبيج كريمي</div>
         </div>
       </div>
-<div class="form-group">
+
+        <div class="form-group">
         <label>حجم خط الذكر: <span id="fontSizeVal">24</span>px</label>
         <input type="range" id="fontSlider" min="18" max="48" value="24" style="width: 100%;" oninput="setFontSize(this.value)">
       </div>
@@ -835,8 +840,7 @@
           { title: 'الصلاة على النبي ﷺ', text: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ', virtue: 'من صلى على النبي ﷺ حين يصبح عشراً أدركته شفاعته يوم القيامة، وصلى الله عليه بها عشراً.', target: 10 }
         ]
       },
-
-          {
+{
         id: 'evening_adhkar',
         title: 'أذكار المساء',
         virtue: 'أذكار المساء الصحيحة من كتاب حصن المسلم، تُقال ما بين صلاة العصر وغروب الشمس (وتمتد إلى الليل).',
@@ -1117,7 +1121,8 @@
       revertTasbihStat(dhikr, sIdx, actualReverted); state.progressMap[dhikr.id] = prog; render();
       showSaveToast(`تم التراجع بمقدار ${actualReverted}`);
     }
-let wakeLockSentinel = null, lastAutoTimeSlot = '';
+
+        let wakeLockSentinel = null, lastAutoTimeSlot = '';
     function getCurrentTimeSlotKey() {
       const d = new Date(), hr = d.getHours();
       const dayStr = getTodayStr();
@@ -1296,13 +1301,86 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
     }
     setInterval(() => { if (state.syncCode && document.visibilityState === 'visible') pullFromCloud(false); }, 1200);
 
-            function getFilteredAdhkarEntries() {
-      if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx }));
+                function buildActiveAdhkarList() {
+      if (state.activeListId === 'all') return state.adhkar.map((item, idx) => ({ item, idx, entryKey: item.id }));
       const list = state.lists.find(l => l.id === state.activeListId);
-      if (!list || !Array.isArray(list.ids) || list.ids.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
-      const filtered = state.adhkar.map((item, idx) => ({ item, idx })).filter(e => list.ids.includes(e.item.id));
-      if (filtered.length === 0) { state.activeListId = 'all'; return state.adhkar.map((item, idx) => ({ item, idx })); }
-      return filtered;
+      if (!list || !Array.isArray(list.ids) || list.ids.length === 0) {
+        state.activeListId = 'all';
+        return state.adhkar.map((item, idx) => ({ item, idx, entryKey: item.id }));
+      }
+      const customTargets = list.customTargets || {};
+      const result = new Array();
+      list.ids.forEach(entryKey => {
+        if (typeof entryKey !== 'string') return;
+        const sepPos = entryKey.indexOf('::');
+        if (sepPos > 0) {
+          const baseId = entryKey.slice(0, sepPos);
+          const sIdx = parseInt(entryKey.slice(sepPos + 2), 10);
+          const baseIdx = state.adhkar.findIndex(d => d.id === baseId);
+          if (baseIdx >= 0 && state.adhkar[baseIdx].steps[sIdx]) {
+            const baseDhikr = state.adhkar[baseIdx];
+            const baseStep = baseDhikr.steps[sIdx];
+            const customTgt = typeof customTargets[entryKey] === 'number' ? customTargets[entryKey] : baseStep.target;
+            const virtualDhikr = {
+              id: `list_${list.id}_${entryKey}`,
+              baseId: baseId,
+              title: (baseStep.title && baseStep.title.trim()) ? baseStep.title.trim() : baseDhikr.title,
+              virtue: baseStep.virtue || baseDhikr.virtue || '',
+              source: baseDhikr.source || '',
+              steps: [{ title: baseStep.title || '', text: baseStep.text, virtue: baseStep.virtue || '', target: customTgt }]
+            };
+            result.push({ item: virtualDhikr, idx: baseIdx, entryKey });
+          }
+        } else {
+          const baseIdx = state.adhkar.findIndex(d => d.id === entryKey);
+          if (baseIdx >= 0) {
+            const baseDhikr = state.adhkar[baseIdx];
+            const customTgt = customTargets[entryKey];
+            if (typeof customTgt === 'number' && baseDhikr.steps.length === 1) {
+              const virtualDhikr = {
+                id: `list_${list.id}_${entryKey}`,
+                baseId: baseDhikr.id,
+                title: baseDhikr.title,
+                virtue: baseDhikr.virtue || '',
+                source: baseDhikr.source || '',
+                steps: [{ title: baseDhikr.steps.title || '', text: baseDhikr.steps.text, virtue: baseDhikr.steps.virtue || '', target: customTgt }]
+              };
+              result.push({ item: virtualDhikr, idx: baseIdx, entryKey });
+            } else {
+              result.push({ item: baseDhikr, idx: baseIdx, entryKey });
+            }
+          }
+        }
+      });
+      if (result.length === 0) {
+        state.activeListId = 'all';
+        return state.adhkar.map((item, idx) => ({ item, idx, entryKey: item.id }));
+      }
+      return result;
+    }
+    function getFilteredAdhkarEntries() {
+      return buildActiveAdhkarList();
+    }
+    function getCurrentDhikr() {
+      if (state.activeListId === 'all') {
+        return state.adhkar[state.activeIndex] || state.adhkar.at(0);
+      }
+      const entries = buildActiveAdhkarList();
+      if (state.activeListEntryKey) {
+        const byKey = entries.find(e => e.entryKey === state.activeListEntryKey);
+        if (byKey) return byKey.item;
+      }
+      const byIdx = entries.find(e => e.idx === state.activeIndex);
+      if (byIdx) {
+        state.activeListEntryKey = byIdx.entryKey;
+        return byIdx.item;
+      }
+      if (entries.length > 0) {
+        state.activeIndex = entries.idx;
+        state.activeListEntryKey = entries.entryKey;
+        return entries.item;
+      }
+      return state.adhkar[state.activeIndex] || state.adhkar.at(0);
     }
     function getDhikrProgress(dhikr) {
       if (!dhikr || !Array.isArray(dhikr.steps) || dhikr.steps.length === 0) {
@@ -1318,6 +1396,7 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
     }
     function isStepInProgress(dhikr, sIdx) { const prog = getDhikrProgress(dhikr), target = dhikr.steps[sIdx].target, cnt = prog.stepCounts[sIdx]; return (target > 0 && cnt < target) || (target === 0 && cnt > 0); }
     function hasActiveProgress(dhikr) { if (!dhikr || !Array.isArray(dhikr.steps)) return false; for (let i = 0; i < dhikr.steps.length; i++) if (isStepInProgress(dhikr, i)) return true; return false; }
+
     function fitDhikrTextToCard() {
       const cardBody = document.querySelector('.card-body');
       const textEl = document.getElementById('dhikrText');
@@ -1423,7 +1502,6 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       lastAutoTimeSlot = getCurrentTimeSlotKey();
       if (state.syncCode) pullFromCloud(false);
     }
-    function getCurrentDhikr() { return state.adhkar[state.activeIndex] || state.adhkar.at(0); }
     function applyAppearance() {
       let activeTheme = state.theme;
       if (state.autoDarkMode) {
@@ -1543,8 +1621,7 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       render();
       showSaveToast(newTarget > 0 ? `الهدف: ${newTarget}` : 'العداد المفتوح');
     }
-
-                        let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
+let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
     function render(skipCloud = false) {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
       const prog = getDhikrProgress(dhikr);
@@ -1649,7 +1726,7 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       saveState(false, '', skipCloud);
     }
 
-                function scrollContinuousToStep(sIdx, pos = 'center') {
+                    function scrollContinuousToStep(sIdx, pos = 'center') {
       if (!document.body.classList.contains('continuous-mode')) return;
       setTimeout(() => {
         const targetCard = document.querySelector(`.cont-step-card[data-step-idx="${sIdx}"]`);
@@ -1662,23 +1739,42 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       prog.stepIndex = stepIdx; state.progressMap[dhikr.id] = prog; render();
       scrollContinuousToStep(stepIdx, 'center');
     }
-    function selectDhikr(index) {
-      if (index !== state.activeIndex) { pauseDhikrTimer(); resetAutoTapCalibration(); }
-      state.activeIndex = index; render();
+    function selectDhikr(index, entryKey = '') {
+      if (index !== state.activeIndex || (entryKey && entryKey !== state.activeListEntryKey)) { pauseDhikrTimer(); resetAutoTapCalibration(); }
+      state.activeIndex = index;
+      if (entryKey) state.activeListEntryKey = entryKey;
+      else {
+        const entries = getFilteredAdhkarEntries();
+        const found = entries.find(e => e.idx === index) || entries.at(0);
+        state.activeListEntryKey = found ? found.entryKey : '';
+      }
+      render();
       const dhikr = getCurrentDhikr();
       if (dhikr) scrollContinuousToStep(getDhikrProgress(dhikr).stepIndex, 'center');
     }
     function prevDhikr() {
       pauseDhikrTimer(); resetAutoTapCalibration();
-      const entries = getFilteredAdhkarEntries(), pos = entries.findIndex(e => e.idx === state.activeIndex);
-      state.activeIndex = entries[(pos - 1 + entries.length) % entries.length].idx; render();
+      const entries = getFilteredAdhkarEntries();
+      const pos = state.activeListId === 'all'
+        ? entries.findIndex(e => e.idx === state.activeIndex)
+        : entries.findIndex(e => e.entryKey === state.activeListEntryKey);
+      const nextEntry = entries[((pos >= 0 ? pos : 0) - 1 + entries.length) % entries.length];
+      state.activeIndex = nextEntry.idx;
+      state.activeListEntryKey = nextEntry.entryKey;
+      render();
       const dhikr = getCurrentDhikr();
       if (dhikr) scrollContinuousToStep(getDhikrProgress(dhikr).stepIndex, 'center');
     }
     function nextDhikr() {
       pauseDhikrTimer(); resetAutoTapCalibration();
-      const entries = getFilteredAdhkarEntries(), pos = entries.findIndex(e => e.idx === state.activeIndex);
-      state.activeIndex = entries[(pos + 1) % entries.length].idx; render();
+      const entries = getFilteredAdhkarEntries();
+      const pos = state.activeListId === 'all'
+        ? entries.findIndex(e => e.idx === state.activeIndex)
+        : entries.findIndex(e => e.entryKey === state.activeListEntryKey);
+      const nextEntry = entries[((pos >= 0 ? pos : 0) + 1) % entries.length];
+      state.activeIndex = nextEntry.idx;
+      state.activeListEntryKey = nextEntry.entryKey;
+      render();
       const dhikr = getCurrentDhikr();
       if (dhikr) scrollContinuousToStep(getDhikrProgress(dhikr).stepIndex, 'center');
     }
@@ -1746,7 +1842,12 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
             }
             if (state.activeListId !== 'all') {
               const entries = getFilteredAdhkarEntries();
-              if (entries.length > 1) { const pos = entries.findIndex(e => e.idx === state.activeIndex); state.activeIndex = entries[(pos + 1) % entries.length].idx; }
+              if (entries.length > 1) {
+                const pos = entries.findIndex(e => e.entryKey === state.activeListEntryKey);
+                const nextE = entries[((pos >= 0 ? pos : 0) + 1) % entries.length];
+                state.activeIndex = nextE.idx;
+                state.activeListEntryKey = nextE.entryKey;
+              }
             }
           }
         }
@@ -2534,7 +2635,7 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       }
     }
 
-    function clearDhikrSearch() {
+        function clearDhikrSearch() {
       const inp = document.getElementById('dhikrSearchInput');
       if (inp) { inp.value = ''; inp.focus(); }
       renderIndexModalList();
@@ -2545,15 +2646,32 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
     }
     function switchActiveList(listId) {
       modalSelectedListId = listId;
-      if (listId === 'all') { state.activeListId = 'all'; renderIndexModalList(); render(); return; }
+      if (listId === 'all') {
+        state.activeListId = 'all';
+        state.activeListEntryKey = '';
+        renderIndexModalList();
+        render();
+        return;
+      }
       const list = state.lists.find(l => l.id === listId);
-      if (list && Array.isArray(list.ids) && list.ids.length > 0) { state.activeListId = listId; renderIndexModalList(); render(); }
-      else { renderIndexModalList(); showSaveToast(`اضغط ☆ بجانب الأذكار لإضافتها إلى "${list ? list.name : ''}"`); }
+      if (list && Array.isArray(list.ids) && list.ids.length > 0) {
+        state.activeListId = listId;
+        const entries = buildActiveAdhkarList();
+        if (entries.length > 0) {
+          state.activeIndex = entries.idx;
+          state.activeListEntryKey = entries.entryKey;
+        }
+        renderIndexModalList();
+        render();
+      } else {
+        renderIndexModalList();
+        showSaveToast(`اضغط ☆ بجانب الأذكار لإضافتها إلى "${list ? list.name : ''}"`);
+      }
     }
     function createCustomList() {
       const inp = document.getElementById('newListNameInput'), name = inp.value.trim();
       if (!name) return;
-      const newList = { id: 'list_' + Date.now(), name, ids: new Array() };
+      const newList = { id: 'list_' + Date.now(), name, ids: new Array(), customTargets: {} };
       state.lists.push(newList); modalSelectedListId = newList.id; inp.value = '';
       saveState(true, `تم إنشاء "${name}" — اختر أذكارها بالضغط على ☆`); renderIndexModalList();
     }
@@ -2565,7 +2683,7 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       document.getElementById('deleteMsg').textContent = `هل أنت متأكد من حذف قائمة "${targetList.name}"؟ (ستبقى الأذكار محفوظة في «الكل»)`;
       state.pendingConfirmAction = () => {
         state.lists = state.lists.filter(l => l.id !== listId);
-        if (state.activeListId === listId) state.activeListId = 'all';
+        if (state.activeListId === listId) { state.activeListId = 'all'; state.activeListEntryKey = ''; }
         if (modalSelectedListId === listId) modalSelectedListId = state.activeListId;
         saveState(true, 'تم حذف القائمة');
         if (document.getElementById('indexModal')?.classList.contains('open')) renderIndexModalList();
@@ -2577,37 +2695,114 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
       if (e) e.stopPropagation();
       const list = state.lists.find(l => l.id === listId); if (!list) return;
       if (!Array.isArray(list.ids)) list.ids = new Array();
+      if (!list.customTargets) list.customTargets = {};
       const idx = list.ids.indexOf(dhikrId);
-      if (idx >= 0) { list.ids.splice(idx, 1); showSaveToast(`أُزيل من ${list.name}`); }
-      else { list.ids.push(dhikrId); showSaveToast(`أُضيف إلى ${list.name}`); }
+      if (idx >= 0) {
+        list.ids.splice(idx, 1);
+        delete list.customTargets[dhikrId];
+        delete state.progressMap[`list_${list.id}_${dhikrId}`];
+        showSaveToast(`أُزيل من ${list.name}`);
+      } else {
+        list.ids.push(dhikrId);
+        showSaveToast(`أُضيف إلى ${list.name}`);
+      }
       if (document.getElementById('quickListsModal')?.classList.contains('open')) renderQuickListsCheckboxes();
       if (document.getElementById('indexModal')?.classList.contains('open')) renderIndexModalList();
       render();
     }
+
+    let quickStarScope = 'pack';
+    function getQuickStarContext() {
+      const dhikr = getCurrentDhikr();
+      if (!dhikr) return null;
+      const prog = getDhikrProgress(dhikr);
+      const baseId = dhikr.baseId || dhikr.id;
+      const baseDhikr = state.adhkar.find(d => d.id === baseId) || dhikr;
+      const isAlreadyStepOnly = Boolean(dhikr.baseId && state.activeListEntryKey && state.activeListEntryKey.includes('::'));
+      const isMulti = !isAlreadyStepOnly && baseDhikr.steps.length > 1;
+      const curStepIdx = prog.stepIndex;
+      const curStepObj = baseDhikr.steps[curStepIdx] || baseDhikr.steps;
+      const entryKey = isAlreadyStepOnly
+        ? state.activeListEntryKey
+        : ((isMulti && quickStarScope === 'step') ? `${baseId}::${curStepIdx}` : baseId);
+      const canSetCount = isAlreadyStepOnly || !isMulti || quickStarScope === 'step';
+      const defaultCount = canSetCount ? (curStepObj ? curStepObj.target : 1) : 1;
+      return { baseDhikr, isMulti, isAlreadyStepOnly, curStepIdx, curStepObj, entryKey, canSetCount, defaultCount };
+    }
+    function setQuickStarScope(scope) {
+      quickStarScope = scope;
+      const pBtn = document.getElementById('quickScopePackBtn');
+      const sBtn = document.getElementById('quickScopeStepBtn');
+      if (pBtn) pBtn.classList.toggle('active', scope === 'pack');
+      if (sBtn) sBtn.classList.toggle('active', scope === 'step');
+      renderQuickListsCheckboxes();
+    }
+    function updateListCustomTarget(listId, entryKey, rawVal) {
+      const list = state.lists.find(l => l.id === listId);
+      if (!list) return;
+      if (!list.customTargets) list.customTargets = {};
+      const parsed = parseInt(rawVal, 10);
+      const cleanVal = isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      list.customTargets[entryKey] = cleanVal;
+      delete state.progressMap[`list_${list.id}_${entryKey}`];
+      renderQuickListsCheckboxes();
+      render();
+      showSaveToast(cleanVal > 0 ? `تم ضبط التكرار: ${cleanVal}` : 'تم الضبط: عداد مفتوح');
+    }
     function renderQuickListsCheckboxes() {
-      const dhikr = getCurrentDhikr(); if (!dhikr) return;
+      const ctx = getQuickStarContext(); if (!ctx) return;
+      const { baseDhikr, isMulti, isAlreadyStepOnly, curStepIdx, curStepObj, entryKey, canSetCount, defaultCount } = ctx;
       const nameEl = document.getElementById('quickListsDhikrName');
-      if (nameEl) nameEl.textContent = `الذكر الحالي: ${dhikr.title}`;
+      const stepLabel = (curStepObj && curStepObj.title && curStepObj.title.trim()) ? curStepObj.title.trim() : `خطوة ${curStepIdx + 1}`;
+      if (nameEl) {
+        nameEl.textContent = isAlreadyStepOnly
+          ? `الذكر: ${stepLabel} (من ${baseDhikr.title})`
+          : (isMulti ? `الحزمة: ${baseDhikr.title} • الخطوة الحالية: ${stepLabel}` : `الذكر الحالي: ${baseDhikr.title}`);
+      }
+      const scopeRow = document.getElementById('quickScopeRow');
+      if (scopeRow) {
+        scopeRow.style.display = isMulti ? 'flex' : 'none';
+        const sBtn = document.getElementById('quickScopeStepBtn');
+        if (sBtn) sBtn.textContent = `هذه الخطوة فقط (${stepLabel})`;
+      }
       const box = document.getElementById('quickListsCheckboxes');
       if (!box) return;
       box.innerHTML = '';
       state.lists.forEach(l => {
-        const isChecked = Array.isArray(l.ids) && l.ids.includes(dhikr.id);
-        const row = document.createElement('label');
-        row.className = 'switch-row';
-        row.style.cssText = 'margin-bottom:0; padding:9px 12px;' + (isChecked ? 'border-color:var(--primary-color); background:var(--primary-light);' : '');
-        row.innerHTML = `<span style="font-size:13.5px; color:var(--text-main);">${l.name} <span style="font-size:11.5px; color:var(--text-muted);">(${Array.isArray(l.ids) ? l.ids.length : 0})</span></span><input type="checkbox" ${isChecked ? 'checked' : ''} style="width:19px; height:19px; accent-color:var(--primary-color); cursor:pointer;">`;
-        row.querySelector('input').onchange = (ev) => toggleDhikrInList(dhikr.id, l.id, ev);
-        box.appendChild(row);
+        const isChecked = Array.isArray(l.ids) && l.ids.includes(entryKey);
+        const curTarget = (l.customTargets && typeof l.customTargets[entryKey] === 'number') ? l.customTargets[entryKey] : defaultCount;
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'border-radius:12px; border:1px solid ' + (isChecked ? 'var(--primary-color)' : 'var(--border-color)') + '; background:' + (isChecked ? 'var(--primary-light)' : 'var(--bg-color)') + '; padding:8px 11px;';
+        let countControlHtml = '';
+        if (isChecked && canSetCount) {
+          countControlHtml = `
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-top:8px; padding-top:7px; border-top:1px dashed var(--border-color); gap:6px;">
+              <span style="font-size:12px; font-weight:700; color:var(--primary-color);">التكرار في هذه القائمة:</span>
+              <div style="display:flex; align-items:center; gap:5px;">
+                <button type="button" class="tool-btn" style="padding:2px 9px; font-size:14px; font-weight:800;" onclick="updateListCustomTarget('${l.id}', '${entryKey}', ${Math.max(0, curTarget - 1)})">-</button>
+                <input type="number" min="0" value="${curTarget}" onchange="updateListCustomTarget('${l.id}', '${entryKey}', this.value)" style="width:58px; padding:3px 5px; text-align:center; font-size:13.5px; font-weight:800; border-radius:8px;">
+                <button type="button" class="tool-btn" style="padding:2px 9px; font-size:14px; font-weight:800;" onclick="updateListCustomTarget('${l.id}', '${entryKey}', ${curTarget + 1})">+</button>
+              </div>
+            </div>`;
+        }
+        wrap.innerHTML = `
+          <label style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:700; font-size:13.5px; margin:0;">
+            <span style="color:var(--text-main);">${l.name} <span style="font-size:11.5px; color:var(--text-muted);">(${Array.isArray(l.ids) ? l.ids.length : 0})</span></span>
+            <input type="checkbox" ${isChecked ? 'checked' : ''} style="width:19px; height:19px; accent-color:var(--primary-color); cursor:pointer;">
+          </label>
+          ${countControlHtml}`;
+        wrap.querySelector('input[type="checkbox"]').onchange = (ev) => toggleDhikrInList(entryKey, l.id, ev);
+        box.appendChild(wrap);
       });
     }
+
     function createQuickListFromStar() {
       const inp = document.getElementById('quickNewListInput');
-      const dhikr = getCurrentDhikr();
-      if (!inp || !dhikr) return;
+      const ctx = getQuickStarContext();
+      if (!inp || !ctx) return;
       const name = inp.value.trim();
       if (!name) return;
-      const newList = { id: 'list_' + Date.now(), name, ids: new Array(dhikr.id) };
+      const newList = { id: 'list_' + Date.now(), name, ids: new Array(ctx.entryKey), customTargets: {} };
       state.lists.push(newList);
       inp.value = '';
       renderQuickListsCheckboxes();
@@ -2617,6 +2812,11 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
     function toggleCurrentDhikrInActiveList() {
       const dhikr = getCurrentDhikr();
       if (!dhikr) return;
+      quickStarScope = 'pack';
+      const pBtn = document.getElementById('quickScopePackBtn');
+      const sBtn = document.getElementById('quickScopeStepBtn');
+      if (pBtn) pBtn.classList.add('active');
+      if (sBtn) sBtn.classList.remove('active');
       const inp = document.getElementById('quickNewListInput');
       if (inp) inp.value = '';
       renderQuickListsCheckboxes();
@@ -2657,10 +2857,23 @@ let wakeLockSentinel = null, lastAutoTimeSlot = '';
         row.onclick = () => {
           if (modalSelectedListId !== 'all') {
             const selList = state.lists.find(l => l.id === modalSelectedListId);
-            state.activeListId = (selList && Array.isArray(selList.ids) && selList.ids.includes(item.id)) ? modalSelectedListId : 'all';
+            const hasFull = selList && Array.isArray(selList.ids) && selList.ids.includes(item.id);
+            const stepKey = selList && Array.isArray(selList.ids) ? selList.ids.find(k => typeof k === 'string' && k.startsWith(item.id + '::')) : '';
+            if (hasFull) {
+              state.activeListId = modalSelectedListId;
+              selectDhikr(idx, item.id);
+            } else if (stepKey) {
+              state.activeListId = modalSelectedListId;
+              selectDhikr(idx, stepKey);
+            } else {
+              state.activeListId = 'all';
+              selectDhikr(idx, item.id);
+            }
+          } else {
+            state.activeListId = 'all';
+            selectDhikr(idx, item.id);
           }
-          selectDhikr(idx);
-          if (matchedStepIdx >= 0) jumpToStep(matchedStepIdx);
+          if (matchedStepIdx >= 0 && state.activeListId === 'all') jumpToStep(matchedStepIdx);
           closeModal('indexModal');
         };
         const isStarred = Array.isArray(targetList.ids) ? targetList.ids.includes(item.id) : false;
