@@ -270,7 +270,7 @@
       body.reading-mode.continuous-mode .ring-wrapper { width: 132px; height: 132px; }
     }
 
-                        .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
+            .modal-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); display: none; align-items: center; justify-content: center; padding: 18px; z-index: 100; }
     .modal-backdrop.open { display: flex; }
     .modal-box { background: var(--surface-color); width: 100%; max-width: 400px; max-height: 85dvh; border-radius: 22px; padding: 20px; overflow-y: auto; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25); }
     .modal-title { font-size: 18px; font-weight: 800; margin: 0 0 14px; color: var(--primary-color); display: flex; align-items: center; gap: 8px; }
@@ -317,7 +317,9 @@
     .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
 
     /* ===== طبقة تثبيت التخطيط (منع اهتزاز المسافات) ===== */
-    #app { height: 100vh; height: 100dvh; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    input[type="text"], input[type="number"], textarea { font-size: 16px !important; }
+    #app { position: fixed; inset: 0; width: auto; height: auto; padding-bottom: max(10px, calc(env(safe-area-inset-bottom, 0px) - 10px)); }
     header { z-index: auto; min-height: 56px; flex-shrink: 0; }
     .tabs-wrapper { min-height: 50px; }
     .tabs-bar { overflow-y: hidden; align-items: center; }
@@ -330,6 +332,9 @@
     .quick-targets-bar { display: flex; visibility: hidden; height: 24px; }
     .quick-targets-bar.show { visibility: visible; }
     .goal-bottom-pill { min-height: 24px; }
+    @media (orientation: portrait) {
+      .ring-wrapper { width: 140px; height: 140px; width: clamp(116px, 15.5dvh, 150px); height: clamp(116px, 15.5dvh, 150px); }
+    }
   </style>
 </head>
 
@@ -378,6 +383,7 @@
       </div>
       <div class="daily-goal-track" id="dailyGoalTrack"><div class="daily-goal-fill" id="dailyGoalFill"></div></div>
     </header>
+
 <div class="tabs-wrapper">
       <button type="button" class="list-filter-btn" id="listFilterBtn" onclick="openIndexModal()">
         <span id="activeListLabel">الكل</span>
@@ -657,23 +663,49 @@
       <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('stepsIndexModal')">إغلاق</button></div>
     </div>
   </div>
-
- <div class="modal-backdrop" id="manageModal">
+<div class="modal-backdrop" id="manageModal">
     <div class="modal-box">
-      <h3 class="modal-title">إدارة وترتيب الأذكار (اسحب للإفلات)</h3>
-      <div id="manageList"></div>
-      <div style="display:flex; gap:8px; margin-top:10px;">
-        <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="exportAllAdhkar()">
-          <svg class="ico-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span>نسخ الكل</span>
-        </button>
-        <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="openImportModal()">
-          <svg class="ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>استيراد كود</span>
-        </button>
+      <h3 class="modal-title">إدارة الأذكار والقوائم</h3>
+      <div style="display:flex; gap:6px; margin-bottom:12px;">
+        <button type="button" id="manageTabAdhkar" class="list-chip active" style="flex:1; justify-content:center;" onclick="setManageTab('adhkar')">الأذكار</button>
+        <button type="button" id="manageTabLists" class="list-chip" style="flex:1; justify-content:center;" onclick="setManageTab('lists')">القوائم</button>
       </div>
-      <button type="button" class="tool-btn delete" style="width: 100%; margin-top: 8px; padding: 9px;" onclick="openResetDefaultsConfirm()">استعادة الأذكار الافتراضية</button>
+      <div id="manageAdhkarPane">
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">اسحب الأيقونة ≡ لإعادة الترتيب</p>
+        <div id="manageList"></div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="exportAllAdhkar()">
+            <svg class="ico-sm" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span>نسخ الكل</span>
+          </button>
+          <button type="button" class="tool-btn" style="flex:1; padding:9px;" onclick="openImportModal()">
+            <svg class="ico-sm" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>استيراد كود</span>
+          </button>
+        </div>
+        <button type="button" class="tool-btn delete" style="width: 100%; margin-top: 8px; padding: 9px;" onclick="openResetDefaultsConfirm()">استعادة الأذكار الافتراضية</button>
+      </div>
+      <div id="manageListsPane" style="display:none;">
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px; line-height:1.6;">رتّب القوائم بالأسهم، واضغط «تعديل» لترتيب أذكار القائمة أو حذفها أو تغيير تكرارها. تُضاف الأذكار للقوائم بالضغط على ☆ في الشاشة الرئيسية.</p>
+        <div id="manageListsContainer"></div>
+        <div style="display:flex; gap:6px; margin-top:10px;">
+          <input type="text" id="manageNewListInput" placeholder="اسم قائمة جديدة..." style="padding:7px 10px;">
+          <button type="button" class="ctrl-btn primary" style="padding:7px 12px; font-size:13px;" onclick="createManageList()">+ قائمة</button>
+        </div>
+      </div>
       <div class="modal-actions"><button class="ctrl-btn primary" style="flex:1;" onclick="closeModal('manageModal')">إغلاق</button></div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="listEditModal" style="z-index:110;">
+    <div class="modal-box">
+      <h3 class="modal-title">تعديل القائمة</h3>
+      <div class="form-group">
+        <label>اسم القائمة</label>
+        <input type="text" id="listEditNameInput" onchange="renameEditingList(this.value)">
+      </div>
+      <div class="stats-section-title" style="margin-top:4px;"><span>أذكار القائمة (رتّب أو احذف أو غيّر التكرار)</span></div>
+      <div id="listEditEntries"></div>
+      <div class="modal-actions"><button type="button" class="ctrl-btn primary" style="flex:1;" onclick="closeListEditor()">تم</button></div>
     </div>
   </div>
   <div class="modal-backdrop" id="importModal">
@@ -1004,7 +1036,6 @@
       { id: 'd7', title: 'كلمتان خفيفتان', virtue: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن.', steps: [{ text: 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ', target: 0 }] },
       { id: 'd8', title: 'الحوقلة', virtue: 'كنزٌ من كنوز الجنّة.', steps: [{ text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ', target: 0 }] }
     ];
-
             function getTodayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function getYesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
     function formatDuration(ms) { const totalSec = Math.floor(ms / 1000); const mins = Math.floor(totalSec / 60); const secs = totalSec % 60; return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`; }
@@ -1745,6 +1776,7 @@ function buildActiveAdhkarList() {
       render();
       showSaveToast(newTarget > 0 ? `الهدف: ${newTarget}` : 'العداد المفتوح');
     }
+
 let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
     function render(skipCloud = false) {
       const dhikr = getCurrentDhikr(); if (!dhikr) return;
@@ -2116,7 +2148,6 @@ let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
       document.getElementById('indexModal').classList.add('open');
       setTimeout(() => { const inp = document.getElementById('dhikrSearchInput'); if (inp) inp.focus(); }, 120);
     }
-
             let lastGeneratedBlob = null;
     const APP_SHARE_URL = 'https://' + 'khalidmaz.github.' + 'io/Albaqiyat/';
 
@@ -2599,41 +2630,267 @@ let lastRenderedDhikrId = '', lastRenderedStepIdx = -1;
       closeModal('formModal'); render(); flushHeavySave(); showSaveToast('تم الحفظ');
     }
 
-    let dragSrcIndex = null;
-    function openManageModal() {
+    let manageTab = 'adhkar', editingListId = '';
+    (function injectDragStyles() {
+      if (document.getElementById('dragExtraStyles')) return;
+      const st = document.createElement('style'); st.id = 'dragExtraStyles';
+      st.textContent = '.drag-handle { -webkit-touch-callout: none; user-select: none; padding: 8px 10px; }'
+        + '.manage-item.drag-armed { border-color: var(--primary-color); background: var(--primary-light); }'
+        + '.manage-item.dragging { opacity: 1; transform: scale(1.02); border-color: var(--primary-color); background: var(--primary-light); box-shadow: 0 10px 24px rgba(0,0,0,0.28); position: relative; z-index: 5; transition: none; }'
+        + '.undo-bar { position: fixed; left: 16px; right: 16px; max-width: 420px; margin-inline: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); z-index: 600; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; border-radius: 14px; background: var(--surface-color); color: var(--text-main); border: 1.5px solid var(--primary-color); box-shadow: 0 8px 24px rgba(0,0,0,0.3); font-size: 13.5px; font-weight: 700; opacity: 0; transform: translateY(20px); pointer-events: none; transition: opacity 0.2s, transform 0.2s; }'
+        + '.undo-bar.show { opacity: 1; transform: none; pointer-events: auto; }'
+        + '.undo-bar button { background: var(--primary-color); color: var(--bg-color); border: none; border-radius: 10px; padding: 7px 13px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }';
+      document.head.appendChild(st);
+    })();
+    let undoBarTimer = null, undoAction = null;
+    function hideUndoBar() {
+      clearTimeout(undoBarTimer); undoAction = null;
+      const bar = document.getElementById('undoBar'); if (bar) bar.classList.remove('show');
+    }
+    function showUndoBar(msg, action) {
+      let bar = document.getElementById('undoBar');
+      if (!bar) {
+        bar = document.createElement('div'); bar.id = 'undoBar'; bar.className = 'undo-bar';
+        bar.innerHTML = '<span id="undoBarMsg"></span><button type="button" id="undoBarBtn">↶ تراجع</button>';
+        document.body.appendChild(bar);
+        document.getElementById('undoBarBtn').onclick = () => { const fn = undoAction; hideUndoBar(); if (fn) fn(); };
+      }
+      document.getElementById('undoBarMsg').textContent = msg;
+      undoAction = action; bar.classList.add('show');
+      clearTimeout(undoBarTimer); undoBarTimer = setTimeout(hideUndoBar, 7000);
+    }
+    function setManageTab(tab) { manageTab = tab; renderManageModal(); }
+    function openManageModal() { renderManageModal(); document.getElementById('manageModal').classList.add('open'); }
+    function renderManageModal() {
+      const isAdhkar = manageTab === 'adhkar';
+      const paneA = document.getElementById('manageAdhkarPane'), paneL = document.getElementById('manageListsPane');
+      if (paneA) paneA.style.display = isAdhkar ? 'block' : 'none';
+      if (paneL) paneL.style.display = isAdhkar ? 'none' : 'block';
+      const tabA = document.getElementById('manageTabAdhkar'), tabL = document.getElementById('manageTabLists');
+      if (tabA) tabA.classList.toggle('active', isAdhkar);
+      if (tabL) tabL.classList.toggle('active', !isAdhkar);
+      if (isAdhkar) renderManageAdhkarRows(); else renderManageListsPane();
+    }
+    function renderManageAdhkarRows() {
+      const hint = document.querySelector('#manageAdhkarPane > p');
+      if (hint) hint.textContent = 'ثبّت إصبعك على ≡ لحظة ثم اسحب لإعادة الترتيب (Esc للإلغاء)';
       const list = document.getElementById('manageList'); list.innerHTML = '';
       state.adhkar.forEach((item, idx) => {
-        const row = document.createElement('div'); row.className = 'manage-item'; row.dataset.index = idx;
-        row.innerHTML = `<div class="drag-handle" title="اسحب لإعادة الترتيب"><svg class="ico-sm" viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><span class="manage-item-title">${item.title}</span><div style="display:flex; gap:4px;"><button class="tool-btn" onclick="shareSingleDhikr(${idx})">مشاركة</button><button class="tool-btn" onclick="openEditModal(${idx})">تعديل</button><button class="tool-btn delete" onclick="openDeleteConfirm(${idx})">حذف</button></div>`;
-        row.querySelector('.drag-handle').addEventListener('pointerdown', (e) => startRowDrag(e, row, idx));
+        const row = document.createElement('div'); row.className = 'manage-item'; row.dataset.id = item.id;
+        row.innerHTML = `<div class="drag-handle" title="ثبّت ثم اسحب لإعادة الترتيب"><svg class="ico-sm" viewBox="0 0 24 24"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg></div><span class="manage-item-title">${escapeHtml(item.title)}</span><div style="display:flex; gap:4px;"><button class="tool-btn" onclick="shareSingleDhikr(${idx})">مشاركة</button><button class="tool-btn" onclick="openEditModal(${idx})">تعديل</button><button class="tool-btn delete" onclick="openDeleteConfirm(${idx})">حذف</button></div>`;
+        const handle = row.querySelector('.drag-handle');
+        handle.addEventListener('pointerdown', (e) => startRowDrag(e, row));
+        handle.addEventListener('contextmenu', (e) => e.preventDefault());
         list.appendChild(row);
       });
-      document.getElementById('manageModal').classList.add('open');
     }
-    function startRowDrag(e, row, idx) {
-      e.preventDefault(); dragSrcIndex = idx; row.classList.add('dragging');
-      const list = document.getElementById('manageList');
-      function onPointerMove(moveEvent) {
-        const items = Array.from(list.querySelectorAll('.manage-item')), clientY = moveEvent.clientY;
-        for (let i = 0; i < items.length; i++) {
-          const targetRow = items[i]; if (targetRow === row) continue;
-          const rect = targetRow.getBoundingClientRect(), midY = rect.top + rect.height / 2;
-          if (clientY < midY && i < dragSrcIndex) { list.insertBefore(row, targetRow); reorderAdhkarArray(dragSrcIndex, i); dragSrcIndex = i; break; }
-          else if (clientY > midY && i > dragSrcIndex) { list.insertBefore(row, targetRow.nextSibling); reorderAdhkarArray(dragSrcIndex, i); dragSrcIndex = i; break; }
+    function applyAdhkarOrder(idList) {
+      const activeId = state.adhkar[state.activeIndex]?.id;
+      const map = new Map(state.adhkar.map(d => [d.id, d]));
+      const next = idList.map(id => map.get(id)).filter(Boolean);
+      if (next.length !== state.adhkar.length) return false;
+      state.adhkar = next;
+      const ni = state.adhkar.findIndex(a => a.id === activeId);
+      if (ni >= 0) state.activeIndex = ni;
+      saveState(false); flushHeavySave();
+      return true;
+    }
+    let dragState = null;
+    function startRowDrag(e, row) {
+      if (dragState) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      e.preventDefault();
+      const list = document.getElementById('manageList'), handle = e.currentTarget;
+      const st = { row, list, box: list.closest('.modal-box'), handle, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, lastY: e.clientY, armed: false, raf: 0, timer: 0, before: state.adhkar.map(d => d.id) };
+      dragState = st;
+      row.classList.add('drag-armed');
+      try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+      st.timer = setTimeout(() => armDrag(st), e.pointerType === 'mouse' ? 120 : 300);
+      document.addEventListener('pointermove', onDragMove);
+      document.addEventListener('pointerup', onDragEnd);
+      document.addEventListener('pointercancel', onDragCancel);
+      document.addEventListener('keydown', onDragKey);
+    }
+    function armDrag(st) {
+      if (dragState !== st) return;
+      st.armed = true; st.row.classList.remove('drag-armed'); st.row.classList.add('dragging');
+      if (navigator.vibrate) { try { navigator.vibrate(15); } catch (err) {} }
+      showSaveToast('اسحب لتغيير الترتيب', 1500);
+      dragTick();
+    }
+    function onDragMove(ev) {
+      const st = dragState; if (!st || ev.pointerId !== st.pointerId) return;
+      st.lastY = ev.clientY;
+      if (!st.armed) {
+        if (Math.hypot(ev.clientX - st.startX, ev.clientY - st.startY) > 10) endDrag(false);
+        return;
+      }
+      ev.preventDefault();
+      placeDraggedRow(st);
+    }
+    function onDragEnd(ev) { if (dragState && ev.pointerId === dragState.pointerId) endDrag(true); }
+    function onDragCancel(ev) { if (dragState && ev.pointerId === dragState.pointerId) endDrag(false); }
+    function onDragKey(ev) { if (ev.key === 'Escape') { ev.stopPropagation(); endDrag(false); } }
+    function placeDraggedRow(st) {
+      const rows = Array.from(st.list.querySelectorAll('.manage-item')).filter(r => r !== st.row);
+      let target = null;
+      for (const r of rows) {
+        const rect = r.getBoundingClientRect();
+        if (st.lastY < rect.top + rect.height / 2) { target = r; break; }
+      }
+      if (target) { if (st.row.nextSibling !== target) st.list.insertBefore(st.row, target); }
+      else if (st.list.lastElementChild !== st.row) st.list.appendChild(st.row);
+    }
+    function dragTick() {
+      const st = dragState; if (!st || !st.armed) return;
+      const rect = st.box.getBoundingClientRect(), edge = 56;
+      let dy = 0;
+      if (st.lastY < rect.top + edge) dy = -Math.min(18, Math.ceil((rect.top + edge - st.lastY) / 5));
+      else if (st.lastY > rect.bottom - edge) dy = Math.min(18, Math.ceil((st.lastY - (rect.bottom - edge)) / 5));
+      if (dy) { st.box.scrollTop += dy; placeDraggedRow(st); }
+      st.raf = requestAnimationFrame(dragTick);
+    }
+    function endDrag(commit) {
+      const st = dragState; if (!st) return;
+      dragState = null;
+      clearTimeout(st.timer); cancelAnimationFrame(st.raf);
+      document.removeEventListener('pointermove', onDragMove);
+      document.removeEventListener('pointerup', onDragEnd);
+      document.removeEventListener('pointercancel', onDragCancel);
+      document.removeEventListener('keydown', onDragKey);
+      try { st.handle.releasePointerCapture(st.pointerId); } catch (err) {}
+      st.row.classList.remove('drag-armed', 'dragging');
+      if (commit && st.armed) {
+        const after = Array.from(st.list.querySelectorAll('.manage-item')).map(r => r.dataset.id);
+        const changed = after.length === st.before.length && after.some((id, i) => id !== st.before[i]);
+        if (changed && applyAdhkarOrder(after)) {
+          const moved = state.adhkar.find(d => d.id === st.row.dataset.id);
+          renderManageModal(); render();
+          showUndoBar(`تم نقل «${moved ? moved.title : ''}»`, () => {
+            applyAdhkarOrder(st.before); renderManageModal(); render(); showSaveToast('تم التراجع');
+          });
+          return;
         }
       }
-      function onPointerUp() {
-        row.classList.remove('dragging');
-        document.removeEventListener('pointermove', onPointerMove); document.removeEventListener('pointerup', onPointerUp);
-        openManageModal(); render(); showSaveToast('تم تحديث الترتيب');
-      }
-      document.addEventListener('pointermove', onPointerMove); document.addEventListener('pointerup', onPointerUp);
+      renderManageModal();
     }
-    function reorderAdhkarArray(fromIdx, toIdx) {
-      const activeId = state.adhkar[state.activeIndex]?.id;
-      const [moved] = state.adhkar.splice(fromIdx, 1); state.adhkar.splice(toIdx, 0, moved);
-      if (activeId) { const newActive = state.adhkar.findIndex(a => a.id === activeId); if (newActive >= 0) state.activeIndex = newActive; }
-      saveState(false);
+    function renderManageListsPane() {
+      const box = document.getElementById('manageListsContainer'); if (!box) return;
+      box.innerHTML = '';
+      state.lists.forEach((l, i) => {
+        const count = Array.isArray(l.ids) ? l.ids.length : 0;
+        const isFav = l.id === 'fav', isFirst = i === 0, isLast = i === state.lists.length - 1;
+        const row = document.createElement('div'); row.className = 'manage-item';
+        row.innerHTML = `<span class="manage-item-title">${escapeHtml(l.name)} (${count})</span><div style="display:flex; gap:4px;"><button type="button" class="tool-btn" style="opacity:${isFirst ? 0.35 : 1};" onclick="moveListPos(${i}, -1)">▲</button><button type="button" class="tool-btn" style="opacity:${isLast ? 0.35 : 1};" onclick="moveListPos(${i}, 1)">▼</button><button type="button" class="tool-btn" onclick="openListEditor('${l.id}')">تعديل</button>${isFav ? '' : `<button type="button" class="tool-btn delete" onclick="confirmDeleteList('${l.id}')">حذف</button>`}</div>`;
+        box.appendChild(row);
+      });
+    }
+    function moveListPos(i, dir) {
+      const j = i + dir;
+      if (j < 0 || j >= state.lists.length) return;
+      const tmp = state.lists[i]; state.lists[i] = state.lists[j]; state.lists[j] = tmp;
+      saveState(true, 'تم تحديث الترتيب'); renderManageListsPane();
+    }
+    function createManageList() {
+      const inp = document.getElementById('manageNewListInput'); if (!inp) return;
+      const name = cleanText(inp.value, 100).trim(); if (!name) return;
+      state.lists.push({ id: 'list_' + Date.now(), name, ids: new Array(), customTargets: {} });
+      inp.value = '';
+      saveState(true, `تم إنشاء "${name}"`); renderManageListsPane();
+    }
+    function confirmDeleteList(listId) {
+      const l = state.lists.find(x => x.id === listId);
+      if (!l || listId === 'fav') return;
+      document.getElementById('deleteMsg').textContent = `هل أنت متأكد من حذف قائمة "${l.name}"؟ (ستبقى الأذكار محفوظة في «الكل»)`;
+      state.pendingConfirmAction = () => {
+        state.lists = state.lists.filter(x => x.id !== listId);
+        Object.keys(state.progressMap).forEach(k => { if (k.startsWith(`list_${listId}_`)) delete state.progressMap[k]; });
+        if (state.activeListId === listId) { state.activeListId = 'all'; state.activeListEntryKey = ''; }
+        saveState(true, 'تم حذف القائمة'); renderManageListsPane(); render();
+      };
+      document.getElementById('deleteModal').classList.add('open');
+    }
+    function getListEntryInfo(key) {
+      const sep = key.indexOf('::');
+      const baseId = sep > 0 ? key.slice(0, sep) : key;
+      const d = state.adhkar.find(x => x.id === baseId);
+      if (!d) return { label: '(ذكر محذوف)', def: 0, canCount: false };
+      if (sep > 0) {
+        const si = parseInt(key.slice(sep + 2), 10), st = d.steps[si];
+        if (!st) return { label: '(خطوة محذوفة)', def: 0, canCount: false };
+        const stName = (st.title && st.title.trim()) ? st.title.trim() : `خطوة ${si + 1}`;
+        return { label: `${d.title} • ${stName}`, def: st.target, canCount: true };
+      }
+      if (d.steps.length === 1) return { label: d.title, def: d.steps.at(0).target, canCount: true };
+      return { label: `${d.title} (حزمة كاملة)`, def: 0, canCount: false };
+    }
+    function openListEditor(listId) {
+      const l = state.lists.find(x => x.id === listId); if (!l) return;
+      editingListId = listId;
+      const nameInp = document.getElementById('listEditNameInput');
+      nameInp.value = l.name; nameInp.disabled = (listId === 'fav');
+      renderListEditorEntries();
+      document.getElementById('listEditModal').classList.add('open');
+    }
+    function renderListEditorEntries() {
+      const l = state.lists.find(x => x.id === editingListId);
+      const box = document.getElementById('listEditEntries'); if (!box) return;
+      box.innerHTML = '';
+      if (!l || !Array.isArray(l.ids) || l.ids.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:14px; color:var(--text-muted); font-size:13px; line-height:1.7;">القائمة فارغة. أضف أذكاراً بالضغط على ☆ في الشاشة الرئيسية.</div>';
+        return;
+      }
+      l.ids.forEach((key, i) => {
+        const info = getListEntryInfo(key);
+        const target = (l.customTargets && typeof l.customTargets[key] === 'number') ? l.customTargets[key] : info.def;
+        const isFirst = i === 0, isLast = i === l.ids.length - 1;
+        const row = document.createElement('div'); row.className = 'step-item-edit';
+        const countHtml = info.canCount
+          ? `<div style="display:flex; align-items:center; gap:6px; margin-top:7px;"><span style="font-size:12px; font-weight:700; color:var(--primary-color);">التكرار في هذه القائمة:</span><input type="number" min="0" value="${Number(target) || 0}" onchange="updateListEntryTarget(${i}, this.value)" style="width:84px; padding:5px 6px; text-align:center;"></div>`
+          : '<div style="font-size:11.5px; color:var(--text-muted); margin-top:5px;">تكرار كل خطوة كما هو في الحزمة الأصلية</div>';
+        row.innerHTML = `<div style="display:flex; align-items:center; gap:6px;"><span style="flex:1; font-weight:700; font-size:13.5px;">${i + 1}. ${escapeHtml(info.label)}</span><button type="button" class="tool-btn" style="opacity:${isFirst ? 0.35 : 1};" onclick="moveListEntry(${i}, -1)">▲</button><button type="button" class="tool-btn" style="opacity:${isLast ? 0.35 : 1};" onclick="moveListEntry(${i}, 1)">▼</button><button type="button" class="tool-btn delete" onclick="removeListEntry(${i})">✕</button></div>${countHtml}`;
+        box.appendChild(row);
+      });
+    }
+    function renameEditingList(val) {
+      const l = state.lists.find(x => x.id === editingListId);
+      if (!l || l.id === 'fav') return;
+      const name = cleanText(val, 100).trim();
+      if (!name) { document.getElementById('listEditNameInput').value = l.name; return; }
+      l.name = name;
+      saveState(true, 'تم تغيير الاسم'); render();
+    }
+    function updateListEntryTarget(i, raw) {
+      const l = state.lists.find(x => x.id === editingListId);
+      if (!l || !l.ids[i]) return;
+      const key = l.ids[i];
+      const parsed = parseInt(raw, 10);
+      const cleanVal = (isNaN(parsed) || parsed < 0) ? 0 : Math.min(parsed, 100000);
+      if (!l.customTargets) l.customTargets = {};
+      l.customTargets[key] = cleanVal;
+      delete state.progressMap[`list_${l.id}_${key}`];
+      saveState(true, cleanVal > 0 ? `تم ضبط التكرار: ${cleanVal}` : 'تم الضبط: عداد مفتوح'); render();
+    }
+    function moveListEntry(i, dir) {
+      const l = state.lists.find(x => x.id === editingListId);
+      if (!l) return;
+      const j = i + dir;
+      if (j < 0 || j >= l.ids.length) return;
+      const tmp = l.ids[i]; l.ids[i] = l.ids[j]; l.ids[j] = tmp;
+      saveState(true, 'تم تحديث الترتيب'); renderListEditorEntries(); render();
+    }
+    function removeListEntry(i) {
+      const l = state.lists.find(x => x.id === editingListId);
+      if (!l || !l.ids[i]) return;
+      const key = l.ids[i];
+      l.ids.splice(i, 1);
+      if (l.customTargets) delete l.customTargets[key];
+      delete state.progressMap[`list_${l.id}_${key}`];
+      if (state.activeListId === l.id && state.activeListEntryKey === key) state.activeListEntryKey = '';
+      saveState(true, 'أُزيل من القائمة'); renderListEditorEntries(); render();
+    }
+    function closeListEditor() {
+      closeModal('listEditModal'); renderManageListsPane(); render();
     }
 
     let modalSelectedListId = 'all';

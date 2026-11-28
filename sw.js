@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tasbih-app-v171';
+const CACHE_NAME = 'tasbih-app-v172';
 const FONT_CACHE = 'tasbih-fonts-v1';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.svg'];
 
